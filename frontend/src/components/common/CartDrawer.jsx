@@ -36,8 +36,8 @@ export const CartDrawer = () => {
               <ShoppingCart className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base">Shopping Cart</h3>
-              <p className="text-xs text-slate-500">{cartItems.length} items selected</p>
+              <h3 className="font-bold text-slate-900 text-base">{t('cartTitle')}</h3>
+              <p className="text-xs text-slate-500">{cartItems.length} items</p>
             </div>
           </div>
           <button
@@ -53,12 +53,12 @@ export const CartDrawer = () => {
           {remainingForFreeShipping === 0 ? (
             <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>🎉 Congratulations! Free Farm Gate Rural Delivery Unlocked!</span>
+              <span>{t('freeShippingUnlocked')}</span>
             </div>
           ) : (
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
-                <span>Add ₹{remainingForFreeShipping} more for <strong>FREE Rural Delivery</strong></span>
+                <span>Add ₹{remainingForFreeShipping} {t('freeShippingProgress')}</span>
                 <span className="text-emerald-700 font-extrabold">{Math.round((subtotal / freeShippingThreshold) * 100)}%</span>
               </div>
               <div className="w-full h-1.5 bg-emerald-200 rounded-full overflow-hidden">
@@ -78,16 +78,16 @@ export const CartDrawer = () => {
               <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto text-2xl">
                 🌾
               </div>
-              <h4 className="font-bold text-slate-800 text-base">Your Cart is Empty</h4>
+              <h4 className="font-bold text-slate-800 text-base">{t('emptyCartTitle')}</h4>
               <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                Explore our catalog of certified high-yield seeds and fertilizers to start your sowing season.
+                {t('emptyCartDesc')}
               </p>
               <Link
                 to="/catalog"
                 onClick={() => setIsCartDrawerOpen(false)}
                 className="inline-block mt-2 bg-emerald-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-700/20"
               >
-                Browse Agricultural Catalog →
+                {t('browseCatalogBtn')}
               </Link>
             </div>
           ) : (
@@ -149,21 +149,21 @@ export const CartDrawer = () => {
             {/* Price Summary Mini */}
             <div className="space-y-1.5 text-xs text-slate-600">
               <div className="flex justify-between">
-                <span>Subtotal</span>
+                <span>{t('subtotal')}</span>
                 <span className="font-semibold text-slate-800">₹{subtotal}</span>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-emerald-700 font-bold">
-                  <span>Kisan Subsidy ({appliedCoupon})</span>
+                  <span>{t('subsidyDiscount')} ({appliedCoupon})</span>
                   <span>- ₹{discount}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span>Rural Delivery</span>
-                <span>{deliveryFee === 0 ? <span className="text-emerald-600 font-bold">FREE</span> : `₹${deliveryFee}`}</span>
+                <span>{t('ruralDeliveryFee')}</span>
+                <span>{deliveryFee === 0 ? <span className="text-emerald-600 font-bold">{t('free')}</span> : `₹${deliveryFee}`}</span>
               </div>
               <div className="flex justify-between text-sm font-extrabold text-slate-900 pt-2 border-t border-slate-200">
-                <span>Total Amount</span>
+                <span>{t('netPayable')}</span>
                 <span className="text-emerald-900 text-base">₹{totalAmount}</span>
               </div>
             </div>
@@ -174,14 +174,14 @@ export const CartDrawer = () => {
                 onClick={() => setIsCartDrawerOpen(false)}
                 className="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs py-3 rounded-xl text-center transition-colors"
               >
-                View Full Cart
+                {t('cart')}
               </Link>
               <Link
                 to="/checkout"
                 onClick={() => setIsCartDrawerOpen(false)}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-700/20"
               >
-                <span>Checkout</span>
+                <span>{t('buyNow')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

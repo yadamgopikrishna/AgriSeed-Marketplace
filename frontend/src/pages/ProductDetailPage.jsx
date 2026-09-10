@@ -103,9 +103,9 @@ export const ProductDetailPage = () => {
       
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-        <Link to="/" className="hover:text-emerald-700">Home</Link>
+        <Link to="/" className="hover:text-emerald-700">{t('home')}</Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <Link to="/catalog" className="hover:text-emerald-700">Catalog</Link>
+        <Link to="/catalog" className="hover:text-emerald-700">{t('catalog')}</Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         <span className="text-slate-800 font-bold truncate max-w-xs">{product.name}</span>
       </div>
@@ -124,7 +124,7 @@ export const ProductDetailPage = () => {
             {product.germinationRate && product.germinationRate !== 'N/A' && (
               <span className="absolute top-3 left-3 bg-emerald-700 text-white font-black text-xs px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
                 <Check className="w-4 h-4 stroke-[3]" />
-                <span>{product.germinationRate} Guaranteed Germination</span>
+                <span>{product.germinationRate} {t('germinationGuaranteed')}</span>
               </span>
             )}
           </div>
@@ -132,10 +132,10 @@ export const ProductDetailPage = () => {
           <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-emerald-900 font-bold">
               <Award className="w-5 h-5 text-emerald-600" />
-              <span>Tested & Certified Lot</span>
+              <span>{t('testedCertifiedLot')}</span>
             </div>
             <span className="text-[11px] font-semibold text-emerald-700">
-              License: {seller.licenseNo}
+              {t('officialLicense')} {seller.licenseNo}
             </span>
           </div>
         </div>
@@ -180,7 +180,7 @@ export const ProductDetailPage = () => {
             {/* Pricing Card */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-baseline justify-between">
               <div>
-                <span className="text-xs text-slate-500 font-bold block mb-0.5">Special Direct Farmer Price:</span>
+                <span className="text-xs text-slate-500 font-bold block mb-0.5">{t('specialPriceLabel')}</span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-emerald-950 font-sans">
                     ₹{currentPrice}
@@ -191,16 +191,16 @@ export const ProductDetailPage = () => {
                     </span>
                   )}
                   <span className="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                    Save ₹{(product.originalPrice || currentPrice) - currentPrice + 50}
+                    {t('saveLabel')} ₹{(product.originalPrice || currentPrice) - currentPrice + 50}
                   </span>
                 </div>
               </div>
 
               <div className="text-right">
                 <span className="inline-block bg-emerald-600 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg">
-                  ✓ In Stock ({product.stock} bags)
+                  {t('inStockBadge')} ({product.stock})
                 </span>
-                <span className="text-[11px] text-slate-400 block mt-1">Ready for immediate dispatch</span>
+                <span className="text-[11px] text-slate-400 block mt-1">{t('readyDispatch')}</span>
               </div>
             </div>
 
@@ -208,7 +208,7 @@ export const ProductDetailPage = () => {
             {product.packSizes && product.packSizes.length > 0 && (
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-700 block">
-                  Select Required Packaging Unit:
+                  {t('selectPackUnit')}
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {product.packSizes.map((pack) => (
@@ -233,7 +233,7 @@ export const ProductDetailPage = () => {
             {/* Quantity Selector & Action Buttons */}
             <div className="pt-2 space-y-3">
               <div className="flex items-center gap-3">
-                <label className="text-xs font-bold text-slate-700">Quantity:</label>
+                <label className="text-xs font-bold text-slate-700">{t('quantityLabel')}</label>
                 <div className="flex items-center bg-slate-100 rounded-xl border border-slate-200 px-2 py-1">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -250,7 +250,7 @@ export const ProductDetailPage = () => {
                   </button>
                 </div>
                 <span className="text-xs text-slate-500 font-medium">
-                  Total: <strong className="text-slate-900 font-extrabold">₹{currentPrice * quantity}</strong>
+                  {t('totalLabel')} <strong className="text-slate-900 font-extrabold">₹{currentPrice * quantity}</strong>
                 </span>
               </div>
 
@@ -260,7 +260,7 @@ export const ProductDetailPage = () => {
                   className="py-3.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
                 >
                   <ShoppingCart className="w-4 h-4 text-emerald-700" />
-                  <span>Add to Cart</span>
+                  <span>{t('addToCart')}</span>
                 </button>
 
                 <button
@@ -268,7 +268,7 @@ export const ProductDetailPage = () => {
                   className="py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-700/25 cursor-pointer hover:scale-102"
                 >
                   <Zap className="w-4 h-4 fill-amber-300 text-amber-300" />
-                  <span>Instant Farm Checkout</span>
+                  <span>{t('buyNow')}</span>
                 </button>
               </div>
             </div>
@@ -279,15 +279,15 @@ export const ProductDetailPage = () => {
           <div className="pt-4 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-slate-600">
             <div className="flex items-center gap-1.5">
               <Truck className="w-4 h-4 text-emerald-600" />
-              <span>Doorstep Village Delivery</span>
+              <span>{t('doorstepAssurance')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Tested & Sealed Bag</span>
+              <span>{t('sealedBagAssurance')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Tag className="w-4 h-4 text-amber-600" />
-              <span>Kisan Subsidy Eligible</span>
+              <span>{t('subsidyEligibleAssurance')}</span>
             </div>
           </div>
 
@@ -307,7 +307,7 @@ export const ProductDetailPage = () => {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            📋 Agronomy Specifications
+            {t('specsTab')}
           </button>
 
           <button
@@ -318,7 +318,7 @@ export const ProductDetailPage = () => {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            🌾 Sowing & Dosage Guide
+            {t('dosageTab')}
           </button>
 
           <button
@@ -329,7 +329,7 @@ export const ProductDetailPage = () => {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            ⭐ Farmer Reviews ({reviewsList.length})
+            {t('reviewsTab')} ({reviewsList.length})
           </button>
 
           <button
@@ -340,14 +340,14 @@ export const ProductDetailPage = () => {
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
-            🏢 Verified Seller Profile
+            {t('sellerTab')}
           </button>
         </div>
 
         {/* Tab 1: Technical Agronomy Specs Table */}
         {activeTab === 'specs' && (
           <div className="space-y-4">
-            <h3 className="text-base font-extrabold text-slate-900">Technical Agronomy Parameters</h3>
+            <h3 className="text-base font-extrabold text-slate-900">{t('techParamsTitle')}</h3>
             <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
               <table className="w-full text-xs text-left">
                 <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
@@ -358,27 +358,27 @@ export const ProductDetailPage = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-800 font-medium">
                   <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Germination Rate</td>
+                    <td className="p-3.5 font-bold text-slate-600">{t('paramGermination')}</td>
                     <td className="p-3.5 text-emerald-700 font-extrabold">{product.germinationRate}</td>
                   </tr>
                   <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Genetic Purity</td>
+                    <td className="p-3.5 font-bold text-slate-600">{t('paramPurity')}</td>
                     <td className="p-3.5">{product.purity}</td>
                   </tr>
                   <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Target Sowing Season</td>
+                    <td className="p-3.5 font-bold text-slate-600">{t('paramSeason')}</td>
                     <td className="p-3.5">{product.season}</td>
                   </tr>
                   <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Maturity Duration</td>
+                    <td className="p-3.5 font-bold text-slate-600">{t('paramMaturity')}</td>
                     <td className="p-3.5">{product.maturityPeriod}</td>
                   </tr>
                   <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Yield Potential per Acre</td>
+                    <td className="p-3.5 font-bold text-slate-600">{t('paramYield')}</td>
                     <td className="p-3.5 font-bold text-slate-900">{product.yieldPotential}</td>
                   </tr>
                   <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Crop Suitability</td>
+                    <td className="p-3.5 font-bold text-slate-600">{t('paramCrop')}</td>
                     <td className="p-3.5">{product.cropSuitability}</td>
                   </tr>
                 </tbody>
@@ -390,12 +390,12 @@ export const ProductDetailPage = () => {
         {/* Tab 2: Sowing & Dosage Guide */}
         {activeTab === 'dosage' && (
           <div className="space-y-4">
-            <h3 className="text-base font-extrabold text-slate-900">Recommended Field Dosage & Best Practices</h3>
+            <h3 className="text-base font-extrabold text-slate-900">{t('dosageBestPracticesTitle')}</h3>
             <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100 text-xs text-emerald-950 space-y-2 leading-relaxed">
-              <strong className="block text-sm font-extrabold">Dosage Instruction:</strong>
+              <strong className="block text-sm font-extrabold">{t('dosageInstruction')}</strong>
               <p>{product.dosageGuide}</p>
               <div className="pt-3 border-t border-emerald-200/60 font-semibold text-emerald-800">
-                💡 Tip: For optimal germination, treat seeds with Trichoderma viride bio-fungicide before nursery preparation.
+                {t('dosageTip')}
               </div>
             </div>
           </div>
@@ -406,14 +406,14 @@ export const ProductDetailPage = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-base font-extrabold text-slate-900">Verified Farmer Reviews</h3>
+                <h3 className="text-base font-extrabold text-slate-900">{t('reviewsTab')}</h3>
                 <p className="text-xs text-slate-500">Real feedback from progressive crop growers.</p>
               </div>
               <button
                 onClick={() => setIsReviewModalOpen(true)}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors cursor-pointer"
               >
-                + Write a Review
+                {t('writeReviewBtn')}
               </button>
             </div>
 
@@ -425,7 +425,7 @@ export const ProductDetailPage = () => {
                       <strong className="text-slate-900 font-bold">{rev.name}</strong>
                       <span className="text-slate-400">({rev.location})</span>
                       <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">
-                        Verified Purchase
+                        {t('verifiedPurchase')}
                       </span>
                     </div>
                     <span className="text-slate-400">{rev.date}</span>
@@ -447,7 +447,7 @@ export const ProductDetailPage = () => {
         {/* Tab 4: Seller Info */}
         {activeTab === 'seller' && (
           <div className="space-y-4 max-w-xl">
-            <h3 className="text-base font-extrabold text-slate-900">Authorized Vendor Profile</h3>
+            <h3 className="text-base font-extrabold text-slate-900">{t('sellerProfileTitle')}</h3>
             <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
               <div className="flex justify-between items-center">
                 <h4 className="text-sm font-bold text-slate-900">{seller.name}</h4>
@@ -458,7 +458,7 @@ export const ProductDetailPage = () => {
               </div>
               <p className="text-slate-600">Owner: <strong>{seller.owner}</strong></p>
               <p className="text-slate-600">Location: <strong>{seller.location}</strong></p>
-              <p className="text-slate-600">Official License No: <code className="bg-white px-2 py-0.5 rounded border border-slate-200 font-mono font-bold text-emerald-800">{seller.licenseNo}</code></p>
+              <p className="text-slate-600">{t('officialLicense')} <code className="bg-white px-2 py-0.5 rounded border border-slate-200 font-mono font-bold text-emerald-800">{seller.licenseNo}</code></p>
               <p className="text-slate-600">Contact: <strong>{seller.phone}</strong> | {seller.email}</p>
             </div>
           </div>
@@ -470,10 +470,10 @@ export const ProductDetailPage = () => {
       {isReviewModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200">
-            <h3 className="text-base font-bold text-slate-900 mb-4">Write a Farmer Review</h3>
+            <h3 className="text-base font-bold text-slate-900 mb-4">{t('writeReviewTitle')}</h3>
             <form onSubmit={handleReviewSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Your Name *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('yourNameLabel')}</label>
                 <input
                   type="text"
                   placeholder="e.g. Gurdeep Singh"
@@ -485,7 +485,7 @@ export const ProductDetailPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Rating</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('ratingLabel')}</label>
                 <select
                   value={newReview.rating}
                   onChange={(e) => setNewReview({ ...newReview, rating: e.target.value })}
@@ -498,7 +498,7 @@ export const ProductDetailPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Your Field Experience & Feedback *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('feedbackLabel')}</label>
                 <textarea
                   rows="3"
                   placeholder="Share your experience regarding germination rate, yield, disease resistance..."
@@ -515,13 +515,13 @@ export const ProductDetailPage = () => {
                   onClick={() => setIsReviewModalOpen(false)}
                   className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs"
                 >
-                  Cancel
+                  {t('cancelBtn')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs"
                 >
-                  Submit Review
+                  {t('submitReviewBtn')}
                 </button>
               </div>
             </form>
@@ -533,7 +533,7 @@ export const ProductDetailPage = () => {
       {relatedProducts.length > 0 && (
         <div className="space-y-6">
           <h2 className="text-xl font-black font-serif text-slate-900">
-            Complementary Inputs for Your Sowing Season
+            {t('complementaryInputsTitle')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedProducts.map((p) => (

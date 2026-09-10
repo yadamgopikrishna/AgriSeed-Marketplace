@@ -11,17 +11,19 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { CROP_DISEASES_DB } from '../data/mockData';
+import { useLanguage } from '../context/LanguageContext';
 
 export const CropDoctorPage = () => {
+  const { t } = useLanguage();
   const [selectedCrop, setSelectedCrop] = useState('Paddy / Rice');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
 
   const sampleImages = [
-    { label: 'Paddy Blast Sample', crop: 'Paddy / Rice', url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80', resultIndex: 0 },
-    { label: 'Cotton Bollworm Sample', crop: 'Cotton', url: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=400&q=80', resultIndex: 1 },
-    { label: 'Wheat Yellow Rust Sample', crop: 'Wheat', url: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80', resultIndex: 2 }
+    { label: t('samplePaddyBlast'), crop: 'Paddy / Rice', url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80', resultIndex: 0 },
+    { label: t('sampleCottonBollworm'), crop: 'Cotton', url: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=400&q=80', resultIndex: 1 },
+    { label: t('sampleWheatRust'), crop: 'Wheat', url: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80', resultIndex: 2 }
   ];
 
   const handleAnalyze = (sampleIndex = 0, imgUrl = null) => {
@@ -51,13 +53,13 @@ export const CropDoctorPage = () => {
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-2 bg-emerald-800/80 px-3 py-1 rounded-full text-xs font-bold text-emerald-200 border border-emerald-700/60">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>AI Powered Krishi Diagnostic Engine</span>
+            <span>{t('aiDiagnosticBadge')}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black font-serif tracking-tight">
-            Krishi AI Crop Doctor & Leaf Scanner
+            {t('aiDoctorTitle')}
           </h1>
           <p className="text-xs sm:text-sm text-emerald-200 leading-relaxed font-normal">
-            Take a photo of infected crop leaves or stems to instantly identify pest attacks, fungal blights, and receive certified chemical or organic remedy recommendations.
+            {t('aiDoctorDesc')}
           </p>
         </div>
       </div>
@@ -68,7 +70,7 @@ export const CropDoctorPage = () => {
         {/* Left Column: Upload / Camera Card */}
         <div className="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
           <h3 className="font-extrabold text-slate-900 text-base">
-            Upload Plant Leaf / Stem Photo
+            {t('uploadPhotoTitle')}
           </h3>
 
           {/* Drag & Drop Box */}
@@ -78,22 +80,22 @@ export const CropDoctorPage = () => {
               <Camera className="w-7 h-7" />
             </div>
             <strong className="text-sm font-bold text-slate-900 block mb-1">
-              Click to Upload Photo or Drag & Drop
+              {t('clickUploadPrompt')}
             </strong>
             <span className="text-xs text-slate-500">
-              Supports JPEG, PNG, WEBP from mobile camera
+              {t('uploadFormatsDesc')}
             </span>
           </label>
 
           {/* Quick Test Demo Samples */}
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2.5">
-              Or Try Instant Diagnostic Samples:
+              {t('tryInstantSamples')}
             </span>
             <div className="grid grid-cols-3 gap-2">
               {sampleImages.map((s, idx) => (
                 <button
-                  key={s.label}
+                  key={idx}
                   type="button"
                   onClick={() => handleAnalyze(idx, s.url)}
                   className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left transition-colors cursor-pointer text-xs"
@@ -111,24 +113,24 @@ export const CropDoctorPage = () => {
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs h-full flex flex-col justify-between">
             <div>
               <h3 className="font-extrabold text-slate-900 text-base mb-4">
-                Diagnostic Analysis & Prescription
+                {t('diagnosticPrescriptionTitle')}
               </h3>
 
               {isAnalyzing && (
                 <div className="text-center py-16 space-y-3">
                   <div className="w-12 h-12 rounded-full border-4 border-emerald-600 border-t-transparent animate-spin mx-auto"></div>
                   <strong className="text-sm font-bold text-slate-800 block">
-                    Analyzing Leaf Pathology Neural Patterns...
+                    {t('analyzingPrompt')}
                   </strong>
-                  <p className="text-xs text-slate-500">Comparing with 10,000+ certified ICAR pathogen datasets</p>
+                  <p className="text-xs text-slate-500">{t('comparingDatasets')}</p>
                 </div>
               )}
 
               {!isAnalyzing && !diagnosisResult && (
                 <div className="text-center py-16 space-y-2 text-xs text-slate-400">
                   <div className="text-3xl mb-2">🌿</div>
-                  <strong className="text-slate-700 block font-bold text-sm">No Photo Scanned Yet</strong>
-                  <p>Upload a leaf image or click one of the demo samples on the left to start diagnosis.</p>
+                  <strong className="text-slate-700 block font-bold text-sm">{t('noPhotoScanned')}</strong>
+                  <p>{t('noPhotoScannedDesc')}</p>
                 </div>
               )}
 
@@ -144,7 +146,7 @@ export const CropDoctorPage = () => {
                   <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-1.5">
                     <div className="flex justify-between items-center">
                       <span className="bg-rose-600 text-white font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
-                        Pathogen Detected
+                        {t('pathogenDetectedBadge')}
                       </span>
                       <span className="text-rose-800 font-bold">{diagnosisResult.crop}</span>
                     </div>
@@ -158,12 +160,12 @@ export const CropDoctorPage = () => {
                   <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2 text-emerald-950">
                     <div className="flex items-center gap-1.5 font-bold text-emerald-900">
                       <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                      <span>Recommended Treatment Solution:</span>
+                      <span>{t('recommendedTreatmentTitle')}</span>
                     </div>
                     <p className="font-extrabold text-sm text-emerald-950">
                       {diagnosisResult.recommendedTreatment.productName}
                     </p>
-                    <p>Dosage: <strong>{diagnosisResult.recommendedTreatment.dosage}</strong></p>
+                    <p>{t('dosageInstruction')} <strong>{diagnosisResult.recommendedTreatment.dosage}</strong></p>
                     <p className="text-slate-600 pt-1 border-t border-emerald-200/60">
                       💡 {diagnosisResult.recommendedTreatment.preventativeTip}
                     </p>
@@ -178,7 +180,7 @@ export const CropDoctorPage = () => {
                   to="/catalog?category=Pesticides"
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-emerald-700/20"
                 >
-                  <span>Order Recommended Remedy from Catalog</span>
+                  <span>{t('orderRemedyBtn')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

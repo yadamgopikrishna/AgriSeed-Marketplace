@@ -99,7 +99,7 @@ export const AuthModal = () => {
                 authModalTab === 'register' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-300 hover:text-white'
               }`}
             >
-              🌾 Quick Register
+              🌾 {t('register')}
             </button>
             <button
               onClick={() => openAuthModal('login')}
@@ -107,7 +107,7 @@ export const AuthModal = () => {
                 authModalTab === 'login' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-300 hover:text-white'
               }`}
             >
-              🔑 Farmer Sign In
+              🔑 {t('login')}
             </button>
           </div>
         </div>
@@ -132,7 +132,7 @@ export const AuthModal = () => {
           {authModalTab === 'register' ? (
             <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Farmer Full Name *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('fullNameInput')}</label>
                 <input
                   type="text"
                   placeholder="e.g. Ramesh Kumar Singh"
@@ -145,7 +145,7 @@ export const AuthModal = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('phoneInput')}</label>
                   <input
                     type="tel"
                     placeholder="9876543210"
@@ -169,7 +169,7 @@ export const AuthModal = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Village / Town *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('villageInput')}</label>
                   <input
                     type="text"
                     value={regForm.village}
@@ -179,7 +179,7 @@ export const AuthModal = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">District *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('districtInput')}</label>
                   <input
                     type="text"
                     value={regForm.district}
@@ -206,13 +206,13 @@ export const AuthModal = () => {
                 disabled={loading}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
               >
-                {loading ? 'Registering Farm...' : '🌱 Complete Registration (+100 Kisan Points)'}
+                {loading ? 'Registering Farm...' : `🌱 ${t('registerFarmBtn')} (+100)`}
               </button>
             </form>
           ) : (
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number or Email</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('phoneInput')}</label>
                 <input
                   type="text"
                   placeholder="e.g. 9876543210 or farmer@agriseed.in"
@@ -240,7 +240,7 @@ export const AuthModal = () => {
                 disabled={loading}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
               >
-                {loading ? 'Signing In...' : '🔑 Sign In to AgriSeed'}
+                {loading ? 'Signing In...' : `🔑 ${t('login')}`}
               </button>
             </form>
           )}
@@ -248,7 +248,7 @@ export const AuthModal = () => {
           {/* Quick Demo Shortcuts */}
           <div className="mt-6 pt-4 border-t border-slate-100 text-center">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-              Instant 1-Click Evaluation Logins
+              {t('demoEvalLabel')}
             </span>
             <div className="flex gap-2 justify-center">
               <button
@@ -259,7 +259,7 @@ export const AuthModal = () => {
                 }}
                 className="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-xs font-bold py-2 rounded-xl transition-colors cursor-pointer"
               >
-                👨‍🌾 Demo Farmer
+                {t('demoFarmer')}
               </button>
               <button
                 type="button"
@@ -269,7 +269,7 @@ export const AuthModal = () => {
                 }}
                 className="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold py-2 rounded-xl transition-colors cursor-pointer"
               >
-                🛡️ Demo Admin
+                {t('demoAdmin')}
               </button>
             </div>
           </div>

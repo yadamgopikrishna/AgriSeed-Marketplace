@@ -105,10 +105,10 @@ export const CheckoutPage = () => {
       
       <div>
         <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-          Secure Farm Gate Checkout
+          {t('checkoutSubtitle')}
         </span>
         <h1 className="text-2xl sm:text-3xl font-black font-serif text-slate-950 mt-1">
-          Delivery Address & Payment
+          {t('checkoutTitle')}
         </h1>
       </div>
 
@@ -124,14 +124,14 @@ export const CheckoutPage = () => {
                 1
               </div>
               <div>
-                <h3 className="font-extrabold text-slate-900 text-sm">Farm Gate Delivery Address</h3>
-                <p className="text-xs text-slate-500">Provide complete rural address for AgriExpress fleet delivery.</p>
+                <h3 className="font-extrabold text-slate-900 text-sm">{t('farmAddressStep')}</h3>
+                <p className="text-xs text-slate-500">{t('farmAddressDesc')}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Farmer Full Name *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('fullNameInput')}</label>
                 <input
                   type="text"
                   value={deliveryAddress.fullName}
@@ -142,7 +142,7 @@ export const CheckoutPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number (for SMS & Driver Call) *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('phoneInput')}</label>
                 <input
                   type="tel"
                   value={deliveryAddress.phone}
@@ -153,7 +153,7 @@ export const CheckoutPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Village / Gram Panchayat *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('villageInput')}</label>
                 <input
                   type="text"
                   value={deliveryAddress.village}
@@ -164,7 +164,7 @@ export const CheckoutPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Tehsil / Taluk</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('talukInput')}</label>
                 <input
                   type="text"
                   value={deliveryAddress.taluk}
@@ -174,7 +174,7 @@ export const CheckoutPage = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">District *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('districtInput')}</label>
                 <input
                   type="text"
                   value={deliveryAddress.district}
@@ -186,7 +186,7 @@ export const CheckoutPage = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">State *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('stateInput')}</label>
                   <input
                     type="text"
                     value={deliveryAddress.state}
@@ -196,7 +196,7 @@ export const CheckoutPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">PIN Code *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('pinInput')}</label>
                   <input
                     type="text"
                     value={deliveryAddress.pincode}
@@ -216,8 +216,8 @@ export const CheckoutPage = () => {
                 2
               </div>
               <div>
-                <h3 className="font-extrabold text-slate-900 text-sm">Payment Method</h3>
-                <p className="text-xs text-slate-500">Choose between instant zero-fee UPI, Card, or Cash on Delivery.</p>
+                <h3 className="font-extrabold text-slate-900 text-sm">{t('paymentMethodStep')}</h3>
+                <p className="text-xs text-slate-500">{t('paymentMethodDesc')}</p>
               </div>
             </div>
 
@@ -242,8 +242,8 @@ export const CheckoutPage = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-xs text-slate-900">UPI / QR Code</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">GPay, PhonePe, Paytm, BHIM</p>
+                  <h4 className="font-extrabold text-xs text-slate-900">{t('upiTitle')}</h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">{t('upiDesc')}</p>
                 </div>
               </div>
 
@@ -265,8 +265,8 @@ export const CheckoutPage = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-xs text-slate-900">Debit / Credit Card</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">RuPay, Visa, Mastercard</p>
+                  <h4 className="font-extrabold text-xs text-slate-900">{t('cardTitle')}</h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">{t('cardDesc')}</p>
                 </div>
               </div>
 
@@ -288,8 +288,8 @@ export const CheckoutPage = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-xs text-slate-900">Cash on Delivery</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Pay on Village Gate Arrival</p>
+                  <h4 className="font-extrabold text-xs text-slate-900">{t('codTitle')}</h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">{t('codDesc')}</p>
                 </div>
               </div>
 
@@ -300,9 +300,9 @@ export const CheckoutPage = () => {
               {paymentMethod === 'upi' && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800">⚡ Dynamic Simulated QR & VPA:</span>
+                    <span className="text-xs font-bold text-slate-800">{t('dynamicQrTitle')}</span>
                     <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                      Zero Processing Fee
+                      {t('zeroFeeBadge')}
                     </span>
                   </div>
 
@@ -312,7 +312,7 @@ export const CheckoutPage = () => {
                       <span className="text-[9px] font-mono text-slate-300 mt-1">UPI: AGRISEED</span>
                     </div>
                     <div className="space-y-1.5 text-xs text-slate-600 text-center sm:text-left">
-                      <strong className="text-slate-900 block font-bold">Scan with any UPI App or Verify VPA:</strong>
+                      <strong className="text-slate-900 block font-bold">{t('scanQrPrompt')}</strong>
                       <div className="flex gap-2">
                         <input
                           type="text"
@@ -321,7 +321,7 @@ export const CheckoutPage = () => {
                           className="text-xs bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg font-mono font-bold text-slate-800 outline-none"
                         />
                         <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded-lg text-[10px] flex items-center">
-                          ✓ Verified
+                          {t('vpaVerified')}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400">Order proceeds automatically upon clicking Confirm.</p>
@@ -332,7 +332,7 @@ export const CheckoutPage = () => {
 
               {paymentMethod === 'card' && (
                 <div className="space-y-3 text-xs">
-                  <label className="block font-bold text-slate-800">Card Credentials (Demo Simulation):</label>
+                  <label className="block font-bold text-slate-800">{t('cardDemoNotice')}</label>
                   <div className="grid grid-cols-2 gap-3">
                     <input
                       type="text"
@@ -356,7 +356,7 @@ export const CheckoutPage = () => {
                     </div>
                   </div>
                   <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
-                    <Lock className="w-3.5 h-3.5" /> 256-bit Encrypted SSL Mock Checkout
+                    <Lock className="w-3.5 h-3.5" /> {t('encryptedSslNotice')}
                   </span>
                 </div>
               )}
@@ -365,9 +365,9 @@ export const CheckoutPage = () => {
                 <div className="flex items-center gap-3 text-xs text-slate-700">
                   <span className="text-2xl">🌾</span>
                   <div>
-                    <strong className="text-slate-900 block font-bold">Pay at Farm Gate after Inspecting Certified Seal</strong>
+                    <strong className="text-slate-900 block font-bold">{t('codAssuranceTitle')}</strong>
                     <p className="text-[11px] text-slate-500">
-                      Hand over cash of <strong>₹{totalAmount}</strong> to the delivery agent upon receiving your seed lot.
+                      {t('codAssuranceDesc')} (<strong>₹{totalAmount}</strong>)
                     </p>
                   </div>
                 </div>
@@ -381,7 +381,7 @@ export const CheckoutPage = () => {
         {/* Right Column: Order Summary & Confirm Button */}
         <div className="lg:col-span-4 space-y-4">
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4 sticky top-28">
-            <h3 className="font-black text-slate-900 text-base">Final Order Summary</h3>
+            <h3 className="font-black text-slate-900 text-base">{t('finalOrderSummary')}</h3>
 
             {/* Cart items list mini */}
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
@@ -399,23 +399,23 @@ export const CheckoutPage = () => {
             {/* Price Calculations */}
             <div className="space-y-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
               <div className="flex justify-between">
-                <span>Subtotal</span>
+                <span>{t('subtotal')}</span>
                 <span className="font-bold text-slate-900">₹{subtotal}</span>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-emerald-700 font-bold">
-                  <span>Kisan Subsidy ({appliedCoupon})</span>
+                  <span>{t('subsidyDiscount')} ({appliedCoupon})</span>
                   <span>- ₹{discount}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span>Rural Delivery</span>
-                <span>{deliveryFee === 0 ? <strong className="text-emerald-600 font-bold">FREE</strong> : `₹${deliveryFee}`}</span>
+                <span>{t('ruralDeliveryFee')}</span>
+                <span>{deliveryFee === 0 ? <strong className="text-emerald-600 font-bold">{t('free')}</strong> : `₹${deliveryFee}`}</span>
               </div>
             </div>
 
             <div className="flex justify-between items-baseline pt-2 border-t border-slate-200">
-              <span className="font-extrabold text-sm text-slate-900">Total Net Amount</span>
+              <span className="font-extrabold text-sm text-slate-900">{t('netPayable')}</span>
               <span className="text-2xl font-black text-emerald-950 font-sans">₹{totalAmount}</span>
             </div>
 
@@ -427,19 +427,19 @@ export const CheckoutPage = () => {
               {isProcessing ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Processing Agricultural Order...</span>
+                  <span>{t('processingOrder')}</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Confirm & Place Order (₹{totalAmount})</span>
+                  <span>{t('confirmPlaceOrderBtn')} (₹{totalAmount})</span>
                 </>
               )}
             </button>
 
             <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 text-[11px] text-slate-500">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Certified ICAR / NSC Lot Guarantee Included</span>
+              <span>{t('certifiedGuaranteeTitle')}</span>
             </div>
           </div>
         </div>

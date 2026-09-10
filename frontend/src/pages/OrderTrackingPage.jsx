@@ -42,11 +42,11 @@ export const OrderTrackingPage = () => {
   };
 
   const steps = [
-    { key: 'Ordered', title: '1. Ordered', desc: 'Order received & batch allocated' },
-    { key: 'Confirmed', title: '2. Confirmed', desc: 'Seed certification verified' },
-    { key: 'Shipped', title: '3. Shipped', desc: 'Dispatched from Agri-Depot' },
-    { key: 'Out for Delivery', title: '4. Out for Delivery', desc: 'Rural delivery van in transit' },
-    { key: 'Delivered', title: '5. Delivered', desc: 'Delivered at village farm gate' }
+    { key: 'Ordered', title: t('stepOrdered'), desc: t('stepOrderedDesc') },
+    { key: 'Confirmed', title: t('stepConfirmed'), desc: t('stepConfirmedDesc') },
+    { key: 'Shipped', title: t('stepShipped'), desc: t('stepShippedDesc') },
+    { key: 'Out for Delivery', title: t('stepOutForDelivery'), desc: t('stepOutForDeliveryDesc') },
+    { key: 'Delivered', title: t('stepDelivered'), desc: t('stepDeliveredDesc') }
   ];
 
   const getStepIndex = (status) => {
@@ -73,20 +73,20 @@ export const OrderTrackingPage = () => {
       <div className="bg-emerald-950 text-white p-8 rounded-3xl relative overflow-hidden shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2 text-center md:text-left">
           <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-            Real-Time Rural Logistics
+            {t('realtimeLogisticsBadge')}
           </span>
           <h1 className="text-2xl sm:text-3xl font-black font-serif tracking-tight">
-            5-Stage Live Order Tracking
+            {t('liveTrackingTitle')}
           </h1>
           <p className="text-xs sm:text-sm text-emerald-200">
-            Track certified seed bags and fertilizer consignments directly to your farm gate.
+            {t('liveTrackingDesc')}
           </p>
         </div>
 
         <form onSubmit={handleSearch} className="w-full md:w-auto flex gap-2">
           <input
             type="text"
-            placeholder="Enter Order ID (e.g. AGRI-849201)"
+            placeholder={t('enterOrderIdPlaceholder')}
             value={inputOrderId}
             onChange={(e) => setInputOrderId(e.target.value)}
             className="w-full md:w-64 bg-white text-slate-900 px-4 py-2.5 rounded-xl text-xs sm:text-sm outline-none font-bold uppercase"
@@ -95,7 +95,7 @@ export const OrderTrackingPage = () => {
             type="submit"
             className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl transition-colors cursor-pointer shrink-0"
           >
-            Track
+            {t('trackBtn')}
           </button>
         </form>
       </div>
@@ -112,14 +112,14 @@ export const OrderTrackingPage = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-extrabold text-slate-900 text-base">
-                    Order #{currentOrder.id || currentOrder.orderId}
+                    {t('orderIdLabel')} #{currentOrder.id || currentOrder.orderId}
                   </h3>
                   <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
                     {currentOrder.status}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Estimated Farm Arrival: <strong className="text-slate-800">{currentOrder.estimatedDelivery || '2-3 Business Days'}</strong>
+                  {t('estimatedArrival')} <strong className="text-slate-800">{currentOrder.estimatedDelivery || '2-3 Business Days'}</strong>
                 </p>
               </div>
             </div>
@@ -129,14 +129,14 @@ export const OrderTrackingPage = () => {
               className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Printer className="w-4 h-4 text-slate-600" />
-              <span>Print Official Invoice</span>
+              <span>{t('printInvoiceBtn')}</span>
             </button>
           </div>
 
           {/* 5-Stage Animated Progress Stepper */}
           <div className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
             <h3 className="font-extrabold text-slate-900 text-base">
-              Milestone Fulfillment Progress
+              {t('milestoneProgressTitle')}
             </h3>
 
             {/* Stepper Bar Container */}
@@ -193,24 +193,24 @@ export const OrderTrackingPage = () => {
               <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                 <h4 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
                   <Truck className="w-4 h-4 text-emerald-600" />
-                  <span>Logistics Carrier & Fleet Info</span>
+                  <span>{t('carrierFleetTitle')}</span>
                 </h4>
 
                 <div className="space-y-3 text-xs">
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Fleet Partner:</span>
+                    <span className="text-slate-500">{t('fleetPartnerLabel')}</span>
                     <strong className="text-slate-900 font-bold">{currentOrder.courierPartner || 'AgriExpress Rural Fleet'}</strong>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Tracking AWB:</span>
+                    <span className="text-slate-500">{t('trackingAwbLabel')}</span>
                     <code className="text-emerald-800 font-mono font-black">{currentOrder.trackingNumber || 'AX-HR-884920'}</code>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Vehicle Registration:</span>
+                    <span className="text-slate-500">{t('vehicleRegLabel')}</span>
                     <strong className="text-slate-900 font-mono">{currentOrder.vehicleNumber || 'HR-05-AB-7721'}</strong>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500">Assigned Driver:</span>
+                    <span className="text-slate-500">{t('assignedDriverLabel')}</span>
                     <strong className="text-slate-900">{currentOrder.driverName || 'Sukhwinder Singh'}</strong>
                   </div>
                 </div>
@@ -218,7 +218,7 @@ export const OrderTrackingPage = () => {
                 <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-between text-xs text-emerald-950">
                   <div className="flex items-center gap-2 font-bold">
                     <Phone className="w-4 h-4 text-emerald-700" />
-                    <span>Driver Contact Available</span>
+                    <span>{t('driverContactAvailable')}</span>
                   </div>
                   <span className="font-mono font-extrabold text-emerald-800">
                     {currentOrder.driverPhone || '+91 98123 77654'}
@@ -230,15 +230,15 @@ export const OrderTrackingPage = () => {
               <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 text-xs">
                 <h4 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
                   <Home className="w-4 h-4 text-emerald-600" />
-                  <span>Destination Farm Address</span>
+                  <span>{t('destinationFarmTitle')}</span>
                 </h4>
                 <div className="text-slate-600 space-y-1">
                   <strong className="text-slate-900 block font-bold text-sm">
                     {currentOrder.deliveryAddress?.fullName || currentOrder.userName}
                   </strong>
-                  <p>Village: {currentOrder.deliveryAddress?.village || 'Rampur Khurd'}, {currentOrder.deliveryAddress?.taluk || 'Gharaunda'}</p>
-                  <p>District: {currentOrder.deliveryAddress?.district || 'Karnal'}, {currentOrder.deliveryAddress?.state || 'Haryana'} - {currentOrder.deliveryAddress?.pincode || '132114'}</p>
-                  <p>Phone: <strong>{currentOrder.deliveryAddress?.phone || currentOrder.phone}</strong></p>
+                  <p>{t('villageLabel')}: {currentOrder.deliveryAddress?.village || 'Rampur Khurd'}, {currentOrder.deliveryAddress?.taluk || 'Gharaunda'}</p>
+                  <p>{t('districtLabel')}: {currentOrder.deliveryAddress?.district || 'Karnal'}, {currentOrder.deliveryAddress?.state || 'Haryana'} - {currentOrder.deliveryAddress?.pincode || '132114'}</p>
+                  <p>{t('phoneLabel')}: <strong>{currentOrder.deliveryAddress?.phone || currentOrder.phone}</strong></p>
                 </div>
               </div>
 
@@ -248,7 +248,7 @@ export const OrderTrackingPage = () => {
             <div className="lg:col-span-7 space-y-6">
               <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
                 <h4 className="font-extrabold text-slate-900 text-sm">
-                  Consignment Items ({currentOrder.items?.length || 0})
+                  {t('consignmentItemsTitle')} ({currentOrder.items?.length || 0})
                 </h4>
 
                 <div className="divide-y divide-slate-100">
@@ -275,21 +275,21 @@ export const OrderTrackingPage = () => {
                 {/* Price Breakdown */}
                 <div className="pt-4 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
                   <div className="flex justify-between">
-                    <span>Subtotal</span>
+                    <span>{t('itemsSubtotal')}</span>
                     <span className="font-bold text-slate-900">₹{currentOrder.subtotal}</span>
                   </div>
                   {currentOrder.discount > 0 && (
                     <div className="flex justify-between text-emerald-700 font-bold">
-                      <span>Kisan Subsidy Discount</span>
+                      <span>{t('kisanSubsidyDiscount')}</span>
                       <span>- ₹{currentOrder.discount}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span>Delivery Fee</span>
-                    <span className="font-bold text-emerald-600">FREE</span>
+                    <span>{t('ruralDeliveryFee')}</span>
+                    <span className="font-bold text-emerald-600">{t('freeDelivery')}</span>
                   </div>
                   <div className="flex justify-between text-base font-black text-slate-950 pt-2 border-t border-slate-200">
-                    <span>Total Amount Paid</span>
+                    <span>{t('totalAmountPaid')}</span>
                     <span className="text-emerald-950">₹{currentOrder.totalAmount}</span>
                   </div>
                 </div>

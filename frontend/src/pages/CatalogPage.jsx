@@ -83,20 +83,20 @@ export const CatalogPage = () => {
       <div className="bg-emerald-950 text-white p-8 rounded-3xl relative overflow-hidden shadow-lg">
         <div className="relative z-10 max-w-2xl space-y-2">
           <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-            Agricultural Marketplace
+            {t('deptSubtitle')}
           </span>
           <h1 className="text-3xl sm:text-4xl font-black font-serif tracking-tight">
-            Certified Seeds & Agricultural Inputs
+            {t('catalogHeaderTitle')}
           </h1>
           <p className="text-xs sm:text-sm text-emerald-200">
-            Browse high-germination seeds, bio-fertilizers, and modern farming equipment with direct farm gate delivery.
+            {t('catalogHeaderDesc')}
           </p>
 
           <div className="pt-3 max-w-xl">
             <div className="relative">
               <input
                 type="text"
-                placeholder="Filter by seed name, crop, NPK ratio, or disease resistance..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white text-slate-900 placeholder:text-slate-400 rounded-2xl py-3 pl-11 pr-4 text-xs sm:text-sm outline-none shadow-md font-medium"
@@ -124,20 +124,20 @@ export const CatalogPage = () => {
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
                 <SlidersHorizontal className="w-4 h-4 text-emerald-600" />
-                <span>Filter Products</span>
+                <span>{t('filterTitle')}</span>
               </div>
               <button
                 onClick={resetFilters}
                 className="text-xs text-emerald-700 hover:underline font-bold cursor-pointer"
               >
-                Reset All
+                {t('resetAll')}
               </button>
             </div>
 
             {/* Category Filter */}
             <div>
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2.5">
-                Departments
+                {t('departmentsFilter')}
               </label>
               <div className="space-y-1.5">
                 {categories.map((cat) => (
@@ -150,7 +150,7 @@ export const CatalogPage = () => {
                         : 'text-slate-700 hover:bg-slate-100'
                     }`}
                   >
-                    <span>{cat}</span>
+                    <span>{cat === 'Seeds' ? t('seedsTitle') : cat === 'Fertilizers' ? t('fertilizersTitle') : cat === 'Pesticides' ? t('pesticidesTitle') : cat === 'Farming Equipment' ? t('equipmentTitle') : cat}</span>
                     {selectedCategory === cat && <Check className="w-3.5 h-3.5" />}
                   </button>
                 ))}
@@ -160,7 +160,7 @@ export const CatalogPage = () => {
             {/* Crop Suitability Filter */}
             <div>
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2.5">
-                Crop Suitability
+                {t('cropSuitabilityFilter')}
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {cropList.map((crop) => (
@@ -182,7 +182,7 @@ export const CatalogPage = () => {
             {/* Price Slider */}
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-700 mb-2">
-                <span>Max Price</span>
+                <span>{t('maxPriceLabel')}</span>
                 <span className="text-emerald-700 font-extrabold">₹{priceMax}</span>
               </div>
               <input
@@ -204,10 +204,10 @@ export const CatalogPage = () => {
             <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1.5 text-xs text-emerald-900">
               <div className="flex items-center gap-1.5 font-bold">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Certified Guarantee</span>
+                <span>{t('certifiedGuaranteeTitle')}</span>
               </div>
               <p className="text-[11px] text-emerald-800 leading-tight">
-                All listed seeds come with verified ICAR/State lab test reports and minimum 90% germination assurance.
+                {t('certifiedGuaranteeDesc')}
               </p>
             </div>
 
@@ -220,22 +220,22 @@ export const CatalogPage = () => {
           {/* Top Control Bar */}
           <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div className="text-xs text-slate-500 font-medium">
-              Showing <strong className="text-slate-900 font-extrabold">{filteredProducts.length}</strong> agricultural products
+              {t('showingCount')} <strong className="text-slate-900 font-extrabold">{filteredProducts.length}</strong> {t('agriculturalProducts')}
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
               {/* Sort Dropdown */}
               <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                <span>Sort by:</span>
+                <span>{t('sortByLabel')}</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs outline-none font-bold text-slate-800 cursor-pointer"
                 >
-                  <option value="featured">Featured Varieties</option>
-                  <option value="rating">Highest Rated</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
+                  <option value="featured">{t('sortFeatured')}</option>
+                  <option value="rating">{t('sortRating')}</option>
+                  <option value="price-low">{t('sortPriceLow')}</option>
+                  <option value="price-high">{t('sortPriceHigh')}</option>
                 </select>
               </div>
 
@@ -245,7 +245,7 @@ export const CatalogPage = () => {
                 className="lg:hidden p-2 rounded-lg bg-emerald-50 text-emerald-800 font-bold text-xs flex items-center gap-1 cursor-pointer"
               >
                 <Filter className="w-3.5 h-3.5" />
-                <span>Filters</span>
+                <span>{t('filtersBtn')}</span>
               </button>
             </div>
           </div>
@@ -256,15 +256,15 @@ export const CatalogPage = () => {
               <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-2xl">
                 🔍
               </div>
-              <h3 className="text-base font-bold text-slate-800">No matching products found</h3>
+              <h3 className="text-base font-bold text-slate-800">{t('noProductsFound')}</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Try clearing your search query or adjusting your category and crop suitability filters.
+                {t('noProductsDesc')}
               </p>
               <button
                 onClick={resetFilters}
                 className="mt-2 bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-emerald-700 cursor-pointer"
               >
-                Reset All Filters
+                {t('resetAll')}
               </button>
             </div>
           ) : (

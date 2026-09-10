@@ -3,11 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Package, ShoppingCart, Stethoscope, User } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const MobileBottomNav = () => {
   const location = useLocation();
   const { totalItemsCount, setIsCartDrawerOpen } = useCart();
   const { currentUser, openAuthModal } = useAuth();
+  const { t } = useLanguage();
 
   const isActive = (path) => location.pathname === path;
 
@@ -20,7 +22,7 @@ export const MobileBottomNav = () => {
         }`}
       >
         <Home className="w-5 h-5" />
-        <span>Home</span>
+        <span>{t('home')}</span>
       </Link>
 
       <Link
@@ -30,7 +32,7 @@ export const MobileBottomNav = () => {
         }`}
       >
         <Package className="w-5 h-5" />
-        <span>Catalog</span>
+        <span>{t('catalog')}</span>
       </Link>
 
       <button
@@ -38,7 +40,7 @@ export const MobileBottomNav = () => {
         className="relative flex flex-col items-center gap-0.5 text-[10px] font-bold text-slate-500 cursor-pointer"
       >
         <ShoppingCart className="w-5 h-5" />
-        <span>Cart</span>
+        <span>{t('cart')}</span>
         {totalItemsCount > 0 && (
           <span className="absolute -top-1 right-1 bg-amber-500 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
             {totalItemsCount}
@@ -53,7 +55,7 @@ export const MobileBottomNav = () => {
         }`}
       >
         <Stethoscope className="w-5 h-5" />
-        <span>Doctor</span>
+        <span>{t('cropDoctor')}</span>
       </Link>
 
       {currentUser ? (
@@ -64,7 +66,7 @@ export const MobileBottomNav = () => {
           }`}
         >
           <User className="w-5 h-5" />
-          <span>Account</span>
+          <span>{t('dashboard')}</span>
         </Link>
       ) : (
         <button
@@ -72,7 +74,7 @@ export const MobileBottomNav = () => {
           className="flex flex-col items-center gap-0.5 text-[10px] font-bold text-emerald-700 cursor-pointer"
         >
           <User className="w-5 h-5" />
-          <span>Sign In</span>
+          <span>{t('login')}</span>
         </button>
       )}
     </div>

@@ -66,7 +66,7 @@ export const ProductCard = ({ product }) => {
         {product.germinationRate && product.germinationRate !== 'N/A' && (
           <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs flex items-center gap-1">
             <Check className="w-3 h-3 stroke-[3]" />
-            <span>{product.germinationRate} Germination</span>
+            <span>{product.germinationRate} {t('testedGermination').split(' ')[1] || 'Germination'}</span>
           </span>
         )}
       </div>
@@ -85,7 +85,7 @@ export const ProductCard = ({ product }) => {
             {product.verifiedSeller && (
               <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-0.5" title="Licensed Seller">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Verified</span>
+                <span>{t('govtApproved').split(' ')[0] || 'Verified'}</span>
               </span>
             )}
           </div>
@@ -100,7 +100,7 @@ export const ProductCard = ({ product }) => {
           {/* Season & Sowing Tags */}
           {product.season && (
             <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              <span>📅 Season:</span> <strong className="text-slate-700">{product.season}</strong>
+              <span>📅 {t('paramSeason')}:</span> <strong className="text-slate-700">{product.season}</strong>
             </p>
           )}
 
@@ -108,7 +108,7 @@ export const ProductCard = ({ product }) => {
           {product.packSizes && product.packSizes.length > 1 && (
             <div className="mt-3">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Pack Size Unit:
+                {t('selectPackUnit')}
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {product.packSizes.map((pack) => (
@@ -162,12 +162,12 @@ export const ProductCard = ({ product }) => {
               {addedAnim ? (
                 <>
                   <Check className="w-3.5 h-3.5" />
-                  <span>Added!</span>
+                  <span>✓</span>
                 </>
               ) : (
                 <>
                   <ShoppingCart className="w-3.5 h-3.5" />
-                  <span>Add to Cart</span>
+                  <span>{t('addToCart')}</span>
                 </>
               )}
             </button>
@@ -177,7 +177,7 @@ export const ProductCard = ({ product }) => {
               className="py-2 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1 transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-              <span>Buy Now</span>
+              <span>{t('buyNow')}</span>
             </button>
           </div>
         </div>

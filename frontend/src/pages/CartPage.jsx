@@ -54,16 +54,16 @@ export const CartPage = () => {
         <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto text-3xl shadow-xs">
           🛒
         </div>
-        <h2 className="text-2xl font-black font-serif text-slate-900">Your Agricultural Cart is Empty</h2>
+        <h2 className="text-2xl font-black font-serif text-slate-900">{t('emptyCartTitle')}</h2>
         <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-          You have not added any certified seed lots or fertilizers yet. Explore our agricultural catalog to start your crop order.
+          {t('emptyCartDesc')}
         </p>
         <div className="pt-2">
           <Link
             to="/catalog"
             className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-2xl shadow-lg shadow-emerald-700/20 transition-all"
           >
-            <span>🌾 Browse Quality Seeds & Inputs</span>
+            <span>{t('browseCatalogBtn')}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -77,17 +77,17 @@ export const CartPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-            Order Review
+            {t('orderReviewBadge')}
           </span>
           <h1 className="text-2xl sm:text-3xl font-black font-serif text-slate-950 mt-1">
-            Shopping Cart ({cartItems.length} Products)
+            {t('cartTitle')} ({cartItems.length} Products)
           </h1>
         </div>
         <button
           onClick={clearCart}
           className="text-xs text-rose-600 hover:underline font-bold cursor-pointer"
         >
-          Clear All Items
+          {t('clearAllItems')}
         </button>
       </div>
 
@@ -96,9 +96,9 @@ export const CartPage = () => {
         <div className="flex items-center gap-2 text-emerald-900 font-bold">
           <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
           {remainingForFreeShipping === 0 ? (
-            <span>🎉 Congratulations! Free Rural Doorstep Delivery Unlocked for your Village!</span>
+            <span>{t('freeShippingUnlocked')}</span>
           ) : (
-            <span>Add ₹{remainingForFreeShipping} more to unlock <strong>FREE Village Delivery</strong> (Orders &gt; ₹999)</span>
+            <span>Add ₹{remainingForFreeShipping} {t('freeShippingProgress')}</span>
           )}
         </div>
         <div className="w-full sm:w-48 h-2 bg-emerald-200 rounded-full overflow-hidden">
@@ -176,13 +176,13 @@ export const CartPage = () => {
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-3">
             <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
               <Tag className="w-4 h-4 text-amber-600" />
-              <span>Kisan Subsidy & Promo Code</span>
+              <span>{t('kisanPromoTitle')}</span>
             </div>
 
             <form onSubmit={handleApplyCoupon} className="flex gap-2">
               <input
                 type="text"
-                placeholder="Enter KISAN50 or AGRISEED100"
+                placeholder={t('enterCouponPlaceholder')}
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value)}
                 className="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-none font-mono uppercase font-bold"
@@ -191,7 +191,7 @@ export const CartPage = () => {
                 type="submit"
                 className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
               >
-                Apply
+                {t('applyBtn')}
               </button>
             </form>
 
@@ -206,13 +206,13 @@ export const CartPage = () => {
               <div className="flex justify-between items-center bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-xs">
                 <div className="flex items-center gap-1.5 text-amber-900 font-bold">
                   <Sparkles className="w-4 h-4 text-amber-600" />
-                  <span>Applied: <strong>{appliedCoupon}</strong></span>
+                  <span>{t('appliedBadge')} <strong>{appliedCoupon}</strong></span>
                 </div>
                 <button
                   onClick={removeCoupon}
                   className="text-rose-600 text-[11px] font-bold hover:underline cursor-pointer"
                 >
-                  Remove
+                  {t('removeCouponBtn')}
                 </button>
               </div>
             )}
@@ -220,29 +220,29 @@ export const CartPage = () => {
 
           {/* Pricing Breakdown Card */}
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <h3 className="font-black text-slate-900 text-base">Order Price Breakdown</h3>
+            <h3 className="font-black text-slate-900 text-base">{t('orderPriceBreakdown')}</h3>
 
             <div className="space-y-2 text-xs text-slate-600 pb-3 border-b border-slate-100">
               <div className="flex justify-between">
-                <span>Items Subtotal</span>
+                <span>{t('subtotal')}</span>
                 <span className="font-bold text-slate-900">₹{subtotal}</span>
               </div>
 
               {discount > 0 && (
                 <div className="flex justify-between text-emerald-700 font-bold">
-                  <span>Kisan Subsidy Discount ({appliedCoupon})</span>
+                  <span>{t('subsidyDiscount')} ({appliedCoupon})</span>
                   <span>- ₹{discount}</span>
                 </div>
               )}
 
               <div className="flex justify-between">
-                <span>Rural Doorstep Delivery</span>
-                <span>{deliveryFee === 0 ? <strong className="text-emerald-600 font-bold">FREE</strong> : `₹${deliveryFee}`}</span>
+                <span>{t('ruralDeliveryFee')}</span>
+                <span>{deliveryFee === 0 ? <strong className="text-emerald-600 font-bold">{t('free')}</strong> : `₹${deliveryFee}`}</span>
               </div>
             </div>
 
             <div className="flex justify-between items-baseline pt-1">
-              <span className="font-extrabold text-sm text-slate-900">Net Payable Amount</span>
+              <span className="font-extrabold text-sm text-slate-900">{t('netPayable')}</span>
               <span className="text-2xl font-black text-emerald-950 font-sans">₹{totalAmount}</span>
             </div>
 
@@ -250,7 +250,7 @@ export const CartPage = () => {
               onClick={() => navigate('/checkout')}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-700/25 cursor-pointer hover:scale-102"
             >
-              <span>Proceed to Village Delivery & Payment</span>
+              <span>{t('proceedToPaymentBtn')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -258,7 +258,7 @@ export const CartPage = () => {
               to="/catalog"
               className="block text-center text-xs font-bold text-slate-500 hover:text-emerald-700"
             >
-              ← Add More Crop Inputs
+              {t('addMoreInputs')}
             </Link>
           </div>
 

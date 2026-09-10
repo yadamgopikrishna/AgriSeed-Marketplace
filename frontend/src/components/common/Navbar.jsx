@@ -47,13 +47,13 @@ export const Navbar = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>🌾 <strong>Krishi Sowing Advisory:</strong> Optimal Kharif & Rabi certified seed booking is live across Punjab, Haryana, UP & AP.</span>
+            <span>{t('topAdvisoryText')}</span>
           </div>
 
           <div className="flex items-center gap-4">
             <Link to="/presentation" className="hover:text-amber-300 transition-colors flex items-center gap-1 font-semibold text-amber-400">
               <Presentation className="w-3.5 h-3.5" />
-              <span>Project Presentation Deck</span>
+              <span>{t('presentationDeck')}</span>
             </Link>
 
             <span className="text-emerald-700">|</span>
@@ -120,7 +120,7 @@ export const Navbar = () => {
           <form onSubmit={handleSearchSubmit} className="hidden lg:flex flex-1 max-w-lg relative">
             <input
               type="text"
-              placeholder="Search certified seeds, NPK fertilizers, bio-pesticides, sprayers..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-emerald-500 rounded-full py-2.5 pl-11 pr-24 text-sm outline-none transition-all shadow-inner focus:shadow-emerald-500/10"
@@ -130,7 +130,7 @@ export const Navbar = () => {
               type="submit"
               className="absolute right-1.5 top-1.5 bottom-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 rounded-full transition-colors cursor-pointer"
             >
-              Search
+              {t('searchBtn')}
             </button>
           </form>
 
@@ -200,7 +200,7 @@ export const Navbar = () => {
                     className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-xs shadow-amber-500/20"
                   >
                     <ShieldCheck className="w-4 h-4" />
-                    <span className="hidden sm:inline">Admin Portal</span>
+                    <span className="hidden sm:inline">{t('admin')}</span>
                   </Link>
                 ) : (
                   <Link
@@ -258,7 +258,7 @@ export const Navbar = () => {
           <form onSubmit={handleSearchSubmit} className="relative">
             <input
               type="text"
-              placeholder="Search seeds, fertilizers..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-9 pr-4 text-sm outline-none"
@@ -299,7 +299,7 @@ export const Navbar = () => {
 
           {/* Language Picker on Mobile */}
           <div className="pt-2 border-t border-slate-100">
-            <label className="text-xs font-bold text-slate-500 block mb-1.5">Language / भाषा</label>
+            <label className="text-xs font-bold text-slate-500 block mb-1.5">Language / भाषा / భాష / ਬੋਲੀ</label>
             <div className="grid grid-cols-4 gap-1">
               {languages.map(l => (
                 <button

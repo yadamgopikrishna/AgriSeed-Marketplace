@@ -25,12 +25,12 @@ export const FarmerDashboardPage = () => {
   if (!currentUser) {
     return (
       <div className="max-w-xl mx-auto py-20 px-4 text-center space-y-4">
-        <h2 className="text-xl font-bold text-slate-800">Please Sign In to Access Kisan Dashboard</h2>
+        <h2 className="text-xl font-bold text-slate-800">{t('pleaseSignInKisan')}</h2>
         <button
           onClick={() => openAuthModal('login')}
           className="bg-emerald-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer"
         >
-          Sign In
+          {t('login')}
         </button>
       </div>
     );
@@ -57,11 +57,11 @@ export const FarmerDashboardPage = () => {
                 {currentUser.name}
               </h1>
               <span className="bg-emerald-700 text-emerald-200 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                Progressive Farmer
+                {t('progressiveFarmerBadge')}
               </span>
             </div>
             <p className="text-xs text-emerald-200">
-              📍 {currentUser.village}, {currentUser.district}, {currentUser.state} • Land: <strong>{currentUser.farmSize}</strong>
+              📍 {currentUser.village}, {currentUser.district}, {currentUser.state} • {t('landLabel')}: <strong>{currentUser.farmSize}</strong>
             </p>
           </div>
         </div>
@@ -73,10 +73,10 @@ export const FarmerDashboardPage = () => {
           </div>
           <div>
             <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-              Kisan Loyalty Rewards
+              {t('kisanLoyaltyRewards')}
             </span>
             <strong className="text-2xl font-black text-white font-sans">
-              {currentUser.kisanRewards || 240} <span className="text-xs font-normal text-amber-200">Pts</span>
+              {currentUser.kisanRewards || 240} <span className="text-xs font-normal text-amber-200">{t('pointsUnit')}</span>
             </strong>
           </div>
         </div>
@@ -89,8 +89,8 @@ export const FarmerDashboardPage = () => {
             <Truck className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase">Active Dispatches</span>
-            <h3 className="text-2xl font-black text-slate-900">{activeOrders.length} In-Transit</h3>
+            <span className="text-xs font-bold text-slate-400 uppercase">{t('activeDispatchesMetric')}</span>
+            <h3 className="text-2xl font-black text-slate-900">{activeOrders.length} {t('inTransit')}</h3>
           </div>
         </div>
 
@@ -99,8 +99,8 @@ export const FarmerDashboardPage = () => {
             <Package className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase">Total Seed Orders</span>
-            <h3 className="text-2xl font-black text-slate-900">{orders.length} Completed</h3>
+            <span className="text-xs font-bold text-slate-400 uppercase">{t('totalOrdersMetric')}</span>
+            <h3 className="text-2xl font-black text-slate-900">{orders.length} {t('completed')}</h3>
           </div>
         </div>
 
@@ -109,7 +109,7 @@ export const FarmerDashboardPage = () => {
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase">Total Kisan Subsidy Saved</span>
+            <span className="text-xs font-bold text-slate-400 uppercase">{t('totalSavedMetric')}</span>
             <h3 className="text-2xl font-black text-emerald-800">₹1,850</h3>
           </div>
         </div>
@@ -118,12 +118,12 @@ export const FarmerDashboardPage = () => {
       {/* Active Orders Section */}
       <div className="space-y-4">
         <h2 className="text-xl font-black font-serif text-slate-900">
-          Active Live Dispatches ({activeOrders.length})
+          {t('activeShipmentsTitle')} ({activeOrders.length})
         </h2>
 
         {activeOrders.length === 0 ? (
           <div className="p-8 rounded-2xl bg-white border border-slate-200 text-center text-xs text-slate-500">
-            No active shipments in transit right now.
+            {t('noActiveShipments')}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -131,7 +131,7 @@ export const FarmerDashboardPage = () => {
               <div key={order.id || order.orderId} className="bg-white p-6 rounded-3xl border border-emerald-200 shadow-xs space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-xs font-bold text-slate-400">Order ID</span>
+                    <span className="text-xs font-bold text-slate-400">{t('orderIdLabel')}</span>
                     <h3 className="text-base font-black text-slate-900">#{order.id || order.orderId}</h3>
                   </div>
                   <span className="bg-emerald-600 text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full uppercase">
@@ -140,9 +140,9 @@ export const FarmerDashboardPage = () => {
                 </div>
 
                 <div className="text-xs text-slate-600 space-y-1 py-2 border-y border-slate-100">
-                  <p>Estimated Arrival: <strong>{order.estimatedDelivery || '2-3 Days'}</strong></p>
-                  <p>Fleet: <strong>{order.courierPartner || 'AgriExpress Rural Fleet'}</strong></p>
-                  <p>Total: <strong>₹{order.totalAmount}</strong> ({order.paymentMethod})</p>
+                  <p>{t('estimatedArrival')} <strong>{order.estimatedDelivery || '2-3 Days'}</strong></p>
+                  <p>{t('fleetPartnerLabel')} <strong>{order.courierPartner || 'AgriExpress Rural Fleet'}</strong></p>
+                  <p>{t('totalLabel')} <strong>₹{order.totalAmount}</strong> ({order.paymentMethod})</p>
                 </div>
 
                 <Link
@@ -150,7 +150,7 @@ export const FarmerDashboardPage = () => {
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                 >
                   <Truck className="w-3.5 h-3.5" />
-                  <span>View 5-Stage Live Stepper</span>
+                  <span>{t('viewLiveStepperBtn')}</span>
                 </Link>
               </div>
             ))}
@@ -161,7 +161,7 @@ export const FarmerDashboardPage = () => {
       {/* Historical Orders Archive */}
       <div className="space-y-4">
         <h2 className="text-xl font-black font-serif text-slate-900">
-          Past Order History & Invoices
+          {t('pastOrderHistoryTitle')}
         </h2>
 
         <div className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-xs">
@@ -184,7 +184,7 @@ export const FarmerDashboardPage = () => {
                     to={`/track?orderId=${o.id || o.orderId}`}
                     className="text-xs text-emerald-700 hover:underline font-bold"
                   >
-                    View Details →
+                    {t('viewDetails')} →
                   </Link>
                 </div>
               </div>

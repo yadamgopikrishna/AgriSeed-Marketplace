@@ -13,8 +13,10 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, INITIAL_ORDERS, INITIAL_SELLERS } from '../data/mockData';
+import { useLanguage } from '../context/LanguageContext';
 
 export const AdminDashboardPage = () => {
+  const { t } = useLanguage();
   const [products, setProducts] = useState(INITIAL_PRODUCTS);
   const [orders, setOrders] = useState(() => {
     const local = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
@@ -119,14 +121,14 @@ export const AdminDashboardPage = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-black font-serif">
-                Store Management Hub
+                {t('adminConsoleTitle')}
               </h1>
               <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                Admin Console
+                {t('adminConsoleSubtitle')}
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Manage product catalogs, inventory stock, seller licenses, and live order status coordinates.
+              {t('adminConsoleDesc')}
             </p>
           </div>
         </div>
@@ -136,7 +138,7 @@ export const AdminDashboardPage = () => {
           className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-md shadow-emerald-700/20 shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Product</span>
+          <span>{t('addNewProductBtn')}</span>
         </button>
       </div>
 
@@ -147,8 +149,8 @@ export const AdminDashboardPage = () => {
             <Package className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase">Catalog Items</span>
-            <h3 className="text-2xl font-black text-slate-900">{products.length} Products</h3>
+            <span className="text-[11px] font-bold text-slate-400 uppercase">{t('kpiCatalogItems')}</span>
+            <h3 className="text-2xl font-black text-slate-900">{products.length} {t('productsUnit')}</h3>
           </div>
         </div>
 
@@ -157,8 +159,8 @@ export const AdminDashboardPage = () => {
             <Truck className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase">Total Orders</span>
-            <h3 className="text-2xl font-black text-slate-900">{orders.length} Dispatches</h3>
+            <span className="text-[11px] font-bold text-slate-400 uppercase">{t('kpiTotalOrders')}</span>
+            <h3 className="text-2xl font-black text-slate-900">{orders.length} {t('dispatchesUnit')}</h3>
           </div>
         </div>
 
@@ -167,7 +169,7 @@ export const AdminDashboardPage = () => {
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase">Gross Revenue</span>
+            <span className="text-[11px] font-bold text-slate-400 uppercase">{t('kpiRevenue')}</span>
             <h3 className="text-2xl font-black text-emerald-950">₹{totalRevenue}</h3>
           </div>
         </div>
@@ -177,8 +179,8 @@ export const AdminDashboardPage = () => {
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase">Low Stock Alert</span>
-            <h3 className="text-2xl font-black text-rose-700">{lowStock.length} Items &lt; 45</h3>
+            <span className="text-[11px] font-bold text-slate-400 uppercase">{t('kpiLowStock')}</span>
+            <h3 className="text-2xl font-black text-rose-700">{lowStock.length} {t('itemsUnder45')}</h3>
           </div>
         </div>
       </div>
@@ -192,7 +194,7 @@ export const AdminDashboardPage = () => {
               activeTab === 'orders' ? 'border-emerald-600 text-emerald-900' : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            📦 Live Orders Coordinator ({orders.length})
+            📦 {t('tabLiveOrders')} ({orders.length})
           </button>
 
           <button
@@ -201,7 +203,7 @@ export const AdminDashboardPage = () => {
               activeTab === 'products' ? 'border-emerald-600 text-emerald-900' : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            🌾 Product Inventory Catalog ({products.length})
+            🌾 {t('tabProductCatalog')} ({products.length})
           </button>
 
           <button
@@ -210,7 +212,7 @@ export const AdminDashboardPage = () => {
               activeTab === 'sellers' ? 'border-emerald-600 text-emerald-900' : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            🏢 Verified Vendors Directory ({INITIAL_SELLERS.length})
+            🏢 {t('tabVerifiedVendors')} ({INITIAL_SELLERS.length})
           </button>
         </div>
 
@@ -220,12 +222,12 @@ export const AdminDashboardPage = () => {
             <table className="w-full text-xs text-left">
               <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                 <tr>
-                  <th className="p-3">Order ID</th>
-                  <th className="p-3">Farmer Name</th>
-                  <th className="p-3">Total (₹)</th>
-                  <th className="p-3">Payment</th>
-                  <th className="p-3">Current Status</th>
-                  <th className="p-3 text-right">Advance Status</th>
+                  <th className="p-3">{t('thOrderId')}</th>
+                  <th className="p-3">{t('thFarmerName')}</th>
+                  <th className="p-3">{t('thTotal')}</th>
+                  <th className="p-3">{t('thPayment')}</th>
+                  <th className="p-3">{t('thCurrentStatus')}</th>
+                  <th className="p-3 text-right">{t('thAdvanceStatus')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
@@ -252,11 +254,11 @@ export const AdminDashboardPage = () => {
                           onChange={(e) => handleStatusChange(id, e.target.value)}
                           className="text-xs bg-slate-100 border border-slate-300 rounded-lg py-1 px-2 font-bold outline-none cursor-pointer text-slate-800"
                         >
-                          <option value="Ordered">1. Ordered</option>
-                          <option value="Confirmed">2. Confirmed</option>
-                          <option value="Shipped">3. Shipped</option>
-                          <option value="Out for Delivery">4. Out for Delivery</option>
-                          <option value="Delivered">5. Delivered</option>
+                          <option value="Ordered">{t('stepOrdered')}</option>
+                          <option value="Confirmed">{t('stepConfirmed')}</option>
+                          <option value="Shipped">{t('stepShipped')}</option>
+                          <option value="Out for Delivery">{t('stepOutForDelivery')}</option>
+                          <option value="Delivered">{t('stepDelivered')}</option>
                         </select>
                       </td>
                     </tr>
@@ -273,12 +275,12 @@ export const AdminDashboardPage = () => {
             <table className="w-full text-xs text-left">
               <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                 <tr>
-                  <th className="p-3">Product Name</th>
-                  <th className="p-3">Category</th>
-                  <th className="p-3">Price</th>
-                  <th className="p-3">Stock</th>
-                  <th className="p-3">Germination</th>
-                  <th className="p-3 text-right">Actions</th>
+                  <th className="p-3">{t('thProductName')}</th>
+                  <th className="p-3">{t('thCategory')}</th>
+                  <th className="p-3">{t('thPrice')}</th>
+                  <th className="p-3">{t('thStock')}</th>
+                  <th className="p-3">{t('thGermination')}</th>
+                  <th className="p-3 text-right">{t('thActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
@@ -289,7 +291,7 @@ export const AdminDashboardPage = () => {
                     <td className="p-3 font-black text-emerald-900">₹{p.price}</td>
                     <td className="p-3">
                       <span className={`font-bold ${p.stock <= 45 ? 'text-rose-600' : 'text-slate-700'}`}>
-                        {p.stock} units
+                        {p.stock} {t('unitsLabel')}
                       </span>
                     </td>
                     <td className="p-3 text-emerald-700 font-extrabold">{p.germinationRate}</td>
@@ -317,12 +319,12 @@ export const AdminDashboardPage = () => {
                 <div className="flex justify-between items-center">
                   <h4 className="font-bold text-slate-900 text-sm">{s.name}</h4>
                   <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">
-                    ✓ Verified
+                    {t('verifiedBadge')}
                   </span>
                 </div>
-                <p className="text-slate-600">License: <code className="font-mono text-emerald-800 font-bold">{s.licenseNo}</code></p>
-                <p className="text-slate-600">Location: {s.location} • Owner: {s.owner}</p>
-                <p className="text-slate-600">Contact: {s.phone}</p>
+                <p className="text-slate-600">{t('licenseLabel')} <code className="font-mono text-emerald-800 font-bold">{s.licenseNo}</code></p>
+                <p className="text-slate-600">{t('locationLabel')} {s.location} • {t('ownerLabel')} {s.owner}</p>
+                <p className="text-slate-600">{t('contactLabel')} {s.phone}</p>
               </div>
             ))}
           </div>
@@ -334,10 +336,10 @@ export const AdminDashboardPage = () => {
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-base font-bold text-slate-900 mb-4">Add Agricultural Product</h3>
+            <h3 className="text-base font-bold text-slate-900 mb-4">{t('addProductModalTitle')}</h3>
             <form onSubmit={handleAddProduct} className="space-y-3 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Product / Seed Name *</label>
+                <label className="block font-bold text-slate-700 mb-1">{t('productNameInput')}</label>
                 <input
                   type="text"
                   placeholder="e.g. Hybrid Mustard Seeds"
@@ -350,20 +352,20 @@ export const AdminDashboardPage = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Department</label>
+                  <label className="block font-bold text-slate-700 mb-1">{t('departmentInput')}</label>
                   <select
                     value={newProd.category}
                     onChange={(e) => setNewProd({ ...newProd, category: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-bold"
                   >
-                    <option value="Seeds">Seeds</option>
-                    <option value="Fertilizers">Fertilizers</option>
-                    <option value="Pesticides">Pesticides</option>
-                    <option value="Farming Equipment">Farming Equipment</option>
+                    <option value="Seeds">{t('seedsTitle')}</option>
+                    <option value="Fertilizers">{t('fertilizersTitle')}</option>
+                    <option value="Pesticides">{t('pesticidesTitle')}</option>
+                    <option value="Farming Equipment">{t('equipmentTitle')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Price (₹) *</label>
+                  <label className="block font-bold text-slate-700 mb-1">{t('priceInput')}</label>
                   <input
                     type="number"
                     value={newProd.price}
@@ -376,7 +378,7 @@ export const AdminDashboardPage = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Stock Quantity</label>
+                  <label className="block font-bold text-slate-700 mb-1">{t('stockQtyInput')}</label>
                   <input
                     type="number"
                     value={newProd.stock}
@@ -385,7 +387,7 @@ export const AdminDashboardPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Germination Rate</label>
+                  <label className="block font-bold text-slate-700 mb-1">{t('germinationRateInput')}</label>
                   <input
                     type="text"
                     value={newProd.germinationRate}
@@ -396,7 +398,7 @@ export const AdminDashboardPage = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Dosage Guide</label>
+                <label className="block font-bold text-slate-700 mb-1">{t('dosageGuideInput')}</label>
                 <input
                   type="text"
                   value={newProd.dosageGuide}
@@ -411,13 +413,13 @@ export const AdminDashboardPage = () => {
                   onClick={() => setIsAddModalOpen(false)}
                   className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold"
                 >
-                  Cancel
+                  {t('cancelBtn')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
                 >
-                  Save Product
+                  {t('saveProductBtn')}
                 </button>
               </div>
             </form>
