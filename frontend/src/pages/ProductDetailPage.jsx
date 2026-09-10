@@ -16,23 +16,48 @@ import {
   Calendar,
   Layers,
   Heart,
-  Tag
+  Tag,
+  Volume2,
+  VolumeX,
+  Flame
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, INITIAL_SELLERS } from '../data/mockData';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useWishlist } from '../context/WishlistContext';
 import { ProductCard } from '../components/product/ProductCard';
 
 export const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart, setIsCartDrawerOpen } = useCart();
-  const { t, localizeProduct } = useLanguage();
+  const { currentLang, t, localizeProduct } = useLanguage();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   const rawProduct = INITIAL_PRODUCTS.find(p => p.id === id) || INITIAL_PRODUCTS[0];
   const lp = localizeProduct(rawProduct);
+  const isWished = isInWishlist(rawProduct.id);
   const seller = INITIAL_SELLERS.find(s => s.id === rawProduct.sellerId) || INITIAL_SELLERS[0];
   const relatedProducts = INITIAL_PRODUCTS.filter(p => p.category === rawProduct.category && p.id !== rawProduct.id).slice(0, 3);
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const handleSpeak = (text) => {
+    if (!('speechSynthesis' in window)) return;
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    const langMap = { en: 'en-IN', hi: 'hi-IN', pa: 'pa-IN', te: 'te-IN' };
+    utterance.lang = langMap[currentLang] || 'en-IN';
+    utterance.rate = 0.95;
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
 
   const [selectedPackIndex, setSelectedPackIndex] = useState(0);
 
@@ -158,9 +183,37 @@ export const ProductDetailPage = () => {
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-black font-serif text-slate-950 leading-snug">
-              {lp.name}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-2xl sm:text-3xl font-black font-serif text-slate-950 leading-snug">
+                {lp.name}
+              </h1>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                {/* Voice Guidance Button */}
+                <button
+                  type="button"
+                  onClick={() => handleSpeak(`${lp.name}. ${lp.cropSuitability}. ${lp.description || ''}. ${lp.dosageGuide || ''}`)}
+                  className="p-2.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors cursor-pointer shadow-xs"
+                  title={isSpeaking ? t('playingAudio') : t('listenAudio')}
+                >
+                  <Volume2 className={`w-4 h-4 ${isSpeaking ? 'animate-bounce text-emerald-600' : ''}`} />
+                </button>
+
+                {/* Wishlist Button */}
+                <button
+                  type="button"
+                  onClick={() => toggleWishlist(rawProduct)}
+                  className={`p-2.5 rounded-2xl border transition-colors cursor-pointer shadow-xs ${
+                    isWished
+                      ? 'bg-rose-500 border-rose-600 text-white'
+                      : 'bg-slate-50 hover:bg-rose-50 border-slate-200 text-slate-700 hover:text-rose-500'
+                  }`}
+                  title={isWished ? t('removedFromWishlist') : t('addedToWishlist')}
+                >
+                  <Heart className={`w-4 h-4 ${isWished ? 'fill-white' : ''}`} />
+                </button>
+              </div>
+            </div>
 
             {/* Ratings & Seller info */}
             <div className="flex items-center gap-4 text-xs">

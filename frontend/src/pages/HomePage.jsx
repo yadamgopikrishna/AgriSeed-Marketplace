@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_PRODUCTS } from '../data/mockData';
 import { ProductCard } from '../components/product/ProductCard';
+import { WeatherAdvisoryWidget } from '../components/home/WeatherAdvisoryWidget';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -212,7 +213,9 @@ export const HomePage = () => {
       </section>
 
       {/* Sowing Season Weather & Krishi Ticker */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <WeatherAdvisoryWidget />
+
         <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-emerald-500/15 to-teal-500/15 border border-emerald-200 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">

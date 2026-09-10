@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, ShoppingCart, ShieldCheck, Check, Zap } from 'lucide-react';
+import { Star, ShoppingCart, ShieldCheck, Check, Zap, Heart, Flame } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useWishlist } from '../../context/WishlistContext';
 
 export const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart, setIsCartDrawerOpen } = useCart();
   const { t, localizeProduct } = useLanguage();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   const lp = localizeProduct(product);
+  const isWished = isInWishlist(product.id);
 
   const [selectedPackIndex, setSelectedPackIndex] = useState(0);
 
@@ -36,6 +39,12 @@ export const ProductCard = ({ product }) => {
     navigate('/checkout');
   };
 
+  const handleWishlistToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 hover:border-emerald-500/60 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group">
       
@@ -49,6 +58,19 @@ export const ProductCard = ({ product }) => {
             loading="lazy"
           />
         </Link>
+
+        {/* Wishlist Floating Button */}
+        <button
+          onClick={handleWishlistToggle}
+          className={`absolute bottom-3 right-3 p-2 rounded-full backdrop-blur-md transition-all cursor-pointer shadow-md ${
+            isWished
+              ? 'bg-rose-500 text-white'
+              : 'bg-white/80 hover:bg-white text-slate-700 hover:text-rose-500'
+          }`}
+          title={isWished ? t('removedFromWishlist') : t('addedToWishlist')}
+        >
+          <Heart className={`w-4 h-4 ${isWished ? 'fill-white' : ''}`} />
+        </button>
 
         {/* Category Pill */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">

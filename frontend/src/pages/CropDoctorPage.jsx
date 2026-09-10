@@ -8,17 +8,37 @@ import {
   CheckCircle2,
   Sparkles,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { CROP_DISEASES_DB } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
 
 export const CropDoctorPage = () => {
-  const { t, localizeDisease } = useLanguage();
+  const { currentLang, t, localizeDisease } = useLanguage();
   const [selectedCrop, setSelectedCrop] = useState('Paddy / Rice');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const handleSpeak = (text) => {
+    if (!('speechSynthesis' in window)) return;
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    const langMap = { en: 'en-IN', hi: 'hi-IN', pa: 'pa-IN', te: 'te-IN' };
+    utterance.lang = langMap[currentLang] || 'en-IN';
+    utterance.rate = 0.95;
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
 
   const sampleImages = [
     { label: t('samplePaddyBlast'), crop: 'Paddy / Rice', url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80', resultIndex: 0 },
@@ -150,7 +170,18 @@ export const CropDoctorPage = () => {
                         <span className="bg-rose-600 text-white font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
                           {t('pathogenDetectedBadge')}
                         </span>
-                        <span className="text-rose-800 font-bold">{ld.crop}</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleSpeak(`${ld.name}. ${ld.symptoms}. ${t('recommendedTreatmentTitle')}: ${ld.recommendedTreatment?.productName}. ${ld.recommendedTreatment?.dosage}`)}
+                            className="p-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 transition-colors flex items-center gap-1 font-bold text-[10px] cursor-pointer"
+                            title="Audio diagnosis"
+                          >
+                            <Volume2 className="w-3.5 h-3.5 text-rose-700" />
+                            <span>{isSpeaking ? t('playingAudio') : t('listenAudio')}</span>
+                          </button>
+                          <span className="text-rose-800 font-bold">{ld.crop}</span>
+                        </div>
                       </div>
                       <h4 className="text-base font-black text-rose-950 font-serif">
                         {ld.name}

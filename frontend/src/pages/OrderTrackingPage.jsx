@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_ORDERS } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
+import { InvoiceModal } from '../components/common/InvoiceModal';
 
 export const OrderTrackingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,6 +26,7 @@ export const OrderTrackingPage = () => {
   const queryOrderId = searchParams.get('orderId') || 'AGRI-849201';
   const [inputOrderId, setInputOrderId] = useState(queryOrderId);
   const [currentOrder, setCurrentOrder] = useState(null);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   useEffect(() => {
     // Check localStorage first, then fallback to mock data
@@ -125,7 +127,7 @@ export const OrderTrackingPage = () => {
             </div>
 
             <button
-              onClick={handlePrint}
+              onClick={() => setIsInvoiceOpen(true)}
               className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Printer className="w-4 h-4 text-slate-600" />
@@ -297,6 +299,12 @@ export const OrderTrackingPage = () => {
             </div>
 
           </div>
+
+          <InvoiceModal
+            order={currentOrder}
+            isOpen={isInvoiceOpen}
+            onClose={() => setIsInvoiceOpen(false)}
+          />
 
         </div>
       )}

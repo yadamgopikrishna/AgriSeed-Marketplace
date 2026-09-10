@@ -12,11 +12,14 @@ import {
   Truck,
   Menu,
   X,
-  LogOut
+  LogOut,
+  Heart
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useWishlist } from '../../context/WishlistContext';
+import { NotificationBell } from './NotificationBell';
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -24,6 +27,7 @@ export const Navbar = () => {
   const { totalItemsCount, setIsCartDrawerOpen } = useCart();
   const { currentUser, logout, openAuthModal, demoLogin } = useAuth();
   const { currentLang, setLang, t, languages } = useLanguage();
+  const { wishlistCount, setIsWishlistOpen } = useWishlist();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -176,7 +180,25 @@ export const Navbar = () => {
           </nav>
 
           {/* Right Action Icons & User State */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            
+            {/* Real-time Notification Bell */}
+            <NotificationBell />
+
+            {/* Wishlist Button */}
+            <button
+              onClick={() => setIsWishlistOpen(true)}
+              className="relative p-2.5 rounded-full bg-slate-50 hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition-colors cursor-pointer group"
+              title={t('wishlistTitle')}
+            >
+              <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+
             {/* Cart Button */}
             <button
               onClick={() => setIsCartDrawerOpen(true)}
