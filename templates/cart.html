@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.25rem;">
+    <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem;">
+        Your Agricultural Cart
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem;">
+        Review your selected seeds, crop protection, and farming equipment before checkout.
+    </p>
+
+    {% if cart_items %}
+        <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 2.5rem; align-items: flex-start;">
+            
+            <!-- Left: Cart Items List -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+                    <span style="font-weight: 700; color: var(--text-dark);">Selected Items ({{ cart_items|length }})</span>
+                    <a href="{{ url_for('catalog') }}" style="color: var(--primary-700); font-size: 0.85rem; font-weight: 600;">+ Add More Products</a>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    {% for item in cart_items %}
+                        <div style="display: flex; gap: 1.25rem; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.25rem;">
+                            <!-- Product Image -->
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius-lg); border: 1px solid var(--border-color); flex-shrink: 0;">
+
+                            <!-- Product Info -->
+                            <div style="flex: 1;">
+                                <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-700); text-transform: uppercase;">{{ item.category }}</span>
+                                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin: 0.15rem 0;">
+                                    <a href="{{ url_for('product_detail', product_id=item.product_id) }}">{{ item.name }}</a>
+                                </h4>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem;">
+                                    Pack: <strong style="color: var(--text-dark);">{{ item.pack_size }}</strong>
+                                </div>
+                                <div style="font-weight: 800; color: var(--primary-800); font-size: 1.1rem;">
+                                    ₹{{ item.price }} <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">per unit</span>
+                                </div>
+                            </div>
+
+                            <!-- Quantity Stepper -->
+                            <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #f8fafc; overflow: hidden; height: 36px;">
+                                <button onclick="Cart.update('{{ item.product_id }}', '{{ item.pack_size }}', 'decrease')" style="padding: 0 0.75rem; height: 100%; border: none; background: none; font-size: 1.1rem; cursor: pointer;">-</button>
+                                <span style="padding: 0 0.5rem; font-weight: 700; font-size: 0.95rem;">{{ item.quantity }}</span>
+                                <button onclick="Cart.update('{{ item.product_id }}', '{{ item.pack_size }}', 'increase')" style="padding: 0 0.75rem; height: 100%; border: none; background: none; font-size: 1.1rem; cursor: pointer;">+</button>
+                            </div>
+
+                            <!-- Subtotal for item -->
+                            <div style="text-align: right; min-width: 90px;">
+                                <div style="font-weight: 800; font-size: 1.15rem; color: var(--text-dark);">
+                                    ₹{{ item.price * item.quantity }}
+                                </div>
+                                <button onclick="Cart.remove('{{ item.product_id }}', '{{ item.pack_size }}')" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 0.2rem;">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div style="margin-top: 1.5rem; background: var(--primary-50); border: 1px solid var(--primary-200); border-radius: var(--radius-lg); padding: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">🚚</span>
+                    <p style="font-size: 0.85rem; color: var(--primary-900);">
+                        {% if subtotal >= 999 %}
+                            <strong>Congratulations!</strong> You qualified for <strong>FREE Doorstep Village Delivery</strong>.
+                        {% else %}
+                            Add <strong>₹{{ 999 - subtotal }}</strong> more of agricultural products to get <strong>FREE Delivery</strong>!
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Promo Coupon & Order Summary -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Coupon Box -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                    <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <span>🏷️</span> Apply Kisan Promo Code
+                    </h4>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="couponInput" placeholder="Enter coupon (e.g. KISAN50)" value="{{ coupon_code or '' }}" style="flex: 1; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none; text-transform: uppercase; font-weight: 600;">
+                        <button onclick="Cart.applyCoupon(document.getElementById('couponInput').value)" class="btn btn-secondary">
+                            Apply
+                        </button>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                        <button onclick="Cart.applyCoupon('KISAN50')" style="background: #fef3c7; border: 1px dashed #d97706; color: #92400e; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer;">
+                            🌾 KISAN50 (10% Off)
+                        </button>
+                        <button onclick="Cart.applyCoupon('AGRISEED100')" style="background: #fef3c7; border: 1px dashed #d97706; color: #92400e; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer;">
+                            ⚡ AGRISEED100 (₹100 Off)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Price Breakdown Box -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">Order Price Summary</h3>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.95rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem; margin-bottom: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; color: var(--text-muted);">
+                            <span>Cart Subtotal</span>
+                            <span style="color: var(--text-dark); font-weight: 600;">₹{{ subtotal }}</span>
+                        </div>
+
+                        {% if discount > 0 %}
+                            <div style="display: flex; justify-content: space-between; color: #16a34a; font-weight: 600;">
+                                <span>Kisan Subsidy Discount ({{ coupon_code }})</span>
+                                <span>- ₹{{ discount }}</span>
+                            </div>
+                        {% endif %}
+
+                        <div style="display: flex; justify-content: space-between; color: var(--text-muted);">
+                            <span>Rural Delivery Charge</span>
+                            {% if delivery_charge == 0 %}
+                                <span style="color: #16a34a; font-weight: 700;">FREE</span>
+                            {% else %}
+                                <span style="color: var(--text-dark); font-weight: 600;">₹{{ delivery_charge }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem;">
+                        <span style="font-size: 1.15rem; font-weight: 800; color: var(--text-dark);">Total Amount</span>
+                        <span style="font-size: 1.85rem; font-weight: 800; color: var(--primary-800);">₹{{ total }}</span>
+                    </div>
+
+                    <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-lg btn-block" style="box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);">
+                        Proceed to Checkout →
+                    </a>
+
+                    <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                        <span>🔒</span> 100% Safe & Direct Village Farm Delivery
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty Cart -->
+        <div style="background: white; border: 1px dashed var(--border-color); border-radius: var(--radius-2xl); padding: 4.5rem 2rem; text-align: center; max-width: 600px; margin: 2rem auto;">
+            <span style="font-size: 4rem; display: block; margin-bottom: 1rem;">🛒</span>
+            <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">Your Cart is Currently Empty</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.75rem; line-height: 1.5;">
+                Explore certified seed varieties, bio-fertilizers, pesticides, and farm tools directly from verified research centers.
+            </p>
+            <a href="{{ url_for('catalog') }}" class="btn btn-primary btn-lg">
+                🌾 Browse Agricultural Catalog
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

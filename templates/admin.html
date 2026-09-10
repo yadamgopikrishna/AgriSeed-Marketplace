@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard & Store Manager – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.25rem;">
+    
+    <!-- Admin Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="background: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 9999px; text-transform: uppercase;">
+                    🛡️ Administrator Console
+                </span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">College Project Evaluation Mode</span>
+            </div>
+            <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-dark);">
+                AgriSeed Store Management Hub
+            </h1>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+            <button onclick="openModal('addProductModal')" class="btn btn-primary">
+                ➕ Add New Agricultural Product
+            </button>
+            <button onclick="resetDemoDatabase()" class="btn btn-secondary" title="Reset to Sample Database">
+                🔄 Reset Sample Data
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards Grid -->
+    <div class="kpi-grid">
+        <!-- Farmers -->
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #dcfce7; color: #15803d;">👨‍🌾</div>
+            <div class="kpi-info">
+                <p>Registered Farmers</p>
+                <h3>{{ farmers|length }}</h3>
+            </div>
+        </div>
+
+        <!-- Products -->
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #fef3c7; color: #b45309;">🌾</div>
+            <div class="kpi-info">
+                <p>Catalog Products</p>
+                <h3>{{ products|length }}</h3>
+            </div>
+        </div>
+
+        <!-- Orders -->
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #e0f2fe; color: #0369a1;">📦</div>
+            <div class="kpi-info">
+                <p>Total Orders</p>
+                <h3>{{ orders|length }}</h3>
+            </div>
+        </div>
+
+        <!-- Revenue -->
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #f3e8ff; color: #7e22ce;">💰</div>
+            <div class="kpi-info">
+                <p>Gross Marketplace Sales</p>
+                <h3>₹{{ total_revenue }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Alert Banner -->
+    {% if low_stock_products %}
+        <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-xl); padding: 1rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="font-size: 1.5rem;">⚠️</span>
+                <div>
+                    <strong style="color: #9f1239; font-size: 0.95rem;">Inventory Stock Alert:</strong>
+                    <span style="color: #881337; font-size: 0.9rem;"> {{ low_stock_products|length }} product(s) running low on stock at regional depot.</span>
+                </div>
+            </div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #9f1239; background: white; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #fecdd3;">
+                {{ low_stock_products[0].name }} ({{ low_stock_products[0].stock }} left)
+            </span>
+        </div>
+    {% endif %}
+
+    <!-- Admin Navigation Tabs -->
+    <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.25rem;">
+        <button onclick="switchAdminTab('orders', this)" class="admin-nav-tab btn btn-primary btn-sm">
+            📦 Manage Orders ({{ orders|length }})
+        </button>
+        <button onclick="switchAdminTab('products', this)" class="admin-nav-tab btn btn-secondary btn-sm">
+            🌾 Manage Products ({{ products|length }})
+        </button>
+        <button onclick="switchAdminTab('farmers', this)" class="admin-nav-tab btn btn-secondary btn-sm">
+            👨‍🌾 Registered Farmers ({{ farmers|length }})
+        </button>
+        <button onclick="switchAdminTab('sellers', this)" class="admin-nav-tab btn btn-secondary btn-sm">
+            🏢 Verified Sellers ({{ sellers|length }})
+        </button>
+    </div>
+
+    <!-- Tab 1: Orders Management -->
+    <div id="admin-tab-orders" class="admin-view-content">
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.25rem; font-weight: 800;">Real-Time Order Logistics & Status Control</h3>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Change status here to live-update the Farmer's tracking view!</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Farmer / Location</th>
+                            <th>Items & Total</th>
+                            <th>Payment</th>
+                            <th>Current Status</th>
+                            <th>Update Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in orders %}
+                            <tr>
+                                <td><strong style="color: var(--primary-800);">#{{ o._id }}</strong></td>
+                                <td style="color: var(--text-muted); font-size: 0.8rem;">{{ o.created_at[:10] }}</td>
+                                <td>
+                                    <strong>{{ o.user_name }}</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                        {{ o.delivery_address.village }}, {{ o.delivery_address.district }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>₹{{ o.total_amount }}</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                        {{ o['items']|length }} item(s) ({{ o['items'][0].name[:20] }}...)
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-size: 0.8rem;">{{ o.payment_method }}</span>
+                                </td>
+                                <td>
+                                    <span style="background: {% if o.status == 'Delivered' %}#dcfce7; color: #15803d;{% elif o.status == 'Shipped' %}#e0f2fe; color: #0369a1;{% else %}#fef3c7; color: #92400e;{% endif %} font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 9999px;">
+                                        {{ o.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <select onchange="updateOrderStatus('{{ o._id }}', this.value)" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-weight: 600; background: #f8fafc; outline: none;">
+                                        <option value="" disabled selected>Change Status...</option>
+                                        <option value="Ordered" {% if o.status == 'Ordered' %}selected{% endif %}>1. Ordered</option>
+                                        <option value="Confirmed" {% if o.status == 'Confirmed' %}selected{% endif %}>2. Confirmed</option>
+                                        <option value="Shipped" {% if o.status == 'Shipped' %}selected{% endif %}>3. Shipped</option>
+                                        <option value="Out for Delivery" {% if o.status == 'Out for Delivery' %}selected{% endif %}>4. Out for Delivery</option>
+                                        <option value="Delivered" {% if o.status == 'Delivered' %}selected{% endif %}>5. Delivered</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('track_order_page', order_id=o._id) }}" class="btn btn-secondary btn-sm" target="_blank">
+                                        View Track ↗
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Product Management -->
+    <div id="admin-tab-products" class="admin-view-content" style="display: none;">
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.25rem; font-weight: 800;">Agricultural Inventory Catalog</h3>
+                <button onclick="openModal('addProductModal')" class="btn btn-primary btn-sm">
+                    ➕ Add Product
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Crop Suitability</th>
+                            <th>Unit Price</th>
+                            <th>Stock</th>
+                            <th>Rating</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in products %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <img src="{{ p.image_url }}" alt="" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover;">
+                                        <div>
+                                            <a href="{{ url_for('product_detail', product_id=p._id) }}" style="font-weight: 700; color: var(--text-dark);">
+                                                {{ p.name }}
+                                            </a>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ p.unit }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span style="font-size: 0.8rem; font-weight: 600;">{{ p.category_icon }} {{ p.category }}</span></td>
+                                <td style="font-size: 0.85rem; color: var(--text-muted);">{{ p.crop_suitability }}</td>
+                                <td><strong style="color: var(--primary-800);">₹{{ p.price }}</strong></td>
+                                <td>
+                                    {% if p.stock and p.stock > 25 %}
+                                        <span style="color: #16a34a; font-weight: 700;">{{ p.stock }} units</span>
+                                    {% elif p.stock and p.stock > 0 %}
+                                        <span style="color: #d97706; font-weight: 700;">{{ p.stock }} (Low)</span>
+                                    {% else %}
+                                        <span style="color: #dc2626; font-weight: 700;">0 (Out)</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span style="color: #eab308; font-weight: 700; font-size: 0.85rem;">★ {{ p.rating }}</span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 0.4rem;">
+                                        <a href="{{ url_for('product_detail', product_id=p._id) }}" class="btn btn-secondary btn-sm" title="View">
+                                            👁️
+                                        </a>
+                                        <button onclick="handleDeleteProduct('{{ p._id }}', '{{ p.name }}')" class="btn btn-secondary btn-sm" style="color: #dc2626;" title="Delete Product">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Registered Farmers -->
+    <div id="admin-tab-farmers" class="admin-view-content" style="display: none;">
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">Farmer Registry & Community Directory</h3>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Farmer Name</th>
+                            <th>Contact Phone</th>
+                            <th>Email</th>
+                            <th>Village & District</th>
+                            <th>Farm Holding</th>
+                            <th>Primary Crops</th>
+                            <th>Kisan Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in farmers %}
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--text-dark);">👨‍🌾 {{ f.name }}</strong>
+                                </td>
+                                <td>+91 {{ f.phone }}</td>
+                                <td style="color: var(--text-muted); font-size: 0.85rem;">{{ f.email }}</td>
+                                <td>{{ f.village }}, {{ f.district }} ({{ f.state }})</td>
+                                <td><strong style="color: var(--primary-700);">{{ f.farm_size }}</strong></td>
+                                <td style="font-size: 0.85rem; color: var(--text-dark);">
+                                    {% if f.primary_crops is iterable and f.primary_crops is not string %}
+                                        {{ f.primary_crops|join(', ') }}
+                                    {% else %}
+                                        {{ f.primary_crops }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span style="background: #fef3c7; color: #92400e; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.8rem;">
+                                        🪙 {{ f.kisan_rewards }} Pts
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Verified Sellers -->
+    <div id="admin-tab-sellers" class="admin-view-content" style="display: none;">
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">Authorized Seed Producers & Agro-Vendors</h3>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Producer / Cooperative</th>
+                            <th>Authorized Representative</th>
+                            <th>Govt License No.</th>
+                            <th>Depot Location</th>
+                            <th>Rating</th>
+                            <th>Contact Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in sellers %}
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--text-dark);">🏢 {{ s.name }}</strong>
+                                    <span style="color: #16a34a; font-size: 0.75rem; display: block;">✓ Govt Verified</span>
+                                </td>
+                                <td>{{ s.owner }}</td>
+                                <td><code>{{ s.license_no }}</code></td>
+                                <td>{{ s.location }}</td>
+                                <td>
+                                    <span style="color: #eab308; font-weight: 800;">★ {{ s.rating }}</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">({{ s.review_count }})</span>
+                                </td>
+                                <td>{{ s.phone }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Add Product Modal -->
+<div id="addProductModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 650px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+            <h3 style="font-size: 1.35rem; font-weight: 800;">Add Agricultural Product to Store</h3>
+            <button onclick="closeModal('addProductModal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <form id="addProductForm" onsubmit="handleAddProduct(event)">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Product Variety / Name *</label>
+                <input type="text" name="name" placeholder="e.g. Shriram Super Wheat 1105" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Category *</label>
+                    <select name="category" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none; background: white;">
+                        <option value="Seeds">🌾 Seeds</option>
+                        <option value="Fertilizers">🧪 Fertilizers</option>
+                        <option value="Pesticides">🌱 Pesticides</option>
+                        <option value="Farming Equipment">🚜 Farming Equipment</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Crop Suitability</label>
+                    <input type="text" name="crop_suitability" placeholder="e.g. Wheat, Paddy, Cotton" value="Paddy / Wheat" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Price (₹) *</label>
+                    <input type="number" name="price" placeholder="450" required min="1" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Stock Qty *</label>
+                    <input type="number" name="stock" placeholder="100" value="75" required min="1" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Pack Unit</label>
+                    <input type="text" name="unit" placeholder="5 kg Pack" value="5 kg Bag" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Sowing Season</label>
+                <input type="text" name="season" placeholder="e.g. Kharif (June - October)" value="Kharif Season" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Image URL (Optional)</label>
+                <input type="url" name="image_url" placeholder="https://images.unsplash.com/photo-..." style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Agronomic Description & Dosage</label>
+                <textarea name="description" rows="3" placeholder="Describe germination percentage, purity, and disease resistance..." style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" onclick="closeModal('addProductModal')" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script>
+function switchAdminTab(tabName, btnElem) {
+    document.querySelectorAll('.admin-nav-tab').forEach(b => {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-secondary');
+    });
+    btnElem.classList.add('btn-primary');
+    btnElem.classList.remove('btn-secondary');
+
+    document.querySelectorAll('.admin-view-content').forEach(c => c.style.display = 'none');
+    document.getElementById(`admin-tab-${tabName}`).style.display = 'block';
+}
+</script>
+{% endblock %}

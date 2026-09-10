@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgriSeed – Quality Seeds. Better Crops. Better Future.{% endblock %}</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Prototype Top Notification Bar -->
+    <div style="background: #14532d; color: #bbf7d0; font-size: 0.8rem; padding: 0.4rem 1rem; text-align: center; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span>🌾 <strong>AgriSeed Project Prototype</strong> — College Evaluation & Demo Mode</span>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <a href="{{ url_for('presentation_page') }}" style="color: #fde047; font-weight: 700; text-decoration: none; font-size: 0.75rem; background: rgba(255,255,255,0.15); padding: 0.2rem 0.5rem; border-radius: 4px;">
+                    📊 Slide Deck (PPT)
+                </a>
+                <span style="display: flex; align-items: center; gap: 0.3rem;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {% if is_live_mongo %}#22c55e{% else %}#38bdf8{% endif %};"></span>
+                    DB: {% if is_live_mongo %}MongoDB Active{% else %}Local MongoDB (Ready){% endif %}
+                </span>
+                <span style="opacity: 0.6;">|</span>
+                <button onclick="resetDemoDatabase()" style="background: none; border: none; color: #fde047; cursor: pointer; font-size: 0.75rem; text-decoration: underline;">
+                    🔄 Reset Sample Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <!-- Brand Logo -->
+            <a href="{{ url_for('index') }}" class="brand-logo">
+                <span style="background: linear-gradient(135deg, #16a34a, #15803d); color: white; width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.25rem; box-shadow: 0 4px 10px rgba(22,163,74,0.3);">🌱</span>
+                <span>Agri<span style="color: #16a34a;">Seed</span></span>
+                <span class="brand-badge">Marketplace</span>
+            </a>
+
+            <!-- Search Bar -->
+            <form action="{{ url_for('catalog') }}" method="GET" class="nav-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" name="q" placeholder="Search seeds, fertilizers, pesticides, equipment..." value="{{ request.args.get('q', '') }}">
+            </form>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+                    🏠 Home
+                </a>
+                <a href="{{ url_for('catalog') }}" class="nav-link {% if request.endpoint == 'catalog' %}active{% endif %}">
+                    📦 Products
+                </a>
+                <a href="{{ url_for('track_search_page') }}" class="nav-link {% if 'track' in request.path %}active{% endif %}">
+                    🚚 Track Order
+                </a>
+
+                <!-- Cart Button -->
+                <a href="{{ url_for('cart') }}" class="cart-btn">
+                    🛒 Cart
+                    <span class="badge-pill cart-badge-count">{{ cart_count }}</span>
+                </a>
+
+                <!-- User Profile / Auth State -->
+                {% if current_user %}
+                    <div style="display: flex; align-items: center; gap: 0.5rem; border-left: 1px solid var(--border-color); padding-left: 1rem;">
+                        {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('admin_page') }}" class="btn btn-amber btn-sm">
+                                🛡️ Admin Panel
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm" style="display: flex; align-items: center; gap: 0.4rem;">
+                                👨‍🌾 {{ current_user.name.split()[0] }}
+                            </a>
+                        {% endif %}
+                        <button onclick="Auth.logout()" title="Logout" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 0.3rem;" aria-label="Logout">
+                            🚪
+                        </button>
+                    </div>
+                {% else %}
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <button onclick="openQuickAuth('register')" class="btn btn-primary btn-sm" style="box-shadow: 0 4px 10px rgba(22,163,74,0.25);">
+                            🌱 Register / Sign In
+                        </button>
+                        <button onclick="Auth.demoLogin('farmer')" class="btn btn-secondary btn-sm" title="Quick 1-Click Demo Login">
+                            ⚡ Demo
+                        </button>
+                    </div>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main style="flex: 1;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Floating Corner Register & Login Feature for Visitors -->
+    {% if not current_user %}
+        <div id="cornerAuthBanner" style="position: fixed; bottom: 1.25rem; right: 1.25rem; z-index: 900; background: #ffffff; border: 2px solid #22c55e; border-radius: 1.25rem; padding: 1rem 1.25rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); display: flex; align-items: center; gap: 1rem; max-width: 390px; border-left: 6px solid #16a34a;">
+            <div style="font-size: 2rem; flex-shrink: 0;">🌾</div>
+            <div style="flex: 1;">
+                <strong style="font-size: 0.95rem; color: #14532d; display: block; line-height: 1.2;">New Farmer? Join AgriSeed</strong>
+                <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.15rem; margin-bottom: 0.4rem;">
+                    Register in 30 seconds & get <strong>+100 Kisan Bonus Points</strong>!
+                </p>
+                <div style="display: flex; gap: 0.4rem;">
+                    <button onclick="openQuickAuth('register')" class="btn btn-primary btn-sm" style="padding: 0.3rem 0.7rem; font-size: 0.8rem;">
+                        ⚡ Quick Register
+                    </button>
+                    <button onclick="openQuickAuth('login')" class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">
+                        Sign In
+                    </button>
+                </div>
+            </div>
+            <button onclick="document.getElementById('cornerAuthBanner').remove()" style="background: none; border: none; font-size: 1.2rem; color: #94a3b8; cursor: pointer; align-self: flex-start;" title="Close banner">&times;</button>
+        </div>
+    {% endif %}
+
+    <!-- Global Quick Auth Modal (Accessible from any page / ngrok) -->
+    <div id="globalQuickAuthModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 520px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">🌱</span>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-dark);">Farmer Portal</h3>
+                </div>
+                <button onclick="closeQuickAuth()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <!-- Switchable Tabs -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--bg-main); padding: 0.3rem; border-radius: var(--radius-lg);">
+                <button type="button" id="quickTabBtnReg" onclick="switchQuickAuthTab('register')" class="btn btn-primary btn-sm">
+                    🌾 Quick Register
+                </button>
+                <button type="button" id="quickTabBtnLogin" onclick="switchQuickAuthTab('login')" class="btn btn-secondary btn-sm" style="background: transparent; border: none;">
+                    🔑 Farmer Sign In
+                </button>
+            </div>
+
+            <!-- 1. Quick Register Form -->
+            <form id="quickRegForm" onsubmit="handleQuickRegisterSubmit(event)">
+                <div style="margin-bottom: 0.85rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Farmer Full Name *</label>
+                    <input type="text" id="qRegName" placeholder="e.g. Ramesh Kumar Singh" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Mobile Number *</label>
+                        <input type="tel" id="qRegPhone" placeholder="9876543210" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Farm Size</label>
+                        <input type="text" id="qRegFarmSize" placeholder="e.g. 5 Acres" value="5 Acres" style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Village / Town *</label>
+                        <input type="text" id="qRegVillage" placeholder="Village name" value="Rampur Khurd" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">District *</label>
+                        <input type="text" id="qRegDistrict" placeholder="District" value="Karnal" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Password *</label>
+                    <input type="password" id="qRegPassword" placeholder="Create a password (min 6 chars)" required value="farmer123" style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block" style="box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);">
+                    🌱 Complete Registration (+100 Kisan Points)
+                </button>
+
+                <!-- Demo shortcuts -->
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Or instant project evaluator login:</span>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.4rem;">
+                        <button type="button" onclick="Auth.demoLogin('farmer')" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                            👨‍🌾 Demo Farmer
+                        </button>
+                        <button type="button" onclick="Auth.demoLogin('admin')" class="btn btn-amber btn-sm" style="font-size: 0.75rem;">
+                            🛡️ Demo Admin
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- 2. Quick Sign In Form -->
+            <form id="quickLoginForm" onsubmit="handleQuickLoginSubmit(event)" style="display: none;">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Registered Mobile / Email</label>
+                    <input type="text" id="qLoginIdentity" placeholder="e.g. 9876543210 or farmer@agriseed.in" value="farmer@agriseed.in" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+
+                <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem;">Password</label>
+                    <input type="password" id="qLoginPassword" placeholder="••••••••" value="farmer123" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    🔑 Sign In to AgriSeed
+                </button>
+
+                <!-- Demo shortcuts -->
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Quick 1-Click Evaluation Login:</span>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.4rem;">
+                        <button type="button" onclick="Auth.demoLogin('farmer')" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                            👨‍🌾 Demo Farmer
+                        </button>
+                        <button type="button" onclick="Auth.demoLogin('admin')" class="btn btn-amber btn-sm" style="font-size: 0.75rem;">
+                            🛡️ Demo Admin
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem; font-weight: 800; color: white; margin-bottom: 1rem;">
+                        <span>🌱</span>
+                        <span>Agri<span style="color: #4ade80;">Seed</span></span>
+                    </div>
+                    <p style="margin-bottom: 1.5rem; line-height: 1.6; font-size: 0.95rem;">
+                        Online Agricultural Marketplace empowering farmers with certified quality seeds, fertilizers, crop protection, and farming tools delivered directly from verified sellers.
+                    </p>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <span style="background: rgba(255,255,255,0.1); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; color: #86efac;">🌾 100% Quality Seeds</span>
+                        <span style="background: rgba(255,255,255,0.1); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; color: #86efac;">🚜 Direct Farm Delivery</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Categories</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('catalog', category='Seeds') }}">🌾 Certified Seeds</a></li>
+                        <li><a href="{{ url_for('catalog', category='Fertilizers') }}">🧪 Bio & Chemical Fertilizers</a></li>
+                        <li><a href="{{ url_for('catalog', category='Pesticides') }}">🌱 Organic & Crop Protection</a></li>
+                        <li><a href="{{ url_for('catalog', category='Farming Equipment') }}">🚜 Modern Farm Equipment</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Farmer Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('track_search_page') }}">🚚 Track Your Order</a></li>
+                        <li><a href="{{ url_for('dashboard') }}">👨‍🌾 Kisan Dashboard</a></li>
+                        <li><a href="{{ url_for('admin_page') }}">🛡️ Admin Dashboard</a></li>
+                        <li><a href="{{ url_for('auth_page') }}">📝 Farmer Registration</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Project Prototype Info</h4>
+                    <p style="font-size: 0.85rem; margin-bottom: 0.75rem; color: #cbd5e1;">
+                        Developed for Academic & Capstone Presentation. Built with Python Flask, MongoDB, and modern agricultural UI architecture.
+                    </p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                        <p style="font-size: 0.8rem; color: #86efac; margin-bottom: 0.25rem;"><strong>⚡ Demo Accounts:</strong></p>
+                        <p style="font-size: 0.75rem;">Farmer: <code>farmer@agriseed.in</code> / <code>farmer123</code></p>
+                        <p style="font-size: 0.75rem;">Admin: <code>admin@agriseed.in</code> / <code>admin123</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 AgriSeed Agricultural Marketplace. College Project Prototype.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="{{ url_for('admin_page') }}" style="color: #cbd5e1; font-weight: 500;">Admin Console</a>
+                    <a href="#" onclick="resetDemoDatabase(); return false;" style="color: #fde047;">Reset System</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <!-- Core Scripts -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

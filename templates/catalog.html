@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Agricultural Products Catalog – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.25rem;">
+    <!-- Catalog Header -->
+    <div style="margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+            <a href="{{ url_for('index') }}">Home</a>
+            <span>/</span>
+            <span style="color: var(--primary-700); font-weight: 600;">Product Catalog</span>
+        </div>
+        <h1 style="font-size: 2.25rem; font-weight: 800;">
+            Agricultural Inputs & Equipment
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-top: 0.25rem;">
+            Showing {{ total_found }} verified products direct from research farms and authorized cooperatives.
+        </p>
+    </div>
+
+    <!-- Filter & Sort Bar -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.25rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+        <form action="{{ url_for('catalog') }}" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 1rem; align-items: flex-end;">
+            
+            <!-- Search Query -->
+            <div>
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Search Keyword</label>
+                <input type="text" name="q" placeholder="e.g. Basmati, NPK, Sprayer..." value="{{ search_query }}" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); outline: none;">
+            </div>
+
+            <!-- Category Filter -->
+            <div>
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Product Category</label>
+                <select name="category" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); outline: none; background: white;">
+                    <option value="All" {% if selected_category == 'All' or not selected_category %}selected{% endif %}>All Categories (All)</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Crop Suitability Filter -->
+            <div>
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Crop Suitability</label>
+                <select name="crop" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); outline: none; background: white;">
+                    <option value="All" {% if selected_crop == 'All' or not selected_crop %}selected{% endif %}>All Crops</option>
+                    {% for crop in crops %}
+                        <option value="{{ crop }}" {% if selected_crop == crop %}selected{% endif %}>{{ crop }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div>
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Sort By</label>
+                <select name="sort" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); outline: none; background: white;">
+                    <option value="featured" {% if selected_sort == 'featured' %}selected{% endif %}>Featured</option>
+                    <option value="price_low" {% if selected_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if selected_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                </select>
+            </div>
+
+            <!-- Submit Filter -->
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="height: 40px; padding: 0 1.25rem;">
+                    Apply Filter
+                </button>
+                <a href="{{ url_for('catalog') }}" class="btn btn-secondary" style="height: 40px; padding: 0 0.85rem;" title="Reset Filters">
+                    🔄
+                </a>
+            </div>
+        </form>
+
+        <!-- Quick Category Filter Pills -->
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); flex-wrap: wrap;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); align-self: center; margin-right: 0.5rem;">Quick Filter:</span>
+            <a href="{{ url_for('catalog') }}" class="btn btn-sm {% if not selected_category or selected_category == 'All' %}btn-primary{% else %}btn-secondary{% endif %}">
+                All Items
+            </a>
+            <a href="{{ url_for('catalog', category='Seeds') }}" class="btn btn-sm {% if selected_category == 'Seeds' %}btn-primary{% else %}btn-secondary{% endif %}">
+                🌾 Seeds
+            </a>
+            <a href="{{ url_for('catalog', category='Fertilizers') }}" class="btn btn-sm {% if selected_category == 'Fertilizers' %}btn-primary{% else %}btn-secondary{% endif %}">
+                🧪 Fertilizers
+            </a>
+            <a href="{{ url_for('catalog', category='Pesticides') }}" class="btn btn-sm {% if selected_category == 'Pesticides' %}btn-primary{% else %}btn-secondary{% endif %}">
+                🌱 Pesticides
+            </a>
+            <a href="{{ url_for('catalog', category='Farming Equipment') }}" class="btn btn-sm {% if selected_category == 'Farming Equipment' %}btn-primary{% else %}btn-secondary{% endif %}">
+                🚜 Farming Equipment
+            </a>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    {% if products %}
+        <div class="product-grid">
+            {% for prod in products %}
+                <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img src="{{ prod.image_url }}" alt="{{ prod.name }}" loading="lazy">
+                        <span class="product-tag">{{ prod.category_icon }} {{ prod.category }}</span>
+                        {% if prod.verified_seller %}
+                            <span class="verified-tag">✓ Verified</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-body">
+                        <div class="product-category">{{ prod.crop_suitability }}</div>
+                        <h3 class="product-title">
+                            <a href="{{ url_for('product_detail', product_id=prod._id) }}">{{ prod.name }}</a>
+                        </h3>
+
+                        <div class="product-meta">
+                            <span style="color: #eab308; font-weight: 700; font-size: 0.9rem;">
+                                ★ {{ prod.rating }} <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 400;">({{ prod.review_count }})</span>
+                            </span>
+                            <span class="crop-badge">📦 {{ prod.unit }}</span>
+                        </div>
+
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; display: flex; justify-content: space-between;">
+                            <span>Seller: <strong>{{ prod.seller_name }}</strong></span>
+                            {% if prod.stock and prod.stock > 0 %}
+                                <span style="color: #16a34a; font-weight: 600;">In Stock ({{ prod.stock }})</span>
+                            {% else %}
+                                <span style="color: #dc2626; font-weight: 600;">Out of Stock</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-pricing">
+                            <span class="current-price">₹{{ prod.price }}</span>
+                            {% if prod.original_price and prod.original_price > prod.price %}
+                                <span class="original-price">₹{{ prod.original_price }}</span>
+                                <span class="discount-badge">
+                                    {{ ((prod.original_price - prod.price) / prod.original_price * 100)|round|int }}% OFF
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                            <a href="{{ url_for('product_detail', product_id=prod._id) }}" class="btn btn-secondary btn-sm">
+                                View Details
+                            </a>
+                            <button onclick="Cart.add('{{ prod._id }}', '{{ prod.unit }}', 1)" class="btn btn-primary btn-sm" {% if prod.stock == 0 %}disabled{% endif %}>
+                                🛒 Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div style="background: white; border: 1px dashed var(--border-color); border-radius: var(--radius-2xl); padding: 4rem 2rem; text-align: center; margin: 2rem 0;">
+            <span style="font-size: 3.5rem; display: block; margin-bottom: 1rem;">🌾</span>
+            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">No Agricultural Products Match Your Filters</h3>
+            <p style="color: var(--text-muted); max-width: 450px; margin: 0 auto 1.5rem;">
+                Try searching with different keywords, select 'All Categories', or reset your crop suitability filters.
+            </p>
+            <a href="{{ url_for('catalog') }}" class="btn btn-primary">
+                🔄 Clear All Filters & Show All Products
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

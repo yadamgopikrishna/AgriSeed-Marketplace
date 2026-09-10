@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Farmer Login & Registration – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1.25rem; max-width: 600px;">
+    
+    <!-- Auth Card -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2.5rem; box-shadow: var(--shadow-md);">
+        
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <span style="font-size: 2.5rem; display: inline-block; margin-bottom: 0.5rem;">🌱</span>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-dark);">
+                Welcome to AgriSeed
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">
+                Quality Seeds. Better Crops. Better Future.
+            </p>
+        </div>
+
+        <!-- Quick 1-Click Demo Logins for Project Evaluation -->
+        <div style="background: var(--primary-50); border: 1px solid var(--primary-200); border-radius: var(--radius-xl); padding: 1.25rem; margin-bottom: 2rem;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: var(--primary-900); margin-bottom: 0.6rem; text-transform: uppercase; text-align: center;">
+                ⚡ 1-Click Demo Logins (For College Evaluation)
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <button type="button" onclick="Auth.demoLogin('farmer')" class="btn btn-primary btn-sm" style="font-size: 0.85rem;">
+                    👨‍🌾 Login as Farmer
+                </button>
+                <button type="button" onclick="Auth.demoLogin('admin')" class="btn btn-amber btn-sm" style="font-size: 0.85rem;">
+                    🛡️ Login as Admin
+                </button>
+            </div>
+        </div>
+
+        <!-- Auth Tabs -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 2rem; background: var(--bg-main); padding: 0.35rem; border-radius: var(--radius-lg);">
+            <button type="button" id="tabBtnLogin" onclick="switchAuthTab('login')" class="btn btn-primary btn-sm" style="border-radius: var(--radius-md);">
+                Farmer Login
+            </button>
+            <button type="button" id="tabBtnRegister" onclick="switchAuthTab('register')" class="btn btn-secondary btn-sm" style="border-radius: var(--radius-md); background: transparent; border: none;">
+                New Registration
+            </button>
+        </div>
+
+        <!-- 1. Login Form -->
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">
+                    Registered Mobile / Email
+                </label>
+                <input type="text" id="loginIdentity" placeholder="e.g. 9876543210 or farmer@agriseed.in" value="farmer@agriseed.in" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">Password</label>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Default: <code>farmer123</code></span>
+                </div>
+                <input type="password" id="loginPassword" placeholder="••••••••" value="farmer123" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block" style="box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);">
+                🔑 Sign In to AgriSeed
+            </button>
+        </form>
+
+        <!-- 2. Registration Form -->
+        <form id="registerForm" onsubmit="handleRegisterSubmit(event)" style="display: none;">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Full Name *</label>
+                <input type="text" id="regName" placeholder="e.g. Gurdeep Singh" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Mobile Number *</label>
+                    <input type="tel" id="regPhone" placeholder="9812345678" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Email Address</label>
+                    <input type="email" id="regEmail" placeholder="farmer@gmail.com" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Farm Land Holding</label>
+                    <input type="text" id="regFarmSize" placeholder="e.g. 10 Acres" value="6 Acres" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Primary Crops</label>
+                    <input type="text" id="regCrops" placeholder="e.g. Wheat, Paddy" value="Paddy, Wheat" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Village / Town *</label>
+                <input type="text" id="regVillage" placeholder="Village Name, Post Office" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">District *</label>
+                    <input type="text" id="regDistrict" placeholder="Karnal / Ludhiana" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">PIN Code *</label>
+                    <input type="text" id="regPincode" placeholder="132001" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Create Password *</label>
+                <input type="password" id="regPassword" placeholder="Minimum 6 characters" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                🌱 Register Farmer Account (+100 Kisan Points)
+            </button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchAuthTab(mode) {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const tabLogin = document.getElementById('tabBtnLogin');
+    const tabRegister = document.getElementById('tabBtnRegister');
+
+    if (mode === 'login') {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        tabLogin.className = 'btn btn-primary btn-sm';
+        tabLogin.style.background = '';
+        tabRegister.className = 'btn btn-secondary btn-sm';
+        tabRegister.style.background = 'transparent';
+        tabRegister.style.border = 'none';
+    } else {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        tabRegister.className = 'btn btn-primary btn-sm';
+        tabRegister.style.background = '';
+        tabLogin.className = 'btn btn-secondary btn-sm';
+        tabLogin.style.background = 'transparent';
+        tabLogin.style.border = 'none';
+    }
+}
+
+async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const identity = document.getElementById('loginIdentity').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identity, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => window.location.href = data.redirect || '/dashboard', 600);
+        } else {
+            showToast(data.message || 'Login failed', 'error');
+        }
+    } catch (err) {
+        showToast('Network error during login', 'error');
+    }
+}
+
+async function handleRegisterSubmit(e) {
+    e.preventDefault();
+    const payload = {
+        name: document.getElementById('regName').value,
+        phone: document.getElementById('regPhone').value,
+        email: document.getElementById('regEmail').value,
+        farm_size: document.getElementById('regFarmSize').value,
+        primary_crops: document.getElementById('regCrops').value.split(',').map(s => s.trim()),
+        village: document.getElementById('regVillage').value,
+        district: document.getElementById('regDistrict').value,
+        pincode: document.getElementById('regPincode').value,
+        password: document.getElementById('regPassword').value
+    };
+
+    try {
+        const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => window.location.href = '/dashboard', 800);
+        } else {
+            showToast(data.message || 'Registration failed', 'error');
+        }
+    } catch (err) {
+        showToast('Network error during registration', 'error');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,8 @@
+Flask>=3.0.0
+pymongo>=4.6.0
+Werkzeug>=3.0.0
+python-dotenv>=1.0.0
+python-pptx>=1.0.0
+reportlab>=4.0.0
+Pillow>=10.0.0
+

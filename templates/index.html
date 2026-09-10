@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+
+{% block title %}AgriSeed – Quality Seeds. Better Crops. Better Future.{% endblock %}
+
+{% block content %}
+
+<!-- 1. Welcome / Splash Hero Section -->
+<section class="hero-section">
+    <div class="hero-pattern"></div>
+    <div class="container hero-grid">
+        <div>
+            <div class="hero-badge">
+                <span>🌱 Certified Agri Portal</span>
+                <span>•</span>
+                <span>Zero Middlemen Commission</span>
+            </div>
+            
+            <h1 class="hero-title">
+                Quality Seeds. <br>
+                <span>Better Crops.</span> <br>
+                Better Future.
+            </h1>
+            
+            <p class="hero-subtitle">
+                Directly connect with certified agricultural research centers, verified cooperatives, and licensed sellers. Get high-germination seeds, fertilizers, and farm equipment delivered directly to your village farm.
+            </p>
+
+            <div class="hero-actions">
+                <a href="{{ url_for('catalog') }}" class="btn btn-amber btn-lg">
+                    🌾 Explore Quality Seeds
+                </a>
+                {% if not current_user %}
+                    <a href="{{ url_for('auth_page') }}" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3); backdrop-filter: blur(10px);">
+                        👨‍🌾 Farmer Get Started
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3); backdrop-filter: blur(10px);">
+                        📊 Open Farmer Dashboard
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Value Props Badges -->
+            <div style="display: flex; gap: 1.5rem; margin-top: 2.5rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #dcfce7;">
+                    <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.5rem; border-radius: 6px;">✓</span>
+                    <span>100% Tested Germination</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #dcfce7;">
+                    <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.5rem; border-radius: 6px;">✓</span>
+                    <span>Govt. Approved Sellers</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #dcfce7;">
+                    <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.5rem; border-radius: 6px;">✓</span>
+                    <span>Doorstep Rural Delivery</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Feature / Quick Register Card -->
+        <div class="hero-card" style="background: rgba(255, 255, 255, 0.95); color: var(--text-dark); padding: 1.75rem; border-radius: var(--radius-2xl); box-shadow: var(--shadow-xl); border: 2px solid var(--primary-400);">
+            {% if not current_user %}
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                    <div>
+                        <span style="font-weight: 800; font-size: 1.15rem; color: #14532d; display: block;">🌾 Quick Farmer Registration</span>
+                        <span style="font-size: 0.75rem; color: var(--primary-700); font-weight: 700;">+100 Kisan Points Bonus on Join!</span>
+                    </div>
+                    <button onclick="Auth.demoLogin('farmer')" class="btn btn-primary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;" title="1-Click Demo Login">
+                        ⚡ Demo
+                    </button>
+                </div>
+
+                <form onsubmit="handleQuickRegisterSubmit(event)">
+                    <div style="margin-bottom: 0.6rem;">
+                        <input type="text" id="qRegName" placeholder="Farmer Full Name (e.g. Ramesh Singh)" required style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.85rem; outline: none;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.6rem;">
+                        <input type="tel" id="qRegPhone" placeholder="Mobile Number *" required style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.85rem; outline: none;">
+                        <input type="text" id="qRegDistrict" placeholder="District / Village" value="Karnal" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.85rem; outline: none;">
+                    </div>
+                    <div style="margin-bottom: 0.85rem;">
+                        <input type="password" id="qRegPassword" placeholder="Create Password" value="farmer123" required style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.85rem; outline: none;">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block btn-sm" style="font-size: 0.9rem; padding: 0.65rem; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
+                        🌱 Register Farm & Enter Store →
+                    </button>
+                </form>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted);">
+                    <span>Already registered?</span>
+                    <button onclick="openQuickAuth('login')" style="background: none; border: none; color: var(--primary-700); font-weight: 700; cursor: pointer; text-decoration: underline;">
+                        🔑 Sign In to Account
+                    </button>
+                </div>
+            {% else %}
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                    <div>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700); text-transform: uppercase;">Active Session</span>
+                        <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--text-dark);">👨‍🌾 {{ current_user.name }}</h4>
+                    </div>
+                    <span style="background: var(--primary-100); color: var(--primary-800); font-weight: 800; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                        🪙 {{ current_user.kisan_rewards or 100 }} Pts
+                    </span>
+                </div>
+
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    📍 {{ current_user.village }}, {{ current_user.district }} • Land: <strong>{{ current_user.farm_size }}</strong>
+                </p>
+
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm" style="flex: 1;">
+                        📊 Farmer Dashboard
+                    </a>
+                    <a href="{{ url_for('catalog') }}" class="btn btn-secondary btn-sm" style="flex: 1;">
+                        🌾 Order Seeds
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Krishi Weather & Sowing Advisory Banner -->
+<div class="container">
+    <div class="advisory-banner">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="font-size: 2.2rem;">🌦️</span>
+            <div>
+                <h4 style="color: #92400e; font-size: 1.05rem; font-weight: 800;">Seasonal Crop Advisory & Sowing Alert</h4>
+                <p style="color: #78350f; font-size: 0.9rem; margin-top: 0.15rem;">
+                    Ideal weather conditions for <strong>Paddy & Cotton sowing</strong>. Apply balanced NPK fertilizers and certified seed varieties for 90%+ germination.
+                </p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+            <a href="{{ url_for('catalog', category='Seeds') }}" class="btn btn-amber btn-sm">
+                View Sowing Seeds →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Product Categories Section -->
+<section style="padding: 2.5rem 0;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem;">
+            <div>
+                <span style="color: var(--primary-700); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Agricultural Inputs</span>
+                <h2 style="font-size: 1.85rem; margin-top: 0.2rem;">Browse Product Categories</h2>
+            </div>
+            <a href="{{ url_for('catalog') }}" style="color: var(--primary-700); font-weight: 600; font-size: 0.95rem;">
+                View All Categories →
+            </a>
+        </div>
+
+        <div class="category-grid">
+            <!-- Seeds -->
+            <a href="{{ url_for('catalog', category='Seeds') }}" class="category-card">
+                <div class="category-icon-wrapper">🌾</div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.35rem;">Certified Seeds</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">Hybrid Paddy, Wheat, Bt Cotton, Mustard, Vegetables</p>
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700); background: var(--primary-50); padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                    {{ category_counts['Seeds'] }} Varieties
+                </span>
+            </a>
+
+            <!-- Fertilizers -->
+            <a href="{{ url_for('catalog', category='Fertilizers') }}" class="category-card">
+                <div class="category-icon-wrapper">🧪</div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.35rem;">Fertilizers</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">NPK 19:19:19, Organic Neem Cake, DAP & Chelated Zinc</p>
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700); background: var(--primary-50); padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                    {{ category_counts['Fertilizers'] }} Products
+                </span>
+            </a>
+
+            <!-- Pesticides -->
+            <a href="{{ url_for('catalog', category='Pesticides') }}" class="category-card">
+                <div class="category-icon-wrapper">🌱</div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.35rem;">Crop Protection</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">Bio-Larvicides, Organic Neem Oil Spray & Fungicides</p>
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700); background: var(--primary-50); padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                    {{ category_counts['Pesticides'] }} Products
+                </span>
+            </a>
+
+            <!-- Farming Equipment -->
+            <a href="{{ url_for('catalog', category='Farming Equipment') }}" class="category-card">
+                <div class="category-icon-wrapper">🚜</div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.35rem;">Farming Equipment</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">Battery Sprayers, Push Seed Drills, Drip Kits, Soil Testers</p>
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700); background: var(--primary-50); padding: 0.25rem 0.75rem; border-radius: 9999px;">
+                    {{ category_counts['Farming Equipment'] }} Tools
+                </span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 3. Featured Products Section -->
+<section style="padding: 2.5rem 0; background: #ffffff; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+            <div>
+                <span style="color: var(--primary-700); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Recommended For You</span>
+                <h2 style="font-size: 1.85rem; margin-top: 0.2rem;">Featured High-Yield Products</h2>
+            </div>
+            <a href="{{ url_for('catalog') }}" class="btn btn-secondary btn-sm">
+                Explore All Products ({{ total_products }}) →
+            </a>
+        </div>
+
+        <div class="product-grid">
+            {% for prod in featured_products %}
+                <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img src="{{ prod.image_url }}" alt="{{ prod.name }}" loading="lazy">
+                        <span class="product-tag">{{ prod.category_icon }} {{ prod.category }}</span>
+                        {% if prod.verified_seller %}
+                            <span class="verified-tag">✓ Verified</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-body">
+                        <div class="product-category">{{ prod.crop_suitability }}</div>
+                        <h3 class="product-title">
+                            <a href="{{ url_for('product_detail', product_id=prod._id) }}">{{ prod.name }}</a>
+                        </h3>
+
+                        <div class="product-meta">
+                            <span style="color: #eab308; font-weight: 700; font-size: 0.9rem;">
+                                ★ {{ prod.rating }} <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 400;">({{ prod.review_count }})</span>
+                            </span>
+                            <span class="crop-badge">📦 {{ prod.unit }}</span>
+                        </div>
+
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                            Seller: <strong>{{ prod.seller_name }}</strong>
+                        </div>
+
+                        <div class="product-pricing">
+                            <span class="current-price">₹{{ prod.price }}</span>
+                            {% if prod.original_price and prod.original_price > prod.price %}
+                                <span class="original-price">₹{{ prod.original_price }}</span>
+                                <span class="discount-badge">
+                                    {{ ((prod.original_price - prod.price) / prod.original_price * 100)|round|int }}% OFF
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                            <a href="{{ url_for('product_detail', product_id=prod._id) }}" class="btn btn-secondary btn-sm">
+                                Details
+                            </a>
+                            <button onclick="Cart.add('{{ prod._id }}', '{{ prod.unit }}', 1)" class="btn btn-primary btn-sm">
+                                🛒 Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 4. Special Offers & Kisan Benefits Banner -->
+<section style="padding: 3rem 0;">
+    <div class="container">
+        <div style="background: linear-gradient(135deg, #14532d 0%, #15803d 100%); border-radius: var(--radius-2xl); color: white; padding: 3rem; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2.5rem; align-items: center; box-shadow: var(--shadow-lg);">
+            <div>
+                <span style="background: #eab308; color: #78350f; font-weight: 800; font-size: 0.8rem; padding: 0.3rem 0.8rem; border-radius: 9999px; text-transform: uppercase;">
+                    Special Kisan Promotion
+                </span>
+                <h2 style="font-size: 2.25rem; color: white; margin: 1rem 0 0.75rem;">
+                    Get Extra 10% Kisan Subsidy On All Certified Seeds
+                </h2>
+                <p style="color: #dcfce7; font-size: 1.05rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                    Use coupon code <strong style="background: rgba(255,255,255,0.25); padding: 0.2rem 0.6rem; border-radius: 6px; color: #fef08a;">KISAN50</strong> during checkout. Enjoy free delivery on orders above ₹999 across all rural districts.
+                </p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="{{ url_for('catalog', category='Seeds') }}" class="btn btn-amber btn-lg">
+                        Shop Seed Subsidy Now
+                    </a>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-xl); padding: 1.75rem; backdrop-filter: blur(10px);">
+                <h4 style="color: white; font-size: 1.15rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 0.75rem;">
+                    ⭐ Why Quality Seeds Matter:
+                </h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; color: #e2e8f0;">
+                    <li>🌱 <strong>Higher Germination:</strong> 90-95% uniform emergence.</li>
+                    <li>🌾 <strong>Purity & Vigour:</strong> Free from weed seeds and diseased grains.</li>
+                    <li>🛡️ <strong>Disease Resistance:</strong> Tested against local blast, rust and blight.</li>
+                    <li>📈 <strong>Yield Increase:</strong> 15-25% more produce per acre.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. Popular Agricultural Inputs -->
+<section style="padding: 2.5rem 0; background: var(--bg-main);">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+            <div>
+                <span style="color: var(--primary-700); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Best Sellers</span>
+                <h2 style="font-size: 1.85rem; margin-top: 0.2rem;">Popular Fertilizers & Equipment</h2>
+            </div>
+            <a href="{{ url_for('catalog') }}" class="btn btn-secondary btn-sm">
+                View Catalog →
+            </a>
+        </div>
+
+        <div class="product-grid">
+            {% for prod in popular_products[:4] %}
+                <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img src="{{ prod.image_url }}" alt="{{ prod.name }}" loading="lazy">
+                        <span class="product-tag">{{ prod.category_icon }} {{ prod.category }}</span>
+                        {% if prod.verified_seller %}
+                            <span class="verified-tag">✓ Verified</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-body">
+                        <div class="product-category">{{ prod.crop_suitability }}</div>
+                        <h3 class="product-title">
+                            <a href="{{ url_for('product_detail', product_id=prod._id) }}">{{ prod.name }}</a>
+                        </h3>
+
+                        <div class="product-meta">
+                            <span style="color: #eab308; font-weight: 700; font-size: 0.9rem;">
+                                ★ {{ prod.rating }} <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 400;">({{ prod.review_count }})</span>
+                            </span>
+                            <span class="crop-badge">📦 {{ prod.unit }}</span>
+                        </div>
+
+                        <div class="product-pricing">
+                            <span class="current-price">₹{{ prod.price }}</span>
+                            {% if prod.original_price and prod.original_price > prod.price %}
+                                <span class="original-price">₹{{ prod.original_price }}</span>
+                                <span class="discount-badge">
+                                    {{ ((prod.original_price - prod.price) / prod.original_price * 100)|round|int }}% OFF
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                            <a href="{{ url_for('product_detail', product_id=prod._id) }}" class="btn btn-secondary btn-sm">
+                                Details
+                            </a>
+                            <button onclick="Cart.add('{{ prod._id }}', '{{ prod.unit }}', 1)" class="btn btn-primary btn-sm">
+                                🛒 Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 6. Farmer Testimonials -->
+<section style="padding: 3.5rem 0; background: white; border-top: 1px solid var(--border-color);">
+    <div class="container">
+        <div style="text-align: center; max-width: 600px; margin: 0 auto 2.5rem;">
+            <span style="color: var(--primary-700); font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">Real Kisan Feedback</span>
+            <h2 style="font-size: 2rem; margin-top: 0.3rem;">Trusted by 10,000+ Progressive Farmers</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">See how direct marketplace access transformed farm productivity.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.75rem;">
+            <div style="background: var(--bg-main); padding: 1.75rem; border-radius: var(--radius-xl); border: 1px solid var(--border-color);">
+                <div style="color: #eab308; margin-bottom: 0.75rem; font-size: 1.1rem;">★★★★★</div>
+                <p style="font-style: italic; color: #334155; margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.6;">
+                    "Ordered Pusa Basmati 1121 seed. The germination was 95%+ in my field. Delivered right at my village doorstep in Karnal within 3 days."
+                </p>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.75rem;">👨‍🌾</span>
+                    <div>
+                        <h4 style="font-size: 0.95rem;">Balwinder Singh</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Paddy & Wheat Farmer (15 Acres, Punjab)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-main); padding: 1.75rem; border-radius: var(--radius-xl); border: 1px solid var(--border-color);">
+                <div style="color: #eab308; margin-bottom: 0.75rem; font-size: 1.1rem;">★★★★★</div>
+                <p style="font-style: italic; color: #334155; margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.6;">
+                    "The Knapsack battery sprayer was half the price of the local mandi shop. Good build quality and strong battery backup for my cotton field."
+                </p>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.75rem;">👨‍🌾</span>
+                    <div>
+                        <h4 style="font-size: 0.95rem;">Shivraj Patil</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Cotton & Soybean Farmer (Maharashtra)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-main); padding: 1.75rem; border-radius: var(--radius-xl); border: 1px solid var(--border-color);">
+                <div style="color: #eab308; margin-bottom: 0.75rem; font-size: 1.1rem;">★★★★★</div>
+                <p style="font-style: italic; color: #334155; margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.6;">
+                    "No fake pesticides or low-grade seeds. The QR tracking and official seller bills give complete peace of mind to small farmers like me."
+                </p>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.75rem;">👨‍🌾</span>
+                    <div>
+                        <h4 style="font-size: 0.95rem;">Ramesh Kumar</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Vegetable & Wheat Farmer (Haryana)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

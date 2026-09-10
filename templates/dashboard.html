@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Farmer Dashboard – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.25rem;">
+    
+    <!-- Farmer Profile Hero Card -->
+    <div style="background: linear-gradient(135deg, #14532d 0%, #15803d 100%); border-radius: var(--radius-2xl); color: white; padding: 2.5rem; margin-bottom: 2.5rem; box-shadow: var(--shadow-md); display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; flex-shrink: 0;">
+                👨‍🌾
+            </div>
+            <div>
+                <span style="background: rgba(255,255,255,0.2); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px; text-transform: uppercase;">
+                    Verified Progressive Farmer
+                </span>
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: white; margin: 0.3rem 0 0.2rem;">
+                    {{ farmer.name }}
+                </h1>
+                <p style="color: #dcfce7; font-size: 0.9rem;">
+                    📍 {{ farmer.village }}, Tehsil {{ farmer.taluk }}, {{ farmer.district }}, {{ farmer.state }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Farm Stats & Rewards Badge -->
+        <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-xl); padding: 1.25rem 1.5rem; backdrop-filter: blur(10px); display: flex; justify-content: space-around; text-align: center;">
+            <div>
+                <span style="font-size: 0.8rem; color: #dcfce7; display: block;">Farm Size</span>
+                <strong style="font-size: 1.35rem; color: white;">{{ farmer.farm_size or '8.5 Acres' }}</strong>
+            </div>
+            <div style="border-left: 1px solid rgba(255,255,255,0.2);"></div>
+            <div>
+                <span style="font-size: 0.8rem; color: #dcfce7; display: block;">Kisan Rewards</span>
+                <strong style="font-size: 1.35rem; color: #fde047;">🪙 {{ farmer.kisan_rewards or '450' }} Pts</strong>
+            </div>
+            <div style="border-left: 1px solid rgba(255,255,255,0.2);"></div>
+            <div>
+                <span style="font-size: 0.8rem; color: #dcfce7; display: block;">Total Orders</span>
+                <strong style="font-size: 1.35rem; color: white;">{{ orders|length }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Orders Section -->
+    <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🚚</span> Active Dispatches ({{ active_orders|length }})
+            </h2>
+            <a href="{{ url_for('catalog') }}" class="btn btn-primary btn-sm">
+                + Order More Seeds
+            </a>
+        </div>
+
+        {% if active_orders %}
+            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                {% for o in active_orders %}
+                    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
+                                <strong style="font-size: 1.15rem; color: var(--text-dark);">Order #{{ o._id }}</strong>
+                                <span style="background: #e0f2fe; color: #0369a1; font-size: 0.8rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                                    ● {{ o.status }}
+                                </span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                {{ o['items']|length }} item(s) • Total: <strong>₹{{ o.total_amount }}</strong> ({{ o.payment_method }})
+                            </p>
+                            <div style="font-size: 0.8rem; color: var(--primary-700); font-weight: 600; margin-top: 0.3rem;">
+                                Expected Arrival: {{ o.estimated_delivery or '3-4 Days' }}
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem;">
+                            <a href="{{ url_for('track_order_page', order_id=o._id) }}" class="btn btn-primary btn-sm">
+                                🔍 Live Tracking Stepper →
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 2rem; text-align: center; color: var(--text-muted);">
+                <p>No ongoing dispatches right now. Need fresh seeds or fertilizers?</p>
+                <a href="{{ url_for('catalog') }}" class="btn btn-secondary btn-sm" style="margin-top: 0.75rem;">
+                    Browse Product Catalog
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Order History Section -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 3rem;">
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>📜</span> Complete Order History
+        </h2>
+
+        {% if orders %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in orders %}
+                            <tr>
+                                <td><strong style="color: var(--primary-800);">#{{ o._id }}</strong></td>
+                                <td style="color: var(--text-muted);">{{ o.created_at[:10] }}</td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-dark);">
+                                        {{ o['items'][0].name }}
+                                        {% if o['items']|length > 1 %}
+                                            <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: normal;">+ {{ o['items']|length - 1 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td><strong style="color: var(--text-dark);">₹{{ o.total_amount }}</strong></td>
+                                <td style="font-size: 0.85rem; color: var(--text-muted);">{{ o.payment_method }}</td>
+                                <td>
+                                    <span style="background: {% if o.status == 'Delivered' %}#dcfce7; color: #15803d;{% elif o.status == 'Shipped' %}#e0f2fe; color: #0369a1;{% else %}#fef3c7; color: #92400e;{% endif %} font-weight: 700; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                                        {{ o.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('track_order_page', order_id=o._id) }}" class="btn btn-secondary btn-sm">
+                                        Track / Invoice
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No previous orders found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Farmer Crop Advisory & Farm Info Grid -->
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem;">
+        
+        <!-- Farm Info -->
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
+                <span>🌾</span> Registered Farm Profile
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+                    <span style="color: var(--text-muted);">Total Cultivable Land:</span>
+                    <strong style="color: var(--text-dark);">{{ farmer.farm_size or '8.5 Acres' }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+                    <span style="color: var(--text-muted);">Primary Crop Rotation:</span>
+                    <strong style="color: var(--text-dark);">
+                        {% if farmer.primary_crops is iterable and farmer.primary_crops is not string %}
+                            {{ farmer.primary_crops|join(', ') }}
+                        {% else %}
+                            {{ farmer.primary_crops or 'Wheat, Paddy, Mustard' }}
+                        {% endif %}
+                    </strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+                    <span style="color: var(--text-muted);">Registered Mobile:</span>
+                    <strong style="color: var(--text-dark);">+91 {{ farmer.phone }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Village Depot Center:</span>
+                    <strong style="color: var(--text-dark);">Karnal Regional Krishi Hub</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personalized Advisory -->
+        <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: var(--radius-2xl); padding: 1.75rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #14532d; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+                <span>💡</span> Crop Advisory for {{ farmer.district }}
+            </h3>
+            <p style="font-size: 0.9rem; color: #166534; line-height: 1.6; margin-bottom: 1rem;">
+                High yield window for <strong>Kharif Sowing</strong> is currently open. Ensure certified seeds with 90%+ germination rate (such as <em>Pusa Basmati 1121</em>) and apply Bio-Neem shield spray within 15 days of transplantation.
+            </p>
+            <a href="{{ url_for('catalog', category='Seeds') }}" class="btn btn-primary btn-sm">
+                View Suitable Seeds →
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

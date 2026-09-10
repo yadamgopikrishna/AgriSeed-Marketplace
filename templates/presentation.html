@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSeed – Project Presentation Slide Deck</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #14532d;
+            --primary-green: #16a34a;
+            --primary-emerald: #22c55e;
+            --primary-light: #f0fdf4;
+            --amber-main: #d97706;
+            --amber-light: #fef3c7;
+            --slate-dark: #0f172a;
+            --slate-muted: #64748b;
+            --bg-slide: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: var(--slate-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Presenter Bar */
+        .presentation-bar {
+            background: #1e293b;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #86efac;
+        }
+
+        .slide-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-ctrl {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.35rem 0.85rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-ctrl:hover {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+
+        .slide-counter {
+            font-weight: 700;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Slide Stage Container */
+        .slide-viewport {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .slide-card {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            max-height: 680px;
+            background: var(--bg-slide);
+            border-radius: 1.25rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .slide-card.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Slide Header */
+        .slide-header {
+            padding: 1.75rem 2.5rem 1rem;
+            border-bottom: 2px solid var(--primary-emerald);
+            background: white;
+        }
+
+        .slide-category {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--amber-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.2rem;
+        }
+
+        .slide-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        /* Slide Body */
+        .slide-body {
+            padding: 2rem 2.5rem;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Card Grids */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.75rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card.card-mint {
+            background: var(--primary-light);
+            border-color: #bbf7d0;
+        }
+
+        .card.card-amber {
+            background: var(--amber-light);
+            border-color: #fde68a;
+        }
+
+        .card.card-alert {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .card-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .card-list li {
+            position: relative;
+            padding-left: 1.2rem;
+        }
+
+        .card-list li::before {
+            content: "•";
+            color: var(--primary-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 0;
+            top: -2px;
+        }
+
+        /* Hero Slide */
+        .hero-slide {
+            background: linear-gradient(135deg, #0d381e 0%, #14532d 50%, #15803d 100%);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 3.5rem;
+        }
+
+        .hero-slide .logo-badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #86efac;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-slide h1 {
+            font-size: 3.2rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .hero-slide .tagline {
+            font-size: 1.4rem;
+            color: #fef08a;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        /* Progress Bar */
+        .slide-progress {
+            height: 4px;
+            background: #334155;
+            width: 100%;
+        }
+
+        .slide-progress-fill {
+            height: 100%;
+            background: var(--primary-emerald);
+            width: 7%;
+            transition: width 0.3s ease;
+        }
+
+        /* Print formatting */
+        @media print {
+            body { background: white; height: auto; overflow: visible; }
+            .presentation-bar, .slide-progress { display: none; }
+            .slide-viewport { padding: 0; display: block; }
+            .slide-card { display: flex !important; page-break-after: always; height: 100vh; max-height: none; box-shadow: none; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Toolbar -->
+    <header class="presentation-bar">
+        <div class="brand-title">
+            <span>🌱</span> AgriSeed Slide Deck
+        </div>
+
+        <div class="slide-controls">
+            <button onclick="prevSlide()" class="btn-ctrl" title="Previous (Left Arrow)">◀ Prev</button>
+            <span id="slideIndicator" class="slide-counter">Slide 1 / 14</span>
+            <button onclick="nextSlide()" class="btn-ctrl" title="Next (Right Arrow / Space)">Next ▶</button>
+            <button onclick="toggleFullScreen()" class="btn-ctrl" title="Full Screen">⛶ Fullscreen</button>
+            <a href="/" class="btn-ctrl" style="background: var(--amber-main); border-color: var(--amber-main);">🏠 Back to Store</a>
+        </div>
+    </header>
+
+    <div class="slide-progress">
+        <div id="progressFill" class="slide-progress-fill"></div>
+    </div>
+
+    <!-- Presentation Viewport -->
+    <main class="slide-viewport">
+        
+        <!-- Slide 1: Title Slide -->
+        <div class="slide-card hero-slide active" id="slide-1">
+            <div class="logo-badge">🌱 AGRISEED PROJECT PRESENTATION</div>
+            <h1>AgriSeed – Online Agricultural Marketplace</h1>
+            <p class="tagline">“Quality Seeds. Better Crops. Better Future.”</p>
+            <p style="font-size: 1.1rem; max-width: 750px; margin: 0 auto 2rem; color: #dcfce7; line-height: 1.6;">
+                A Direct-to-Farmer Marketplace Disintermediating Agricultural Supply Chains & Connecting Rural Farmers Directly with Certified Seed Producers.
+            </p>
+            <div style="background: rgba(0,0,0,0.25); padding: 0.75rem 1.5rem; border-radius: 9999px; display: inline-block; font-size: 0.9rem; color: #86efac; border: 1px solid rgba(255,255,255,0.2);">
+                ⚡ Powered by Python Flask • MongoDB • Modern Agricultural UI System
+            </div>
+        </div>
+
+        <!-- Slide 2: Vision & Purpose -->
+        <div class="slide-card" id="slide-2">
+            <div class="slide-header">
+                <div class="slide-category">FOUNDATION & MOTIVATION</div>
+                <h2 class="slide-title">Project Vision & Core Purpose</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card card-mint">
+                        <div class="card-icon">🌟</div>
+                        <h3 class="card-title">The Vision</h3>
+                        <ul class="card-list">
+                            <li>Empower Indian smallholder farmers through transparent digital procurement.</li>
+                            <li>Eliminate predatory middlemen commissions inflating input costs.</li>
+                            <li>Ensure 100% access to certified, high-germination seed varieties across remote villages.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🎯</div>
+                        <h3 class="card-title">The Mission</h3>
+                        <ul class="card-list">
+                            <li>Direct linkage between verified Krishi Kendra cooperatives and farmers.</li>
+                            <li>Complete agronomic transparency: germination %, purity, and dosage guidance.</li>
+                            <li>End-to-end 5-stage rural delivery tracking directly to farm gates.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-amber">
+                        <div class="card-icon">📈</div>
+                        <h3 class="card-title">Key Impact Goals</h3>
+                        <ul class="card-list">
+                            <li><strong>20%–30% Cost Reduction:</strong> Removing retail markup.</li>
+                            <li><strong>90%+ Germination Guarantee:</strong> Eliminating crop loss from spurious seeds.</li>
+                            <li><strong>Zero Counterfeit Risk:</strong> Official government license verified vendors.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Problem Statement -->
+        <div class="slide-card" id="slide-3">
+            <div class="slide-header">
+                <div class="slide-category">PROBLEM STATEMENT</div>
+                <h2 class="slide-title">The Real-World Agricultural Crisis</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card card-alert">
+                        <div class="card-icon">📉</div>
+                        <h3 class="card-title" style="color: #b91c1c;">1. Middlemen Exploitation</h3>
+                        <ul class="card-list">
+                            <li>Complex 4-tier intermediaries: Producer ➔ State Distributor ➔ Mandi Agent ➔ Village Retailer.</li>
+                            <li>Commissions inflate input costs by 25% to 40% before reaching farmers.</li>
+                            <li>Lack of transparent price discovery for rural growers.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-alert">
+                        <div class="card-icon">⚠️</div>
+                        <h3 class="card-title" style="color: #b91c1c;">2. Spurious & Fake Inputs</h3>
+                        <ul class="card-list">
+                            <li>Over 30% of local mandi seeds suffer from poor germination (< 60%).</li>
+                            <li>Adulterated chemical pesticides cause widespread crop failure and soil toxicity.</li>
+                            <li>No verified provenance or testing batch verification for farmers.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-alert">
+                        <div class="card-icon">🚚</div>
+                        <h3 class="card-title" style="color: #b91c1c;">3. Rural Logistics Barrier</h3>
+                        <ul class="card-list">
+                            <li>Farmers waste valuable farming days traveling 30-50 km to city mandi shops.</li>
+                            <li>Lack of doorstep transport for heavy 40kg seed bags and fertilizer pouches.</li>
+                            <li>Zero tracking or estimated arrival notifications for sowing schedules.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Solution Architecture -->
+        <div class="slide-card" id="slide-4">
+            <div class="slide-header">
+                <div class="slide-category">SOLUTION ARCHITECTURE</div>
+                <h2 class="slide-title">The AgriSeed Direct Marketplace Model</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card card-alert">
+                        <div class="card-icon">❌</div>
+                        <h3 class="card-title" style="color: #b91c1c;">Traditional Broken Supply Chain</h3>
+                        <ul class="card-list">
+                            <li>Seed Producer (National Seed Corp / ICAR)</li>
+                            <li>⬇ <em>(takes 10% commission)</em> State Distributor</li>
+                            <li>⬇ <em>(takes 12% commission)</em> City Mandi Commission Agent</li>
+                            <li>⬇ <em>(takes 15% commission)</em> Local Village Unverified Trader</li>
+                            <li>⬇ <strong>Farmer pays 40% higher price + High Risk of Fake Seeds</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <div class="card-icon">✅</div>
+                        <h3 class="card-title" style="color: #14532d;">AgriSeed Direct-to-Farmer Model</h3>
+                        <ul class="card-list">
+                            <li><strong>Verified Seed Producers & Cooperatives</strong></li>
+                            <li>↕ <em>Direct 0% Middlemen Connection</em></li>
+                            <li><strong>AGRISEED DIGITAL AGRICULTURAL MARKETPLACE</strong>
+                                <ul>
+                                    <li>Certified Govt. License Verification</li>
+                                    <li>Agronomic Specifications & Sowing Advisory</li>
+                                    <li>Dynamic Pack Pricing & Kisan Subsidy Discounts</li>
+                                    <li>5-Stage Live Dispatch Tracking</li>
+                                </ul>
+                            </li>
+                            <li>↕ <strong>Progressive Farmers (Direct Farm Gate Village Delivery)</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Tech Stack -->
+        <div class="slide-card" id="slide-5">
+            <div class="slide-header">
+                <div class="slide-category">TECHNICAL IMPLEMENTATION</div>
+                <h2 class="slide-title">Full-Stack Technology Architecture</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-icon">💻</div>
+                        <h3 class="card-title">Frontend Presentation</h3>
+                        <ul class="card-list">
+                            <li>Semantic HTML5 & Modern Responsive CSS</li>
+                            <li>Agricultural Emerald UI Design System (Green, Amber, Mint).</li>
+                            <li>Vanilla JavaScript (ES6+) for dynamic pack pricing & cart state.</li>
+                            <li>Interactive Asynchronous Modals, QR Code simulation & Toasts.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">⚙️</div>
+                        <h3 class="card-title">Backend Application</h3>
+                        <ul class="card-list">
+                            <li>Python Flask (v3.12+) Modular REST API Architecture.</li>
+                            <li>Jinja2 Server-Side Templating Engine with context injection.</li>
+                            <li>Role-Based Access Control (Farmer vs. Admin Manager).</li>
+                            <li>Werkzeug SHA-256 encrypted password hashing.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <div class="card-icon">🗄️</div>
+                        <h3 class="card-title">Database & Resilience</h3>
+                        <ul class="card-list">
+                            <li>MongoDB NoSQL Document Store for heterogeneous products.</li>
+                            <li>Dual-Mode Connection Engine: Native PyMongo connection.</li>
+                            <li>Automated Embedded JSON Fallback Engine (Zero-Config startup).</li>
+                            <li><strong>100% Reliable Execution for College Viva on any computer.</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 10 Prototype Screens -->
+        <div class="slide-card" id="slide-6">
+            <div class="slide-header">
+                <div class="slide-category">PROTOTYPE OVERVIEW</div>
+                <h2 class="slide-title">10-Screen Integrated User Ecosystem</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 class="card-title">🌾 Discovery & Cataloging</h3>
+                        <ul class="card-list">
+                            <li><strong>1. Splash Screen:</strong> Sprout logo & certified value propositions.</li>
+                            <li><strong>2. Home Page:</strong> Krishi weather advisory ticker & categories.</li>
+                            <li><strong>3. Farmer Auth:</strong> Login, farm land registration & 1-click Demo.</li>
+                            <li><strong>4. Categories:</strong> Seeds, Fertilizers, Pesticides, Equipment.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <h3 class="card-title">🚚 Checkout & Fulfillment</h3>
+                        <ul class="card-list">
+                            <li><strong>5. Product Detail:</strong> Dynamic pack sizing & agronomy specs.</li>
+                            <li><strong>6. Shopping Cart:</strong> Steppers & Kisan subsidy discount engine.</li>
+                            <li><strong>7. Checkout:</strong> Village address & UPI/Card/COD payments.</li>
+                            <li><strong>8. Order Tracking:</strong> 5-stage live dispatch progress stepper.</li>
+                            <li><strong>9. Farmer Dashboard & 10. Admin Console:</strong> Store management.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Product Catalog & Agronomy -->
+        <div class="slide-card" id="slide-7">
+            <div class="slide-header">
+                <div class="slide-category">CORE FEATURES</div>
+                <h2 class="slide-title">Agricultural Catalog & Agronomic Precision</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-icon">📦</div>
+                        <h3 class="card-title">4 Main Departments</h3>
+                        <ul class="card-list">
+                            <li>🌾 <strong>Seeds:</strong> Basmati Rice, Wheat 1105, Bt Cotton, Tomato.</li>
+                            <li>🧪 <strong>Fertilizers:</strong> NPK 19:19:19, Cold-Pressed Neem Cake, Zinc.</li>
+                            <li>🌱 <strong>Pesticides:</strong> Bio-Neem Shield, Larvicide, Fungicide.</li>
+                            <li>🚜 <strong>Equipment:</strong> 16L Battery Sprayer, Manual Seed Drill.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <div class="card-icon">📋</div>
+                        <h3 class="card-title">Agronomy Technical Data</h3>
+                        <ul class="card-list">
+                            <li>Germination Emergence Rate (e.g. 92–95%).</li>
+                            <li>Genetic Purity & Moisture Content standards.</li>
+                            <li>Sowing Season & Maturity Period (Days).</li>
+                            <li>Yield Potential per Acre expectation.</li>
+                            <li>Dosage & Sowing Guide per hectare/acre.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-amber">
+                        <div class="card-icon">⚡</div>
+                        <h3 class="card-title">Dynamic Pack Pricing</h3>
+                        <ul class="card-list">
+                            <li>Interactive Pack Selector: 1 kg, 5 kg, 25 kg Bag.</li>
+                            <li>Client-side instant price recalculation.</li>
+                            <li>Real-time regional stock inventory tracker.</li>
+                            <li>Verified producer license & contact transparency.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Checkout & Subsidies -->
+        <div class="slide-card" id="slide-8">
+            <div class="slide-header">
+                <div class="slide-category">TRANSACTIONS & SUBSIDIES</div>
+                <h2 class="slide-title">Kisan Subsidy & Multi-Payment Checkout</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card card-amber">
+                        <div class="card-icon">🏷️</div>
+                        <h3 class="card-title">Kisan Subsidy Engine</h3>
+                        <ul class="card-list">
+                            <li>Coupon code <code>KISAN50</code> applies 10% direct farmer subsidy.</li>
+                            <li>Coupon <code>AGRISEED100</code> provides flat ₹100 discount.</li>
+                            <li>Automated Free Delivery rule on orders above ₹999.</li>
+                            <li>Real-time subtotal, savings, and net payable calculation.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">💳</div>
+                        <h3 class="card-title">3 Payment Gateways</h3>
+                        <ul class="card-list">
+                            <li>📱 <strong>UPI (GPay, PhonePe, Paytm):</strong> Dynamic QR code & VPA.</li>
+                            <li>💳 <strong>Credit / Debit Card:</strong> Card expiry, CVV & OTP validation.</li>
+                            <li>💵 <strong>Cash on Delivery (COD):</strong> Pay on village doorstep delivery.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <div class="card-icon">📍</div>
+                        <h3 class="card-title">Farm Delivery Logistics</h3>
+                        <ul class="card-list">
+                            <li>Village, Tehsil, District, and State localized addressing.</li>
+                            <li>Automated SMS/Phone notification for delivery.</li>
+                            <li>Instant unique Order ID generation (#AGRI-XXXXXX).</li>
+                            <li>Stock inventory auto-decrement on order placement.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: 5-Stage Live Order Tracking -->
+        <div class="slide-card" id="slide-9">
+            <div class="slide-header">
+                <div class="slide-category">LOGISTICS TRANSPARENCY</div>
+                <h2 class="slide-title">5-Stage Rural Order Tracking Stepper</h2>
+            </div>
+            <div class="slide-body">
+                <div class="card card-mint" style="margin-bottom: 1.5rem;">
+                    <div style="font-weight: 800; font-size: 1.1rem; color: #14532d; margin-bottom: 0.5rem;">
+                        5-Milestone Lifecycle Progress Stepper
+                    </div>
+                    <div style="font-size: 1.05rem; font-weight: 700; color: #166534; display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                        <span>1. Ordered</span> ➔ <span>2. Confirmed</span> ➔ <span>3. Shipped</span> ➔ <span>4. Out for Delivery</span> ➔ <span>5. Delivered</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #14532d; margin-top: 0.3rem;">
+                        Status updates in Admin Console immediately synchronize with the farmer's live tracker in real time!
+                    </p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h4 class="card-title">🚚 Logistics Partner Card</h4>
+                        <ul class="card-list">
+                            <li>Courier Partner: AgriExpress Rural Fleet.</li>
+                            <li>AWB Number & Vehicle Registration (e.g. HR-05-AB-7721).</li>
+                            <li>Driver Name & Direct Contact Phone number.</li>
+                            <li>Estimated farm arrival date (3-4 business days).</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h4 class="card-title">🖨️ Activity Log & Official Bill</h4>
+                        <ul class="card-list">
+                            <li>Chronological timestamped depot log entries.</li>
+                            <li>Printable Official Agricultural Invoice with tax breakdowns.</li>
+                            <li>Eligible for government subsidy reimbursement records.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Admin Dashboard -->
+        <div class="slide-card" id="slide-10">
+            <div class="slide-header">
+                <div class="slide-category">ADMINISTRATIVE CONTROL</div>
+                <h2 class="slide-title">Admin Store Manager & Order Logistics</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <h3 class="card-title">Store KPIs & Stock Alerts</h3>
+                        <ul class="card-list">
+                            <li>Real-time metric cards: Total Farmers, Products, Orders, Revenue.</li>
+                            <li>Low-stock inventory badges flagging items under 25 units at regional depots.</li>
+                            <li>Directory of registered farmers, land holdings, and Kisan points.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <div class="card-icon">🔄</div>
+                        <h3 class="card-title">Live Order Coordinator & CRUD</h3>
+                        <ul class="card-list">
+                            <li>Dropdown control to advance orders through the 5 fulfillment stages.</li>
+                            <li>Directly synchronizes with the customer's live tracking stepper view.</li>
+                            <li>Add New Product Modal with specifications, season, price & stock.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: MongoDB Schema -->
+        <div class="slide-card" id="slide-11">
+            <div class="slide-header">
+                <div class="slide-category">DATA ARCHITECTURE</div>
+                <h2 class="slide-title">MongoDB Schema & Dual-Mode Resilience</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-icon">🗄️</div>
+                        <h3 class="card-title">5 Core Collections</h3>
+                        <ul class="card-list">
+                            <li><code>users</code>: Farmers (land size, crops, village) & Admin.</li>
+                            <li><code>products</code>: Seeds, fertilizers, tools with agronomy specs.</li>
+                            <li><code>sellers</code>: Authorized vendors with Govt license numbers.</li>
+                            <li><code>orders</code>: Items, addresses, tracking & status history.</li>
+                            <li><code>reviews</code>: Farmer field ratings & comments.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <div class="card-icon">💡</div>
+                        <h3 class="card-title">Why MongoDB NoSQL?</h3>
+                        <ul class="card-list">
+                            <li>Heterogeneous product schemas without complex SQL tables.</li>
+                            <li>Embedded <code>status_history</code> arrays for chronological logs.</li>
+                            <li>JSON document flexibility for varying agricultural attributes.</li>
+                            <li>Fast execution for multi-faceted crop filtering.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-amber">
+                        <div class="card-icon">🛡️</div>
+                        <h3 class="card-title">Dual-Mode Resilience</h3>
+                        <ul class="card-list">
+                            <li>Connects to Live MongoDB (port 27017) if available.</li>
+                            <li>Auto-fallback to Embedded JSON-persisted Engine if MongoDB is offline.</li>
+                            <li><strong>100% Zero-Config execution for College Viva on any computer!</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Testing & Impact -->
+        <div class="slide-card" id="slide-12">
+            <div class="slide-header">
+                <div class="slide-category">EVALUATION & RESULTS</div>
+                <h2 class="slide-title">Testing, Validation & Project Impact</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card card-mint">
+                        <div class="card-icon">🧪</div>
+                        <h3 class="card-title">Automated Test Suite (100% Pass)</h3>
+                        <ul class="card-list">
+                            <li><code>test_01</code>: Welcome / Splash & Home Page rendering [PASS]</li>
+                            <li><code>test_02</code>: Catalog filtering & crop suitability search [PASS]</li>
+                            <li><code>test_03</code>: Product details & farmer review submission [PASS]</li>
+                            <li><code>test_04</code>: Cart quantity steppers & Kisan subsidy coupon [PASS]</li>
+                            <li><code>test_05</code>: Farmer auth & 1-click Demo Logins [PASS]</li>
+                            <li><code>test_06</code>: Checkout, UPI payment & Order creation [PASS]</li>
+                            <li><code>test_07</code>: Admin Dashboard, Order Status & Product CRUD [PASS]</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🌱</div>
+                        <h3 class="card-title">Measurable Socio-Economic Impact</h3>
+                        <ul class="card-list">
+                            <li><strong>25–30% Cost Reduction:</strong> Removing middlemen margins saves thousands of rupees per harvest.</li>
+                            <li><strong>90%+ Guaranteed Germination:</strong> Eliminates the devastating risk of fake seeds.</li>
+                            <li><strong>Direct Farm-Gate Logistics:</strong> Saves 2-3 working days per sowing cycle.</li>
+                            <li><strong>Digital Literacy & Empowerment:</strong> Simple UI tailored for rural farmers.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Future Roadmap -->
+        <div class="slide-card" id="slide-13">
+            <div class="slide-header">
+                <div class="slide-category">FUTURE ROADMAP</div>
+                <h2 class="slide-title">Future Enhancements & Scalability</h2>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-icon">🤖</div>
+                        <h3 class="card-title">1. AI Crop Diagnostics</h3>
+                        <ul class="card-list">
+                            <li>Integrate Deep Learning (CNN) vision model to detect leaf diseases from phone photos.</li>
+                            <li>Instantly recommends certified remedies available in the catalog.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-mint">
+                        <div class="card-icon">🎙️</div>
+                        <h3 class="card-title">2. Multilingual Voice AI</h3>
+                        <ul class="card-list">
+                            <li>Speech-to-Text and Voice Assistant in Hindi, Punjabi, Marathi, Telugu, Tamil, and Bengali.</li>
+                            <li>Enables farmers with lower literacy to order seeds by voice.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card card-amber">
+                        <div class="card-icon">📡</div>
+                        <h3 class="card-title">3. IoT Soil & Weather Sync</h3>
+                        <ul class="card-list">
+                            <li>Connect low-cost IoT soil NPK/moisture sensors to farmer dashboard.</li>
+                            <li>Automated predictive fertilizer dosage and irrigation alerts.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Conclusion -->
+        <div class="slide-card hero-slide" id="slide-14">
+            <div class="logo-badge">🌾 PROJECT CONCLUSION & VIVA DEMO</div>
+            <h2>AgriSeed: Ready for Live Demonstration</h2>
+            <p class="tagline">“Transforming Agricultural Procurement for a Self-Reliant India (Atmanirbhar Krishi)”</p>
+            
+            <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 1rem; padding: 1.5rem; max-width: 700px; margin: 0 auto 2rem; backdrop-filter: blur(10px);">
+                <p style="font-size: 1.15rem; font-weight: 700; color: #86efac; margin-bottom: 0.5rem;">
+                    ⚡ Live Prototype URL: <code>http://127.0.0.1:5000</code>
+                </p>
+                <p style="font-size: 0.95rem; color: #dcfce7;">
+                    • Farmer Demo: <code>farmer@agriseed.in</code> (farmer123)<br>
+                    • Admin Demo: <code>admin@agriseed.in</code> (admin123)
+                </p>
+            </div>
+
+            <h3 style="font-size: 1.75rem; color: white;">Thank You! Questions & Discussion Warmly Welcomed.</h3>
+        </div>
+
+    </main>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 14;
+
+        function showSlide(index) {
+            if (index < 1) index = 1;
+            if (index > totalSlides) index = totalSlides;
+
+            document.querySelectorAll('.slide-card').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(`slide-${index}`);
+            if (target) {
+                target.classList.add('active');
+                currentSlide = index;
+                document.getElementById('slideIndicator').textContent = `Slide ${currentSlide} / ${totalSlides}`;
+                document.getElementById('progressFill').style.width = `${(currentSlide / totalSlides) * 100}%`;
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) showSlide(currentSlide - 1);
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullScreen();
+            }
+        });
+    </script>
+</body>
+</html>

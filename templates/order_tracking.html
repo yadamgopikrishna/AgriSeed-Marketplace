@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Order Tracking – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.25rem;">
+
+    {% if order %}
+        <!-- Order Header -->
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700); text-transform: uppercase; letter-spacing: 0.5px;">Live Agricultural Dispatch Tracker</span>
+                    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--text-dark); margin-top: 0.2rem;">
+                        Order #{{ order._id }}
+                    </h1>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Placed on {{ order.created_at[:10] }} • Customer: <strong>{{ order.user_name }}</strong> ({{ order.phone }})
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    <span style="background: {% if order.status == 'Delivered' %}#dcfce7; color: #15803d;{% elif order.status == 'Shipped' %}#e0f2fe; color: #0369a1;{% else %}#fef3c7; color: #92400e;{% endif %} font-weight: 800; font-size: 0.9rem; padding: 0.45rem 1rem; border-radius: 9999px;">
+                        ● Status: {{ order.status }}
+                    </span>
+                    <button onclick="printInvoice()" class="btn btn-secondary btn-sm">
+                        🖨️ Print Invoice
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5-Stage Live Tracking Stepper -->
+            {% set statuses = ['Ordered', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered'] %}
+            {% set current_idx = 0 %}
+            {% for s in statuses %}
+                {% if s == order.status %}
+                    {% set current_idx = loop.index0 %}
+                {% endif %}
+            {% endfor %}
+
+            <div style="padding: 1rem 0;">
+                <div class="tracking-stepper">
+                    <!-- Progress line calculation -->
+                    {% set progress_pct = (current_idx / 4) * 100 %}
+                    <div class="stepper-progress-bar" style="width: calc({{ progress_pct }}% - 30px);"></div>
+
+                    <!-- Step 1: Ordered -->
+                    <div class="step-item {% if current_idx > 0 %}completed{% elif current_idx == 0 %}active{% endif %}">
+                        <div class="step-circle">
+                            {% if current_idx > 0 %}✓{% else %}📝{% endif %}
+                        </div>
+                        <span class="step-label">1. Ordered</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Order Placed</span>
+                    </div>
+
+                    <!-- Step 2: Confirmed -->
+                    <div class="step-item {% if current_idx > 1 %}completed{% elif current_idx == 1 %}active{% endif %}">
+                        <div class="step-circle">
+                            {% if current_idx > 1 %}✓{% else %}📋{% endif %}
+                        </div>
+                        <span class="step-label">2. Confirmed</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Stock Verified</span>
+                    </div>
+
+                    <!-- Step 3: Shipped -->
+                    <div class="step-item {% if current_idx > 2 %}completed{% elif current_idx == 2 %}active{% endif %}">
+                        <div class="step-circle">
+                            {% if current_idx > 2 %}✓{% else %}🚚{% endif %}
+                        </div>
+                        <span class="step-label">3. Shipped</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">In Transit</span>
+                    </div>
+
+                    <!-- Step 4: Out for Delivery -->
+                    <div class="step-item {% if current_idx > 3 %}completed{% elif current_idx == 3 %}active{% endif %}">
+                        <div class="step-circle">
+                            {% if current_idx > 3 %}✓{% else %}🚜{% endif %}
+                        </div>
+                        <span class="step-label">4. Out for Delivery</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Rural Van Active</span>
+                    </div>
+
+                    <!-- Step 5: Delivered -->
+                    <div class="step-item {% if current_idx == 4 %}completed{% endif %}">
+                        <div class="step-circle">
+                            {% if current_idx == 4 %}✓{% else %}🏡{% endif %}
+                        </div>
+                        <span class="step-label">5. Delivered</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Farm Gate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logistics Details Card -->
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.25rem 1.5rem; margin-top: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+                <div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Courier Service</span>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-top: 0.15rem;">{{ order.courier_partner or 'AgriExpress Rural Fleet' }}</h4>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">AWB: {{ order.tracking_number or 'AX-782910' }}</span>
+                </div>
+
+                <div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Delivery Executive</span>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-top: 0.15rem;">{{ order.driver_name or 'Agri Logistics Partner (+91 94160 55432)' }}</h4>
+                    <span style="font-size: 0.8rem; color: #16a34a; font-weight: 600;">✓ Verified Courier</span>
+                </div>
+
+                <div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Expected Delivery</span>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary-800); margin-top: 0.15rem;">{{ order.estimated_delivery or 'Within 3 Business Days' }}</h4>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Direct to Village Farm</span>
+                </div>
+
+                <div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Payment</span>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-top: 0.15rem;">{{ order.payment_method }}</h4>
+                    <span style="font-size: 0.8rem; color: #16a34a; font-weight: 700;">{{ order.payment_status or 'Paid' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items & Status Timeline Grid -->
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem;">
+            
+            <!-- Left: Order Items Breakdown & Delivery Address -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">
+                        Ordered Agricultural Products
+                    </h3>
+
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                        {% for item in order['items'] %}
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    {% if item.image_url %}
+                                        <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 55px; height: 55px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                    {% endif %}
+                                    <div>
+                                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark);">{{ item.name }}</h4>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                            Pack: {{ item.pack_size }} • Qty: {{ item.quantity }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="font-weight: 700; font-size: 1rem; color: var(--text-dark);">
+                                    ₹{{ item.price * item.quantity }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Price summary table -->
+                    <div style="background: var(--bg-main); padding: 1.25rem; border-radius: var(--radius-xl); font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                            <span style="color: var(--text-muted);">Subtotal:</span>
+                            <span style="font-weight: 600;">₹{{ order.subtotal }}</span>
+                        </div>
+                        {% if order.discount and order.discount > 0 %}
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; color: #16a34a;">
+                                <span>Kisan Subsidy Discount ({{ order.coupon_code }}):</span>
+                                <span>- ₹{{ order.discount }}</span>
+                            </div>
+                        {% endif %}
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                            <span style="color: var(--text-muted);">Village Delivery:</span>
+                            <span style="font-weight: 600; color: {% if order.delivery_charge == 0 %}#16a34a{% else %}var(--text-dark){% endif %};">
+                                {% if order.delivery_charge == 0 %}FREE{% else %}₹{{ order.delivery_charge }}{% endif %}
+                            </span>
+                        </div>
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem; display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
+                            <span>Total Amount:</span>
+                            <span style="color: var(--primary-800);">₹{{ order.total_amount }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Farm Delivery Address Details -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <span>📍</span> Farm Delivery Address
+                    </h3>
+                    <p style="font-size: 0.9rem; color: var(--text-dark); line-height: 1.6;">
+                        <strong>{{ order.delivery_address.name }}</strong><br>
+                        {{ order.delivery_address.village }}<br>
+                        Tehsil: {{ order.delivery_address.taluk }}, District: {{ order.delivery_address.district }}<br>
+                        PIN: {{ order.delivery_address.pincode }}, State: {{ order.delivery_address.state }}<br>
+                        Contact: {{ order.delivery_address.phone }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Status History Timeline -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm); height: fit-content;">
+                <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <span>🕒</span> Dispatch Activity Log
+                </h3>
+
+                <div style="display: flex; flex-direction: column; gap: 1.25rem; position: relative; padding-left: 0.5rem;">
+                    {% if order.status_history %}
+                        {% for event in order.status_history %}
+                            <div style="display: flex; gap: 1rem; position: relative;">
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary-600); margin-top: 5px;"></div>
+                                    {% if not loop.last %}
+                                        <div style="width: 2px; background: var(--border-color); flex: 1; margin: 4px 0;"></div>
+                                    {% endif %}
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong style="font-size: 0.95rem; color: var(--text-dark);">{{ event.status }}</strong>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted);">{{ event.timestamp }}</span>
+                                    </div>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+                                        {{ event.details }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Order processing initiated.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Order Lookup Form -->
+        <div style="max-width: 550px; margin: 3rem auto; background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2.5rem; text-align: center; box-shadow: var(--shadow-sm);">
+            <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🚚</span>
+            <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem;">Track Your Agricultural Order</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.75rem;">
+                Enter your AgriSeed Order ID (e.g. <code>AGRI-849201</code> or <code>AGRI-773190</code>) to check live dispatch and delivery status.
+            </p>
+
+            <form action="{{ url_for('track_search_page') }}" method="GET">
+                <div style="margin-bottom: 1.25rem;">
+                    <input type="text" name="order_id" placeholder="Enter Order ID (e.g. AGRI-849201)" required style="width: 100%; padding: 0.85rem 1.25rem; font-size: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); text-transform: uppercase; font-weight: 700; text-align: center; outline: none;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    🔍 Track Agricultural Dispatch
+                </button>
+            </form>
+
+            <!-- Quick Demo Order IDs -->
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); font-size: 0.85rem;">
+                <span style="color: var(--text-muted); display: block; margin-bottom: 0.5rem;">⚡ Quick Demo Orders to test:</span>
+                <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                    <a href="{{ url_for('track_order_page', order_id='AGRI-849201') }}" class="btn btn-secondary btn-sm">
+                        📦 AGRI-849201 (Shipped)
+                    </a>
+                    <a href="{{ url_for('track_order_page', order_id='AGRI-773190') }}" class="btn btn-secondary btn-sm">
+                        ✅ AGRI-773190 (Delivered)
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

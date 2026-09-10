@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout & Payment – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.25rem;">
+    <!-- Step Header -->
+    <div style="margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+            <a href="{{ url_for('cart') }}">Cart</a>
+            <span>/</span>
+            <span style="color: var(--primary-700); font-weight: 600;">Checkout & Payment</span>
+        </div>
+        <h1 style="font-size: 2.25rem; font-weight: 800;">
+            Farmer Checkout & Delivery Details
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1rem;">
+            Direct delivery from authorized agricultural depots directly to your village farm doorstep.
+        </p>
+    </div>
+
+    <form id="checkoutForm" onsubmit="handlePlaceOrder(event)">
+        <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 2.5rem; align-items: flex-start;">
+            
+            <!-- Left: Delivery Address & Payment Options -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                
+                <!-- Section 1: Farmer & Delivery Address -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📍</span> 1. Farm Delivery Address
+                    </h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Farmer Full Name *</label>
+                            <input type="text" id="custName" name="name" value="{% if farmer %}{{ farmer.name }}{% else %}Ramesh Kumar Singh{% endif %}" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Mobile Number (For Delivery SMS) *</label>
+                            <input type="tel" id="custPhone" name="phone" value="{% if farmer %}{{ farmer.phone }}{% else %}9876543210{% endif %}" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Village / Town / Farm Landmark *</label>
+                        <input type="text" id="custVillage" name="village" value="{% if farmer %}{{ farmer.village }}{% else %}Rampur Khurd, Near Water Tank{% endif %}" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Tehsil / Taluk</label>
+                            <input type="text" id="custTaluk" name="taluk" value="{% if farmer %}{{ farmer.taluk }}{% else %}Indri{% endif %}" style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">District *</label>
+                            <input type="text" id="custDistrict" name="district" value="{% if farmer %}{{ farmer.district }}{% else %}Karnal{% endif %}" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">PIN Code *</label>
+                            <input type="text" id="custPincode" name="pincode" value="{% if farmer %}{{ farmer.pincode }}{% else %}132001{% endif %}" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Payment Method -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>💳</span> 2. Select Payment Method
+                    </h3>
+
+                    <!-- Payment Method Tabs -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                        <label class="payment-method-card" style="border: 2px solid var(--primary-600); background: var(--primary-50); border-radius: var(--radius-xl); padding: 1.25rem; cursor: pointer; text-align: center; display: block;" onclick="switchPaymentTab('upi', this)">
+                            <input type="radio" name="payment_method_choice" value="UPI (Google Pay / PhonePe)" checked style="display: none;">
+                            <span style="font-size: 1.75rem; display: block; margin-bottom: 0.3rem;">📱</span>
+                            <strong style="font-size: 0.95rem; color: var(--primary-900); display: block;">UPI / QR</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">GPay, PhonePe, Paytm</span>
+                        </label>
+
+                        <label class="payment-method-card" style="border: 2px solid var(--border-color); background: white; border-radius: var(--radius-xl); padding: 1.25rem; cursor: pointer; text-align: center; display: block;" onclick="switchPaymentTab('card', this)">
+                            <input type="radio" name="payment_method_choice" value="Credit / Debit Card" style="display: none;">
+                            <span style="font-size: 1.75rem; display: block; margin-bottom: 0.3rem;">💳</span>
+                            <strong style="font-size: 0.95rem; color: var(--text-dark); display: block;">Card</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Debit / Credit Card</span>
+                        </label>
+
+                        <label class="payment-method-card" style="border: 2px solid var(--border-color); background: white; border-radius: var(--radius-xl); padding: 1.25rem; cursor: pointer; text-align: center; display: block;" onclick="switchPaymentTab('cod', this)">
+                            <input type="radio" name="payment_method_choice" value="Cash on Delivery" style="display: none;">
+                            <span style="font-size: 1.75rem; display: block; margin-bottom: 0.3rem;">💵</span>
+                            <strong style="font-size: 0.95rem; color: var(--text-dark); display: block;">Cash on Delivery</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Pay on Farm Arrival</span>
+                        </label>
+                    </div>
+
+                    <!-- Tab Details: UPI -->
+                    <div id="tab-upi" class="pay-tab-content">
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.5rem; display: grid; grid-template-columns: 140px 1fr; gap: 1.5rem; align-items: center;">
+                            <!-- Simulated QR Code -->
+                            <div style="text-align: center; background: white; padding: 0.75rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                                <div style="width: 110px; height: 110px; background: #0f172a; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; border-radius: 8px; font-family: monospace; font-size: 0.7rem; text-align: center; padding: 4px;">
+                                    [ AGRI-UPI-QR ]<br>Scan with<br>GPay/PhonePe
+                                </div>
+                                <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; display: block;">₹{{ total }}</span>
+                            </div>
+
+                            <div>
+                                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem;">Scan QR or Enter UPI ID</h4>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                                    Instant zero-fee payment verified directly via National Unified Payments Interface.
+                                </p>
+                                <input type="text" placeholder="e.g. 9876543210@upi or farmer@okaxis" value="farmer.ramesh@okhdfcbank" style="width: 100%; padding: 0.6rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Details: Card -->
+                    <div id="tab-card" class="pay-tab-content" style="display: none;">
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.5rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Card Number</label>
+                                <input type="text" placeholder="4532 •••• •••• 8892" value="4532 8821 9901 8892" style="width: 100%; padding: 0.6rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Expiry Date</label>
+                                    <input type="text" placeholder="MM/YY" value="08/29" style="width: 100%; padding: 0.6rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">CVV</label>
+                                    <input type="password" placeholder="•••" value="882" maxlength="4" style="width: 100%; padding: 0.6rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Details: COD -->
+                    <div id="tab-cod" class="pay-tab-content" style="display: none;">
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-xl); padding: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-size: 2.2rem;">💵</span>
+                            <div>
+                                <h4 style="font-size: 1rem; font-weight: 800; color: #166534;">Pay Cash on Delivery</h4>
+                                <p style="font-size: 0.85rem; color: #14532d;">
+                                    Pay cash to the AgriExpress delivery driver after inspecting the certified seed seal at your farm.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Order Summary & Place Order Action -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">Order Summary</h3>
+
+                    <!-- Mini items list -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; max-height: 240px; overflow-y: auto; padding-right: 0.5rem;">
+                        {% for item in cart_items %}
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+                                <div>
+                                    <strong style="color: var(--text-dark);">{{ item.name }}</strong>
+                                    <div style="color: var(--text-muted); font-size: 0.75rem;">Qty: {{ item.quantity }} × {{ item.pack_size }}</div>
+                                </div>
+                                <div style="font-weight: 700; color: var(--text-dark);">
+                                    ₹{{ item.price * item.quantity }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; color: var(--text-muted);">
+                            <span>Subtotal</span>
+                            <span style="font-weight: 600; color: var(--text-dark);">₹{{ subtotal }}</span>
+                        </div>
+
+                        {% if discount > 0 %}
+                            <div style="display: flex; justify-content: space-between; color: #16a34a; font-weight: 600;">
+                                <span>Kisan Subsidy Discount</span>
+                                <span>- ₹{{ discount }}</span>
+                            </div>
+                        {% endif %}
+
+                        <div style="display: flex; justify-content: space-between; color: var(--text-muted);">
+                            <span>Delivery Charges</span>
+                            <span style="font-weight: 600; color: {% if delivery_charge == 0 %}#16a34a{% else %}var(--text-dark){% endif %};">
+                                {% if delivery_charge == 0 %}FREE{% else %}₹{{ delivery_charge }}{% endif %}
+                            </span>
+                        </div>
+
+                        <div style="border-top: 2px dashed var(--border-color); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: baseline;">
+                            <span style="font-size: 1.1rem; font-weight: 800;">Total Payable</span>
+                            <span style="font-size: 1.85rem; font-weight: 800; color: var(--primary-800);">₹{{ total }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Place Order Button -->
+                    <button type="submit" id="placeOrderBtn" class="btn btn-primary btn-lg btn-block" style="box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);">
+                        🌾 Place Agricultural Order →
+                    </button>
+
+                    <div style="margin-top: 1.25rem; background: var(--bg-main); padding: 0.85rem; border-radius: var(--radius-lg); font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                        <span>📦 Expected Village Delivery: <strong>3-4 Working Days</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedPaymentMethod = 'UPI (Google Pay / PhonePe)';
+
+function switchPaymentTab(tabName, cardElem) {
+    document.querySelectorAll('.payment-method-card').forEach(c => {
+        c.style.borderColor = 'var(--border-color)';
+        c.style.background = 'white';
+    });
+    cardElem.style.borderColor = 'var(--primary-600)';
+    cardElem.style.background = 'var(--primary-50)';
+
+    document.querySelectorAll('.pay-tab-content').forEach(t => t.style.display = 'none');
+    document.getElementById(`tab-${tabName}`).style.display = 'block';
+
+    if (tabName === 'upi') selectedPaymentMethod = 'UPI (Google Pay / PhonePe)';
+    else if (tabName === 'card') selectedPaymentMethod = 'Credit / Debit Card';
+    else if (tabName === 'cod') selectedPaymentMethod = 'Cash on Delivery';
+}
+
+async function handlePlaceOrder(e) {
+    e.preventDefault();
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Processing Order...';
+
+    const payload = {
+        name: document.getElementById('custName').value,
+        phone: document.getElementById('custPhone').value,
+        village: document.getElementById('custVillage').value,
+        taluk: document.getElementById('custTaluk').value,
+        district: document.getElementById('custDistrict').value,
+        pincode: document.getElementById('custPincode').value,
+        state: 'Punjab / Haryana',
+        payment_method: selectedPaymentMethod
+    };
+
+    try {
+        const res = await fetch('/api/orders/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 800);
+        } else {
+            showToast(data.message || 'Failed to place order', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '🌾 Place Agricultural Order →';
+        }
+    } catch (err) {
+        showToast('Network error placing order', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '🌾 Place Agricultural Order →';
+    }
+}
+</script>
+{% endblock %}

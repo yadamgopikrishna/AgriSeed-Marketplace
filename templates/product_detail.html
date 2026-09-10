@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} – AgriSeed{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.25rem;">
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        <a href="{{ url_for('index') }}">Home</a>
+        <span>/</span>
+        <a href="{{ url_for('catalog', category=product.category) }}">{{ product.category }}</a>
+        <span>/</span>
+        <span style="color: var(--primary-700); font-weight: 600;">{{ product.name }}</span>
+    </div>
+
+    <!-- Main Product Layout Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2.5rem; box-shadow: var(--shadow-sm); margin-bottom: 3rem;">
+        
+        <!-- Left: Product Image & Certifications -->
+        <div>
+            <div style="position: relative; width: 100%; height: 420px; border-radius: var(--radius-xl); overflow: hidden; background: #f8fafc; border: 1px solid var(--border-color);">
+                <img id="mainProductImg" src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <span class="product-tag" style="top: 1rem; left: 1rem; font-size: 0.85rem;">{{ product.category_icon }} {{ product.category }}</span>
+                {% if product.verified_seller %}
+                    <span class="verified-tag" style="top: 1rem; right: 1rem; font-size: 0.85rem;">✓ Verified Producer</span>
+                {% endif %}
+            </div>
+
+            <!-- Quality Badges Grid -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem;">
+                <div style="background: var(--primary-50); border: 1px solid var(--primary-200); border-radius: var(--radius-lg); padding: 0.75rem; text-align: center;">
+                    <span style="font-size: 1.5rem; display: block;">🧪</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-800);">Tested Seed Batch</span>
+                </div>
+                <div style="background: var(--primary-50); border: 1px solid var(--primary-200); border-radius: var(--radius-lg); padding: 0.75rem; text-align: center;">
+                    <span style="font-size: 1.5rem; display: block;">📜</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-800);">Govt. License Verified</span>
+                </div>
+                <div style="background: var(--primary-50); border: 1px solid var(--primary-200); border-radius: var(--radius-lg); padding: 0.75rem; text-align: center;">
+                    <span style="font-size: 1.5rem; display: block;">🚚</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-800);">Direct Farm Delivery</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Product Information & Purchase Panel -->
+        <div style="display: flex; flex-direction: column;">
+            <!-- Category & Crop -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="background: var(--primary-100); color: var(--primary-800); font-weight: 700; font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                    {{ product.category }}
+                </span>
+                <span style="background: #f1f5f9; color: var(--text-dark); font-weight: 600; font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                    🌾 Suitable for: {{ product.crop_suitability }}
+                </span>
+            </div>
+
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.75rem; line-height: 1.25;">
+                {{ product.name }}
+            </h1>
+
+            <!-- Ratings & Seller Row -->
+            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                    <span style="color: #eab308; font-size: 1.1rem;">★</span>
+                    <span style="font-weight: 800; font-size: 1rem;">{{ product.rating }}</span>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">({{ product.review_count }} Farmer Reviews)</span>
+                </div>
+                <span style="color: var(--border-color);">|</span>
+                <div style="font-size: 0.9rem; color: var(--text-muted);">
+                    Sold by: <strong style="color: var(--text-dark);">{{ seller.name or product.seller_name }}</strong>
+                    <span style="color: #16a34a; font-size: 0.8rem; margin-left: 0.3rem;">(📍 {{ seller.location or 'Verified Hub' }})</span>
+                </div>
+            </div>
+
+            <!-- Pricing Box -->
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.25rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.25rem;">
+                    <span id="displayPrice" style="font-size: 2.25rem; font-weight: 800; color: var(--primary-800);">₹{{ product.price }}</span>
+                    {% if product.original_price and product.original_price > product.price %}
+                        <span id="displayOriginalPrice" style="font-size: 1.2rem; color: var(--text-light); text-decoration: line-through;">₹{{ product.original_price }}</span>
+                        <span class="discount-badge" style="font-size: 0.85rem;">
+                            {{ ((product.original_price - product.price) / product.original_price * 100)|round|int }}% Kisan Subsidy
+                        </span>
+                    {% endif %}
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                    Prices inclusive of all taxes. Free doorstep shipping on orders above ₹999.
+                </div>
+            </div>
+
+            <!-- Pack Size Selector -->
+            {% if product.pack_sizes %}
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.6rem; color: var(--text-dark);">
+                        Select Pack Size / Quantity:
+                    </label>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        {% for pack in product.pack_sizes %}
+                            <button type="button" class="pack-size-btn btn btn-sm {% if loop.first %}btn-primary active-pack{% else %}btn-secondary{% endif %}" 
+                                    data-size="{{ pack.size }}" 
+                                    data-price="{{ pack.price }}"
+                                    onclick="selectPackSize(this, '{{ pack.size }}', {{ pack.price }})">
+                                {{ pack.size }} — ₹{{ pack.price }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Stock Status -->
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                {% if product.stock and product.stock > 0 %}
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></span>
+                    <span style="color: #15803d; font-weight: 700;">In Stock ({{ product.stock }} units left)</span>
+                    <span style="color: var(--text-muted);">— Dispatched from {{ seller.location or 'Regional Krishi Depot' }}</span>
+                {% else %}
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
+                    <span style="color: #b91c1c; font-weight: 700;">Currently Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <!-- Quantity & Actions -->
+            <div style="display: flex; gap: 1rem; margin-top: auto; align-items: center;">
+                <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: white; overflow: hidden; height: 48px;">
+                    <button type="button" onclick="adjustQty(-1)" style="padding: 0 1rem; height: 100%; border: none; background: none; font-size: 1.2rem; cursor: pointer;">-</button>
+                    <input type="number" id="purchaseQty" value="1" min="1" max="{{ product.stock or 100 }}" style="width: 45px; text-align: center; border: none; font-weight: 700; font-size: 1rem; outline: none;">
+                    <button type="button" onclick="adjustQty(1)" style="padding: 0 1rem; height: 100%; border: none; background: none; font-size: 1.2rem; cursor: pointer;">+</button>
+                </div>
+
+                <button type="button" onclick="handleAddSelectedToCart()" class="btn btn-primary btn-lg" style="flex: 1; height: 48px;" {% if product.stock == 0 %}disabled{% endif %}>
+                    🛒 Add to Cart
+                </button>
+
+                <button type="button" onclick="handleBuyNow()" class="btn btn-amber btn-lg" style="flex: 1; height: 48px;" {% if product.stock == 0 %}disabled{% endif %}>
+                    ⚡ Buy Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agronomy Specifications & Description Tab -->
+    <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 2rem; margin-bottom: 3rem;">
+        <!-- Left: Agronomy Specs Table -->
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2rem; box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📋</span> Agronomic Specifications & Crop Details
+            </h3>
+
+            <p style="color: #475569; line-height: 1.6; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                {{ product.description }}
+            </p>
+
+            <table class="table" style="font-size: 0.9rem;">
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 700; width: 35%; color: var(--text-dark);">Crop Suitability</td>
+                        <td style="color: #1e293b;">{{ product.crop_suitability }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-dark);">Sowing Season</td>
+                        <td style="color: #1e293b;">{{ product.season }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-dark);">Germination Rate</td>
+                        <td style="color: #15803d; font-weight: 700;">{{ product.germination_rate }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-dark);">Genetic Purity</td>
+                        <td style="color: #1e293b;">{{ product.purity }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-dark);">Maturity Duration</td>
+                        <td style="color: #1e293b;">{{ product.maturity_period }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-dark);">Yield Expectation</td>
+                        <td style="color: #1e293b; font-weight: 600;">{{ product.yield_potential }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: var(--text-dark);">Dosage & Sowing Guide</td>
+                        <td style="color: #1e293b;">{{ product.dosage_guide }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Right: Seller Card -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700); text-transform: uppercase;">Verified Producer</span>
+                    <span style="background: var(--primary-100); color: var(--primary-800); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 9999px;">
+                        ★ {{ seller.rating or 4.8 }} ({{ seller.review_count or 100 }}+ Orders)
+                    </span>
+                </div>
+
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-dark); margin-bottom: 0.35rem;">
+                    {{ seller.name or product.seller_name }}
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                    Authorized Regional Distributor • {{ seller.location or 'Karnal, Haryana' }}
+                </p>
+
+                <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-lg); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                    <div style="margin-bottom: 0.4rem;">
+                        <span style="color: var(--text-muted);">License:</span> <strong>{{ seller.license_no or 'AGRI/GOVT/2026/991' }}</strong>
+                    </div>
+                    <div style="margin-bottom: 0.4rem;">
+                        <span style="color: var(--text-muted);">Contact:</span> <strong>{{ seller.phone or '+91 98765 43210' }}</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted);">Email:</span> <strong>{{ seller.email or 'support@agriseed.in' }}</strong>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.8rem; color: #166534; display: flex; align-items: center; gap: 0.4rem; font-weight: 600;">
+                    <span>🛡️</span> All products protected by AgriSeed 100% Quality Replacement Guarantee.
+                </div>
+            </div>
+
+            <!-- Promo Card -->
+            <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #fcd34d; border-radius: var(--radius-2xl); padding: 1.5rem;">
+                <h4 style="font-size: 1.05rem; font-weight: 800; color: #92400e; margin-bottom: 0.35rem;">
+                    🌾 Special Kisan Discount Code
+                </h4>
+                <p style="font-size: 0.85rem; color: #78350f; margin-bottom: 0.75rem;">
+                    Use coupon code <strong>KISAN50</strong> in your cart to claim 10% direct farmer subsidy on this order.
+                </p>
+                <button onclick="navigator.clipboard.writeText('KISAN50'); showToast('Copied coupon code KISAN50!', 'success')" class="btn btn-secondary btn-sm" style="background: white;">
+                    📋 Copy Code: KISAN50
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farmer Reviews Section -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-2xl); padding: 2.5rem; box-shadow: var(--shadow-sm); margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h3 style="font-size: 1.5rem; font-weight: 800;">Farmer Reviews & Field Experience</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">
+                    Average Rating: <strong style="color: #eab308; font-size: 1.1rem;">★ {{ product.rating }}</strong> out of 5.0 ({{ reviews|length }} reviews)
+                </p>
+            </div>
+            <button onclick="openModal('reviewModal')" class="btn btn-primary">
+                ✍️ Write a Farmer Review
+            </button>
+        </div>
+
+        {% if reviews %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                {% for rev in reviews %}
+                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.5rem;">👨‍🌾</span>
+                                <div>
+                                    <h4 style="font-size: 0.95rem; font-weight: 700;">{{ rev.user_name }}</h4>
+                                    <span style="font-size: 0.75rem; color: #16a34a; font-weight: 600;">✓ Verified Field Purchase</span>
+                                </div>
+                            </div>
+                            <div style="color: #eab308; font-size: 0.95rem;">
+                                {{ "★" * rev.rating }}{{ "☆" * (5 - rev.rating) }}
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #334155; line-height: 1.5; margin-bottom: 0.75rem;">
+                            "{{ rev.comment }}"
+                        </p>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">
+                            Reviewed on {{ rev.date }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <p>No reviews yet for this product. Be the first progressive farmer to share field results!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+        <div style="margin-bottom: 2rem;">
+            <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem;">
+                Related Products in {{ product.category }}
+            </h3>
+            <div class="product-grid">
+                {% for rprod in related_products %}
+                    <div class="product-card">
+                        <div class="product-img-wrapper">
+                            <img src="{{ rprod.image_url }}" alt="{{ rprod.name }}" loading="lazy">
+                            <span class="product-tag">{{ rprod.category_icon }} {{ rprod.category }}</span>
+                        </div>
+                        <div class="product-body">
+                            <div class="product-category">{{ rprod.crop_suitability }}</div>
+                            <h4 class="product-title">
+                                <a href="{{ url_for('product_detail', product_id=rprod._id) }}">{{ rprod.name }}</a>
+                            </h4>
+                            <div class="product-pricing">
+                                <span class="current-price">₹{{ rprod.price }}</span>
+                                <span class="crop-badge">{{ rprod.unit }}</span>
+                            </div>
+                            <a href="{{ url_for('product_detail', product_id=rprod._id) }}" class="btn btn-secondary btn-sm btn-block">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Write Review Modal -->
+<div id="reviewModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 800;">Write a Product Review</h3>
+            <button onclick="closeModal('reviewModal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <form id="reviewForm" onsubmit="submitReview(event)">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Your Name / Farm Location</label>
+                <input type="text" id="revUserName" class="form-input" placeholder="e.g. Ramesh Singh (Karnal)" value="{% if current_user %}{{ current_user.name }} ({{ current_user.district }}){% endif %}" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;" required>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Rating</label>
+                <select id="revRating" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none; background: white;">
+                    <option value="5">★★★★★ (5 - Excellent Germination & Yield)</option>
+                    <option value="4">★★★★☆ (4 - Good Quality)</option>
+                    <option value="3">★★★☆☆ (3 - Average)</option>
+                    <option value="2">★★☆☆☆ (2 - Below Expectations)</option>
+                    <option value="1">★☆☆☆☆ (1 - Poor)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Your Field Observations / Feedback</label>
+                <textarea id="revComment" rows="4" placeholder="Share your experience regarding germination rate, yield, disease resistance, or packaging..." style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none; resize: vertical;" required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" onclick="closeModal('reviewModal')" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedPackSize = '{{ product.unit }}';
+let selectedPrice = {{ product.price }};
+const productId = '{{ product._id }}';
+
+function selectPackSize(btn, size, price) {
+    document.querySelectorAll('.pack-size-btn').forEach(b => {
+        b.classList.remove('btn-primary', 'active-pack');
+        b.classList.add('btn-secondary');
+    });
+    btn.classList.add('btn-primary', 'active-pack');
+    btn.classList.remove('btn-secondary');
+
+    selectedPackSize = size;
+    selectedPrice = price;
+
+    document.getElementById('displayPrice').textContent = `₹${price}`;
+}
+
+function adjustQty(delta) {
+    const input = document.getElementById('purchaseQty');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    input.value = val;
+}
+
+function handleAddSelectedToCart() {
+    const qty = parseInt(document.getElementById('purchaseQty').value) || 1;
+    Cart.add(productId, selectedPackSize, qty);
+}
+
+async function handleBuyNow() {
+    const qty = parseInt(document.getElementById('purchaseQty').value) || 1;
+    await Cart.add(productId, selectedPackSize, qty);
+    window.location.href = '/checkout';
+}
+
+async function submitReview(e) {
+    e.preventDefault();
+    const userName = document.getElementById('revUserName').value;
+    const rating = document.getElementById('revRating').value;
+    const comment = document.getElementById('revComment').value;
+
+    try {
+        const res = await fetch(`/api/products/${productId}/reviews`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_name: userName, rating: rating, comment: comment })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message, 'success');
+            closeModal('reviewModal');
+            setTimeout(() => window.location.reload(), 700);
+        } else {
+            showToast(data.message || 'Error submitting review', 'error');
+        }
+    } catch (err) {
+        showToast('Network error submitting review', 'error');
+    }
+}
+</script>
+{% endblock %}
