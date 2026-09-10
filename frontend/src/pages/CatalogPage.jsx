@@ -17,7 +17,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 export const CatalogPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t } = useLanguage();
+  const { t, localizeProduct } = useLanguage();
 
   const initialCategory = searchParams.get('category') || 'All';
   const initialSearch = searchParams.get('q') || '';
@@ -50,10 +50,11 @@ export const CatalogPage = () => {
       // Search match
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchName = item.name.toLowerCase().includes(q);
-        const matchCat = item.category.toLowerCase().includes(q);
-        const matchCrop = item.cropSuitability.toLowerCase().includes(q);
-        const matchDesc = item.description.toLowerCase().includes(q);
+        const lp = localizeProduct(item);
+        const matchName = item.name.toLowerCase().includes(q) || (lp.name && lp.name.toLowerCase().includes(q));
+        const matchCat = item.category.toLowerCase().includes(q) || (lp.category && lp.category.toLowerCase().includes(q));
+        const matchCrop = item.cropSuitability.toLowerCase().includes(q) || (lp.cropSuitability && lp.cropSuitability.toLowerCase().includes(q));
+        const matchDesc = item.description.toLowerCase().includes(q) || (lp.description && lp.description.toLowerCase().includes(q));
         if (!matchName && !matchCat && !matchCrop && !matchDesc) {
           return false;
         }
@@ -65,7 +66,7 @@ export const CatalogPage = () => {
       if (sortBy === 'rating') return b.rating - a.rating;
       return b.isFeatured ? 1 : -1;
     });
-  }, [selectedCategory, selectedCrop, searchQuery, priceMax, sortBy]);
+  }, [selectedCategory, selectedCrop, searchQuery, priceMax, sortBy, localizeProduct]);
 
   const resetFilters = () => {
     setSelectedCategory('All');

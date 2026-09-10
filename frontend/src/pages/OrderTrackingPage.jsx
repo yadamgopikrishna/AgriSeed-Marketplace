@@ -20,7 +20,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 export const OrderTrackingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t } = useLanguage();
+  const { t, getLocalizedProductName } = useLanguage();
 
   const queryOrderId = searchParams.get('orderId') || 'AGRI-849201';
   const [inputOrderId, setInputOrderId] = useState(queryOrderId);
@@ -257,11 +257,11 @@ export const OrderTrackingPage = () => {
                       <div className="flex items-center gap-3">
                         <img
                           src={item.imageUrl}
-                          alt={item.name}
+                          alt={getLocalizedProductName(item)}
                           className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                         />
                         <div>
-                          <strong className="text-slate-900 block font-bold text-xs">{item.name}</strong>
+                          <strong className="text-slate-900 block font-bold text-xs">{getLocalizedProductName(item)}</strong>
                           <span className="text-slate-400 text-[11px]">{item.packSize} • Qty: {item.quantity}</span>
                         </div>
                       </div>

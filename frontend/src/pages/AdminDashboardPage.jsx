@@ -16,7 +16,7 @@ import { INITIAL_PRODUCTS, INITIAL_ORDERS, INITIAL_SELLERS } from '../data/mockD
 import { useLanguage } from '../context/LanguageContext';
 
 export const AdminDashboardPage = () => {
-  const { t } = useLanguage();
+  const { t, getLocalizedProductName, getLocalizedCategory } = useLanguage();
   const [products, setProducts] = useState(INITIAL_PRODUCTS);
   const [orders, setOrders] = useState(() => {
     const local = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
@@ -286,8 +286,8 @@ export const AdminDashboardPage = () => {
               <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
                 {products.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3 font-bold text-slate-900">{p.name}</td>
-                    <td className="p-3">{p.category}</td>
+                    <td className="p-3 font-bold text-slate-900">{getLocalizedProductName(p)}</td>
+                    <td className="p-3">{getLocalizedCategory(p.category)}</td>
                     <td className="p-3 font-black text-emerald-900">₹{p.price}</td>
                     <td className="p-3">
                       <span className={`font-bold ${p.stock <= 45 ? 'text-rose-600' : 'text-slate-700'}`}>

@@ -22,7 +22,7 @@ export const CheckoutPage = () => {
   const navigate = useNavigate();
   const { cartItems, subtotal, discount, deliveryFee, totalAmount, clearCart, appliedCoupon } = useCart();
   const { currentUser } = useAuth();
-  const { t } = useLanguage();
+  const { t, getLocalizedProductName } = useLanguage();
 
   const [deliveryAddress, setDeliveryAddress] = useState({
     fullName: currentUser ? currentUser.name : 'Ramesh Kumar Singh',
@@ -388,7 +388,7 @@ export const CheckoutPage = () => {
               {cartItems.map((item, i) => (
                 <div key={i} className="flex justify-between items-center py-1.5 border-b border-slate-50">
                   <div className="truncate pr-2">
-                    <span className="font-bold text-slate-900 block truncate">{item.name}</span>
+                    <span className="font-bold text-slate-900 block truncate">{getLocalizedProductName(item)}</span>
                     <span className="text-[10px] text-slate-400">{item.packSize} × {item.quantity}</span>
                   </div>
                   <span className="font-extrabold text-slate-900 shrink-0">₹{item.price * item.quantity}</span>

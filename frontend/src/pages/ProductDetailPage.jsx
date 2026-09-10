@@ -15,7 +15,8 @@ import {
   MapPin,
   Calendar,
   Layers,
-  Heart
+  Heart,
+  Tag
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, INITIAL_SELLERS } from '../data/mockData';
 import { useCart } from '../context/CartContext';
@@ -26,15 +27,19 @@ export const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart, setIsCartDrawerOpen } = useCart();
-  const { t } = useLanguage();
+  const { t, localizeProduct } = useLanguage();
 
-  const product = INITIAL_PRODUCTS.find(p => p.id === id) || INITIAL_PRODUCTS[0];
-  const seller = INITIAL_SELLERS.find(s => s.id === product.sellerId) || INITIAL_SELLERS[0];
-  const relatedProducts = INITIAL_PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 3);
+  const rawProduct = INITIAL_PRODUCTS.find(p => p.id === id) || INITIAL_PRODUCTS[0];
+  const lp = localizeProduct(rawProduct);
+  const seller = INITIAL_SELLERS.find(s => s.id === rawProduct.sellerId) || INITIAL_SELLERS[0];
+  const relatedProducts = INITIAL_PRODUCTS.filter(p => p.category === rawProduct.category && p.id !== rawProduct.id).slice(0, 3);
 
-  const [selectedPack, setSelectedPack] = useState(
-    product.packSizes && product.packSizes.length > 0 ? product.packSizes[0].size : product.unit
-  );
+  const [selectedPackIndex, setSelectedPackIndex] = useState(0);
+
+  const packs = lp.packSizes && lp.packSizes.length > 0 ? lp.packSizes : [{ size: lp.unit, price: lp.price }];
+  const currentPack = packs[selectedPackIndex] || packs[0];
+  const currentPrice = currentPack.price || lp.price;
+  const selectedPack = currentPack.size;
 
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('specs'); // 'specs' | 'dosage' | 'reviews' | 'seller'
@@ -62,19 +67,15 @@ export const ProductDetailPage = () => {
     }
   ]);
 
-  const [newReview, setNewReview] = useState({ name: '', rating: 5, comment: '', crop: product.cropSuitability });
-
-  const currentPrice = product.packSizes
-    ? (product.packSizes.find(p => p.size === selectedPack)?.price || product.price)
-    : product.price;
+  const [newReview, setNewReview] = useState({ name: '', rating: 5, comment: '', crop: lp.cropSuitability });
 
   const handleAddToCart = () => {
-    addToCart(product, selectedPack, quantity);
+    addToCart(rawProduct, selectedPack, quantity);
     setIsCartDrawerOpen(true);
   };
 
   const handleBuyNow = () => {
-    addToCart(product, selectedPack, quantity);
+    addToCart(rawProduct, selectedPack, quantity);
     setIsCartDrawerOpen(false);
     navigate('/checkout');
   };
@@ -95,7 +96,7 @@ export const ProductDetailPage = () => {
       ...reviewsList
     ]);
     setIsReviewModalOpen(false);
-    setNewReview({ name: '', rating: 5, comment: '', crop: product.cropSuitability });
+    setNewReview({ name: '', rating: 5, comment: '', crop: lp.cropSuitability });
   };
 
   return (
@@ -107,7 +108,7 @@ export const ProductDetailPage = () => {
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         <Link to="/catalog" className="hover:text-emerald-700">{t('catalog')}</Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <span className="text-slate-800 font-bold truncate max-w-xs">{product.name}</span>
+        <span className="text-slate-800 font-bold truncate max-w-xs">{lp.name}</span>
       </div>
 
       {/* Main Product Hero Grid */}
@@ -117,14 +118,14 @@ export const ProductDetailPage = () => {
         <div className="lg:col-span-5 space-y-4">
           <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
             <img
-              src={product.imageUrl}
-              alt={product.name}
+              src={rawProduct.imageUrl}
+              alt={lp.name}
               className="w-full h-full object-cover"
             />
-            {product.germinationRate && product.germinationRate !== 'N/A' && (
+            {rawProduct.germinationRate && rawProduct.germinationRate !== 'N/A' && (
               <span className="absolute top-3 left-3 bg-emerald-700 text-white font-black text-xs px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
                 <Check className="w-4 h-4 stroke-[3]" />
-                <span>{product.germinationRate} {t('germinationGuaranteed')}</span>
+                <span>{rawProduct.germinationRate} {t('germinationGuaranteed')}</span>
               </span>
             )}
           </div>
@@ -146,34 +147,34 @@ export const ProductDetailPage = () => {
             
             <div className="flex flex-wrap items-center gap-2">
               <span className="bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                <span>{product.categoryIcon}</span>
-                <span>{product.category}</span>
+                <span>{rawProduct.categoryIcon}</span>
+                <span>{lp.category}</span>
               </span>
               <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-3 py-1 rounded-full">
-                🌾 {product.cropSuitability}
+                🌾 {lp.cropSuitability}
               </span>
               <span className="bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
-                📅 {product.season}
+                📅 {lp.season}
               </span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black font-serif text-slate-950 leading-snug">
-              {product.name}
+              {lp.name}
             </h1>
 
             {/* Ratings & Seller info */}
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                <span className="font-black text-slate-900">{product.rating}</span>
-                <span className="text-slate-500 font-medium">({product.reviewCount} reviews)</span>
+                <span className="font-black text-slate-900">{rawProduct.rating}</span>
+                <span className="text-slate-500 font-medium">({rawProduct.reviewCount} reviews)</span>
               </div>
 
               <span className="text-slate-300">•</span>
 
               <div className="flex items-center gap-1 text-slate-600">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Seller: <strong className="text-slate-800">{product.sellerName}</strong></span>
+                <span>Seller: <strong className="text-slate-800">{rawProduct.sellerName}</strong></span>
               </div>
             </div>
 
@@ -185,39 +186,39 @@ export const ProductDetailPage = () => {
                   <span className="text-3xl font-black text-emerald-950 font-sans">
                     ₹{currentPrice}
                   </span>
-                  {product.originalPrice && product.originalPrice > currentPrice && (
+                  {rawProduct.originalPrice && rawProduct.originalPrice > currentPrice && (
                     <span className="text-sm text-slate-400 line-through">
-                      ₹{product.originalPrice}
+                      ₹{rawProduct.originalPrice}
                     </span>
                   )}
                   <span className="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                    {t('saveLabel')} ₹{(product.originalPrice || currentPrice) - currentPrice + 50}
+                    {t('saveLabel')} ₹{(rawProduct.originalPrice || currentPrice) - currentPrice + 50}
                   </span>
                 </div>
               </div>
 
               <div className="text-right">
                 <span className="inline-block bg-emerald-600 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg">
-                  {t('inStockBadge')} ({product.stock})
+                  {t('inStockBadge')} ({rawProduct.stock})
                 </span>
                 <span className="text-[11px] text-slate-400 block mt-1">{t('readyDispatch')}</span>
               </div>
             </div>
 
             {/* Dynamic Pack Size Unit Selector */}
-            {product.packSizes && product.packSizes.length > 0 && (
+            {packs && packs.length > 0 && (
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-700 block">
                   {t('selectPackUnit')}
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {product.packSizes.map((pack) => (
+                  {packs.map((pack, idx) => (
                     <button
-                      key={pack.size}
+                      key={pack.size || idx}
                       type="button"
-                      onClick={() => setSelectedPack(pack.size)}
+                      onClick={() => setSelectedPackIndex(idx)}
                       className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                        selectedPack === pack.size
+                        selectedPackIndex === idx
                           ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 ring-2 ring-emerald-500/20 shadow-xs'
                           : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
                       }`}
@@ -359,27 +360,27 @@ export const ProductDetailPage = () => {
                 <tbody className="divide-y divide-slate-100 text-slate-800 font-medium">
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramGermination')}</td>
-                    <td className="p-3.5 text-emerald-700 font-extrabold">{product.germinationRate}</td>
+                    <td className="p-3.5 text-emerald-700 font-extrabold">{rawProduct.germinationRate}</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramPurity')}</td>
-                    <td className="p-3.5">{product.purity}</td>
+                    <td className="p-3.5">{rawProduct.purity}</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramSeason')}</td>
-                    <td className="p-3.5">{product.season}</td>
+                    <td className="p-3.5">{lp.season}</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramMaturity')}</td>
-                    <td className="p-3.5">{product.maturityPeriod}</td>
+                    <td className="p-3.5">{rawProduct.maturityPeriod}</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramYield')}</td>
-                    <td className="p-3.5 font-bold text-slate-900">{product.yieldPotential}</td>
+                    <td className="p-3.5 font-bold text-slate-900">{rawProduct.yieldPotential}</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramCrop')}</td>
-                    <td className="p-3.5">{product.cropSuitability}</td>
+                    <td className="p-3.5">{lp.cropSuitability}</td>
                   </tr>
                 </tbody>
               </table>
@@ -393,7 +394,7 @@ export const ProductDetailPage = () => {
             <h3 className="text-base font-extrabold text-slate-900">{t('dosageBestPracticesTitle')}</h3>
             <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-100 text-xs text-emerald-950 space-y-2 leading-relaxed">
               <strong className="block text-sm font-extrabold">{t('dosageInstruction')}</strong>
-              <p>{product.dosageGuide}</p>
+              <p>{lp.dosageGuide}</p>
               <div className="pt-3 border-t border-emerald-200/60 font-semibold text-emerald-800">
                 {t('dosageTip')}
               </div>

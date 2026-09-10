@@ -7,15 +7,16 @@ import { useLanguage } from '../../context/LanguageContext';
 export const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart, setIsCartDrawerOpen } = useCart();
-  const { t } = useLanguage();
+  const { t, localizeProduct } = useLanguage();
 
-  const [selectedPack, setSelectedPack] = useState(
-    product.packSizes && product.packSizes.length > 0 ? product.packSizes[0].size : product.unit
-  );
+  const lp = localizeProduct(product);
 
-  const currentPrice = product.packSizes
-    ? (product.packSizes.find(p => p.size === selectedPack)?.price || product.price)
-    : product.price;
+  const [selectedPackIndex, setSelectedPackIndex] = useState(0);
+
+  const packs = lp.packSizes && lp.packSizes.length > 0 ? lp.packSizes : [{ size: lp.unit, price: lp.price }];
+  const currentPack = packs[selectedPackIndex] || packs[0];
+  const currentPrice = currentPack.price || lp.price;
+  const selectedPack = currentPack.size;
 
   const [addedAnim, setAddedAnim] = useState(false);
 
@@ -43,7 +44,7 @@ export const ProductCard = ({ product }) => {
         <Link to={`/product/${product.id}`}>
           <img
             src={product.imageUrl}
-            alt={product.name}
+            alt={lp.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />
@@ -53,11 +54,11 @@ export const ProductCard = ({ product }) => {
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           <span className="bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
             <span>{product.categoryIcon}</span>
-            <span>{product.category}</span>
+            <span>{lp.category}</span>
           </span>
-          {product.cropSuitability && (
+          {lp.cropSuitability && (
             <span className="bg-emerald-700/90 backdrop-blur-xs text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-xs">
-              🌾 {product.cropSuitability}
+              🌾 {lp.cropSuitability}
             </span>
           )}
         </div>
@@ -93,31 +94,31 @@ export const ProductCard = ({ product }) => {
           {/* Title */}
           <Link to={`/product/${product.id}`}>
             <h3 className="font-bold text-slate-900 text-sm hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
-              {product.name}
+              {lp.name}
             </h3>
           </Link>
 
           {/* Season & Sowing Tags */}
-          {product.season && (
+          {lp.season && (
             <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
-              <span>📅 {t('paramSeason')}:</span> <strong className="text-slate-700">{product.season}</strong>
+              <span>📅 {t('paramSeason')}:</span> <strong className="text-slate-700">{lp.season}</strong>
             </p>
           )}
 
           {/* Dynamic Pack Size Selector */}
-          {product.packSizes && product.packSizes.length > 1 && (
+          {packs && packs.length > 1 && (
             <div className="mt-3">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
                 {t('selectPackUnit')}
               </label>
               <div className="flex flex-wrap gap-1.5">
-                {product.packSizes.map((pack) => (
+                {packs.map((pack, idx) => (
                   <button
-                    key={pack.size}
+                    key={pack.size || idx}
                     type="button"
-                    onClick={() => setSelectedPack(pack.size)}
+                    onClick={() => setSelectedPackIndex(idx)}
                     className={`text-[11px] px-2 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                      selectedPack === pack.size
+                      selectedPackIndex === idx
                         ? 'bg-emerald-700 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}

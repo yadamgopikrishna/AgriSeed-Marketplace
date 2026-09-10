@@ -20,7 +20,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 export const FarmerDashboardPage = () => {
   const { currentUser, logout, openAuthModal } = useAuth();
-  const { t } = useLanguage();
+  const { t, getLocalizedProductName } = useLanguage();
 
   if (!currentUser) {
     return (
@@ -174,7 +174,7 @@ export const FarmerDashboardPage = () => {
                     <span className="text-[11px] text-slate-400">({o.paymentMethod})</span>
                   </div>
                   <p className="text-slate-500 text-[11px]">
-                    {o.items?.map(i => `${i.name} (${i.packSize})`).join(', ')}
+                    {o.items?.map(i => `${getLocalizedProductName(i)} (${i.packSize})`).join(', ')}
                   </p>
                 </div>
 

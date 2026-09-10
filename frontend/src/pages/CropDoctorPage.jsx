@@ -14,7 +14,7 @@ import { CROP_DISEASES_DB } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
 
 export const CropDoctorPage = () => {
-  const { t } = useLanguage();
+  const { t, localizeDisease } = useLanguage();
   const [selectedCrop, setSelectedCrop] = useState('Paddy / Rice');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState(null);
@@ -134,44 +134,47 @@ export const CropDoctorPage = () => {
                 </div>
               )}
 
-              {!isAnalyzing && diagnosisResult && (
-                <div className="space-y-4 text-xs animate-fadeIn">
-                  
-                  {previewImage && (
-                    <div className="aspect-16/9 rounded-2xl overflow-hidden border border-slate-200 max-h-48 mb-3">
-                      <img src={previewImage} alt="Diagnosed Leaf" className="w-full h-full object-cover" />
-                    </div>
-                  )}
+              {!isAnalyzing && diagnosisResult && (() => {
+                const ld = localizeDisease(diagnosisResult);
+                return (
+                  <div className="space-y-4 text-xs animate-fadeIn">
+                    
+                    {previewImage && (
+                      <div className="aspect-16/9 rounded-2xl overflow-hidden border border-slate-200 max-h-48 mb-3">
+                        <img src={previewImage} alt="Diagnosed Leaf" className="w-full h-full object-cover" />
+                      </div>
+                    )}
 
-                  <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-1.5">
-                    <div className="flex justify-between items-center">
-                      <span className="bg-rose-600 text-white font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
-                        {t('pathogenDetectedBadge')}
-                      </span>
-                      <span className="text-rose-800 font-bold">{diagnosisResult.crop}</span>
+                    <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <span className="bg-rose-600 text-white font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
+                          {t('pathogenDetectedBadge')}
+                        </span>
+                        <span className="text-rose-800 font-bold">{ld.crop}</span>
+                      </div>
+                      <h4 className="text-base font-black text-rose-950 font-serif">
+                        {ld.name}
+                      </h4>
+                      <p className="text-slate-700">{ld.symptoms}</p>
                     </div>
-                    <h4 className="text-base font-black text-rose-950 font-serif">
-                      {diagnosisResult.name}
-                    </h4>
-                    <p className="text-slate-700">{diagnosisResult.symptoms}</p>
-                  </div>
 
-                  {/* Treatment Card */}
-                  <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2 text-emerald-950">
-                    <div className="flex items-center gap-1.5 font-bold text-emerald-900">
-                      <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                      <span>{t('recommendedTreatmentTitle')}</span>
+                    {/* Treatment Card */}
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2 text-emerald-950">
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-900">
+                        <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                        <span>{t('recommendedTreatmentTitle')}</span>
+                      </div>
+                      <p className="font-extrabold text-sm text-emerald-950">
+                        {ld.recommendedTreatment?.productName}
+                      </p>
+                      <p>{t('dosageInstruction')} <strong>{ld.recommendedTreatment?.dosage}</strong></p>
+                      <p className="text-slate-600 pt-1 border-t border-emerald-200/60">
+                        💡 {ld.recommendedTreatment?.preventativeTip}
+                      </p>
                     </div>
-                    <p className="font-extrabold text-sm text-emerald-950">
-                      {diagnosisResult.recommendedTreatment.productName}
-                    </p>
-                    <p>{t('dosageInstruction')} <strong>{diagnosisResult.recommendedTreatment.dosage}</strong></p>
-                    <p className="text-slate-600 pt-1 border-t border-emerald-200/60">
-                      💡 {diagnosisResult.recommendedTreatment.preventativeTip}
-                    </p>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
 
             {diagnosisResult && (

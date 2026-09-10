@@ -32,7 +32,7 @@ export const CartPage = () => {
     freeShippingThreshold
   } = useCart();
 
-  const { t } = useLanguage();
+  const { t, getLocalizedProductName } = useLanguage();
 
   const [couponInput, setCouponInput] = useState('');
   const [couponMsg, setCouponMsg] = useState('');
@@ -120,11 +120,11 @@ export const CartPage = () => {
                 <div className="flex items-center gap-3.5">
                   <img
                     src={item.imageUrl}
-                    alt={item.name}
+                    alt={getLocalizedProductName(item)}
                     className="w-16 h-16 rounded-xl object-cover border border-slate-200 shrink-0"
                   />
                   <div>
-                    <h4 className="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{item.name}</h4>
+                    <h4 className="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{getLocalizedProductName(item)}</h4>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">
                         {item.packSize}

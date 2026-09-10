@@ -19,7 +19,7 @@ export const CartDrawer = () => {
     freeShippingThreshold
   } = useCart();
 
-  const { t } = useLanguage();
+  const { t, getLocalizedProductName } = useLanguage();
 
   if (!isCartDrawerOpen) return null;
 
@@ -95,11 +95,11 @@ export const CartDrawer = () => {
               <div key={`${item.id}-${item.packSize}-${idx}`} className="flex gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-200 transition-colors">
                 <img
                   src={item.imageUrl}
-                  alt={item.name}
+                  alt={getLocalizedProductName(item)}
                   className="w-18 h-18 rounded-xl object-cover border border-slate-200 shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-slate-900 text-xs leading-snug line-clamp-2">{item.name}</h4>
+                  <h4 className="font-bold text-slate-900 text-xs leading-snug line-clamp-2">{getLocalizedProductName(item)}</h4>
                   <div className="inline-block bg-emerald-100/80 text-emerald-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded mt-1">
                     {item.packSize}
                   </div>
