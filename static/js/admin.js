@@ -78,6 +78,73 @@ async function handleDeleteProduct(productId, productName) {
     }
 }
 
+async function handleDeleteUser(userId, userName) {
+    if (!confirm(`Are you sure you want to permanently delete user "${userName}" from the database? This cannot be undone.`)) return;
+
+    try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+            method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message || 'User deleted successfully', 'success');
+            setTimeout(() => window.location.reload(), 600);
+        } else {
+            showToast(data.message || 'Failed to delete user', 'error');
+        }
+    } catch (err) {
+        showToast('Network error deleting user', 'error');
+    }
+}
+
+function openEditUserModal(userJsonStr) {
+    try {
+        const user = JSON.parse(userJsonStr);
+        document.getElementById('editUserId').value = user.id || user._id;
+        document.getElementById('editUserName').value = user.name || '';
+        document.getElementById('editUserPhone').value = user.phone || '';
+        document.getElementById('editUserEmail').value = user.email || '';
+        document.getElementById('editUserRole').value = user.role || 'farmer';
+        document.getElementById('editUserFarmSize').value = user.farmSize || user.farm_size || '5 Acres';
+        document.getElementById('editUserRewards').value = user.kisanRewards || user.kisan_rewards || 100;
+        openModal('editUserModal');
+    } catch (e) {
+        console.error('Error parsing user JSON:', e);
+    }
+}
+
+async function handleSaveEditedUser(e) {
+    e.preventDefault();
+    const userId = document.getElementById('editUserId').value;
+    const payload = {
+        name: document.getElementById('editUserName').value,
+        phone: document.getElementById('editUserPhone').value,
+        email: document.getElementById('editUserEmail').value,
+        role: document.getElementById('editUserRole').value,
+        farmSize: document.getElementById('editUserFarmSize').value,
+        farm_size: document.getElementById('editUserFarmSize').value,
+        kisanRewards: parseInt(document.getElementById('editUserRewards').value) || 100
+    };
+
+    try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message || 'User updated successfully', 'success');
+            closeModal('editUserModal');
+            setTimeout(() => window.location.reload(), 600);
+        } else {
+            showToast(data.message || 'Failed to update user', 'error');
+        }
+    } catch (err) {
+        showToast('Network error updating user', 'error');
+    }
+}
+
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.add('active');

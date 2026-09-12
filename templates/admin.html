@@ -250,19 +250,28 @@
                     <thead>
                         <tr>
                             <th>Farmer Name</th>
+                            <th>Role</th>
                             <th>Contact Phone</th>
                             <th>Email</th>
                             <th>Village & District</th>
                             <th>Farm Holding</th>
                             <th>Primary Crops</th>
                             <th>Kisan Points</th>
+                            <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for f in farmers %}
                             <tr>
                                 <td>
-                                    <strong style="color: var(--text-dark);">👨‍🌾 {{ f.name }}</strong>
+                                    <strong style="color: var(--text-dark);">
+                                        {% if f.role == 'admin' %}🛡️{% else %}👨‍🌾{% endif %} {{ f.name }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <span style="font-size: 0.75rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase; {% if f.role == 'admin' %}background: #fef3c7; color: #92400e;{% else %}background: #dcfce7; color: #166534;{% endif %}">
+                                        {{ f.role or 'farmer' }}
+                                    </span>
                                 </td>
                                 <td>+91 {{ f.phone }}</td>
                                 <td style="color: var(--text-muted); font-size: 0.85rem;">{{ f.email }}</td>
@@ -279,6 +288,16 @@
                                     <span style="background: #fef3c7; color: #92400e; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.8rem;">
                                         🪙 {{ f.kisan_rewards }} Pts
                                     </span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+                                        <button onclick='openEditUserModal({{ f | tojson }})' class="btn btn-secondary btn-sm" title="Edit User">
+                                            ✏️
+                                        </button>
+                                        <button onclick="handleDeleteUser('{{ f._id }}', '{{ f.name }}')" class="btn btn-secondary btn-sm" style="color: #dc2626;" title="Delete User">
+                                            🗑️
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -396,6 +415,60 @@
             <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
                 <button type="button" onclick="closeModal('addProductModal')" class="btn btn-secondary">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editUserModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 550px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+            <h3 style="font-size: 1.35rem; font-weight: 800;">Edit User Profile & Role</h3>
+            <button onclick="closeModal('editUserModal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <form id="editUserForm" onsubmit="handleSaveEditedUser(event)">
+            <input type="hidden" id="editUserId">
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Full Name *</label>
+                <input type="text" id="editUserName" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Mobile Phone *</label>
+                    <input type="tel" id="editUserPhone" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Email Address</label>
+                    <input type="email" id="editUserEmail" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">System Role</label>
+                    <select id="editUserRole" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none; background: white;">
+                        <option value="farmer">👨‍🌾 Farmer</option>
+                        <option value="admin">🛡️ Admin</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Farm Land Holding</label>
+                    <input type="text" id="editUserFarmSize" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Kisan Loyalty Reward Points</label>
+                <input type="number" id="editUserRewards" min="0" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none; font-weight: 700; color: #166534;">
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" onclick="closeModal('editUserModal')" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
     </div>

@@ -48,17 +48,22 @@
         <form id="loginForm" onsubmit="handleLoginSubmit(event)">
             <div style="margin-bottom: 1.25rem;">
                 <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">
-                    Registered Mobile / Email
+                    Registered Mobile / Email *
                 </label>
                 <input type="text" id="loginIdentity" placeholder="e.g. 9876543210 or farmer@agriseed.in" value="farmer@agriseed.in" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
             </div>
 
             <div style="margin-bottom: 1.5rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">Password</label>
+                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">Password *</label>
                     <span style="font-size: 0.75rem; color: var(--text-muted);">Default: <code>farmer123</code></span>
                 </div>
-                <input type="password" id="loginPassword" placeholder="••••••••" value="farmer123" required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                <div style="position: relative;">
+                    <input type="password" id="loginPassword" placeholder="••••••••" value="farmer123" required style="width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    <button type="button" onclick="togglePassVisibility('loginPassword', this)" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 1rem;">
+                        👁️
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-lg btn-block" style="box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);">
@@ -69,7 +74,7 @@
         <!-- 2. Registration Form -->
         <form id="registerForm" onsubmit="handleRegisterSubmit(event)" style="display: none;">
             <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Full Name *</label>
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Farmer Full Name *</label>
                 <input type="text" id="regName" placeholder="e.g. Gurdeep Singh" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
             </div>
 
@@ -100,20 +105,43 @@
                 <input type="text" id="regVillage" placeholder="Village Name, Post Office" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
                 <div>
                     <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">District *</label>
-                    <input type="text" id="regDistrict" placeholder="Karnal / Ludhiana" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    <input type="text" id="regDistrict" placeholder="Karnal" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">State *</label>
+                    <select id="regState" style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none; background: white;">
+                        <option value="Haryana" selected>Haryana</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                    </select>
                 </div>
                 <div>
                     <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">PIN Code *</label>
-                    <input type="text" id="regPincode" placeholder="132001" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    <input type="text" id="regPincode" placeholder="132001" maxlength="6" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
                 </div>
             </div>
 
             <div style="margin-bottom: 1.5rem;">
                 <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text-dark);">Create Password *</label>
-                <input type="password" id="regPassword" placeholder="Minimum 6 characters" required style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                <div style="position: relative;">
+                    <input type="password" id="regPassword" placeholder="Minimum 6 characters" required style="width: 100%; padding: 0.65rem 2.5rem 0.65rem 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); outline: none;">
+                    <button type="button" onclick="togglePassVisibility('regPassword', this)" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 1rem;">
+                        👁️
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-lg btn-block">
@@ -127,6 +155,17 @@
 
 {% block scripts %}
 <script>
+function togglePassVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+    }
+}
+
 function switchAuthTab(mode) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -182,9 +221,11 @@ async function handleRegisterSubmit(e) {
         phone: document.getElementById('regPhone').value,
         email: document.getElementById('regEmail').value,
         farm_size: document.getElementById('regFarmSize').value,
+        farmSize: document.getElementById('regFarmSize').value,
         primary_crops: document.getElementById('regCrops').value.split(',').map(s => s.trim()),
         village: document.getElementById('regVillage').value,
         district: document.getElementById('regDistrict').value,
+        state: document.getElementById('regState').value,
         pincode: document.getElementById('regPincode').value,
         password: document.getElementById('regPassword').value
     };

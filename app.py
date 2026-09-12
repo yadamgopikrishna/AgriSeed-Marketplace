@@ -54,9 +54,11 @@ def format_user(u):
     uid = str(u_dict.get('_id', u_dict.get('id', '')))
     u_dict['id'] = uid
     u_dict['_id'] = uid
-    u_dict['farmSize'] = u_dict.get('farmSize', u_dict.get('farm_size', '2 Acres'))
+    u_dict['farmSize'] = u_dict.get('farmSize', u_dict.get('farm_size', '5 Acres'))
     u_dict['primaryCrops'] = u_dict.get('primaryCrops', u_dict.get('primary_crops', ['Paddy', 'Wheat']))
     u_dict['kisanRewards'] = u_dict.get('kisanRewards', u_dict.get('kisan_rewards', 100))
+    u_dict['state'] = u_dict.get('state', 'Haryana')
+    u_dict['pincode'] = u_dict.get('pincode', '132001')
     return u_dict
 
 def format_product(p):
@@ -178,15 +180,13 @@ def api_health():
 def api_register():
     data = request.get_json(silent=True) or request.form.to_dict() or {}
     
-    # Robustly extract name across all possible frontend field conventions
-    name = (
+    # Robustly extract name
+    name = str(
         data.get('name') or 
         data.get('fullName') or 
         data.get('full_name') or 
         data.get('farmerName') or 
         data.get('farmer_name') or 
-        data.get('username') or 
-        data.get('user_name') or 
         ''
     ).strip()
     
@@ -211,6 +211,7 @@ def api_register():
     village = str(data.get('village') or data.get('town') or data.get('villageName') or 'Krishi Nagar').strip()
     district = str(data.get('district') or data.get('districtName') or 'Karnal').strip()
     state = str(data.get('state') or data.get('stateName') or 'Haryana').strip()
+    pincode = str(data.get('pincode') or data.get('pinCode') or '132001').strip()
     farm_size = str(data.get('farm_size') or data.get('farmSize') or data.get('land_size') or data.get('landSize') or '5 Acres').strip()
     primary_crops = data.get('primary_crops') or data.get('primaryCrops') or data.get('crops') or ['Wheat', 'Rice']
     role = str(data.get('role', 'farmer')).strip().lower()
@@ -224,7 +225,7 @@ def api_register():
 
     # Check if user already exists
     query_or = []
-    if email: query_or.append({"email": email})
+    if email: query_or.append({"email": {"$regex": f"^{email}$", "$options": "i"}})
     if phone: query_or.append({"phone": phone})
     
     if query_or:
@@ -236,8 +237,8 @@ def api_register():
     new_user = {
         "_id": f"user_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(100, 999)}",
         "name": name,
-        "email": email or f"{phone}@agriseed.in",
-        "phone": phone or "9876543210",
+        "email": email or (f"{phone}@agriseed.in" if phone else "farmer@agriseed.in"),
+        "phone": phone,
         "password_hash": generate_password_hash(password),
         "role": role if role in ['farmer', 'admin', 'seller'] else 'farmer',
         "farm_size": farm_size or "5 Acres",
@@ -248,7 +249,7 @@ def api_register():
         "taluk": data.get('taluk', 'Taluk Center'),
         "district": district,
         "state": state,
-        "pincode": data.get('pincode', '132001'),
+        "pincode": pincode,
         "kisan_rewards": 100, # 100 bonus welcome points
         "kisanRewards": 100,
         "registered_host": request.host,
@@ -262,7 +263,7 @@ def api_register():
     session['user_role'] = new_user.get('role', 'farmer')
     session['user_name'] = new_user['name']
 
-    print(f"[AUTH-REGISTRATION] Successfully saved user '{name}' ({new_user['phone']}) to MongoDB! Host: {request.host}")
+    print(f"[AUTH-REGISTRATION] Successfully saved user '{name}' ({new_user.get('phone') or new_user.get('email')}) to MongoDB! Host: {request.host}")
 
     return jsonify({
         "success": True,
@@ -274,16 +275,23 @@ def api_register():
 @app.route('/api/auth/login', methods=['POST'])
 def api_login():
     data = request.get_json(silent=True) or request.form.to_dict() or {}
-    identity = str(data.get('identity') or data.get('phone') or data.get('email') or data.get('username') or '').strip().lower()
+    identity = str(data.get('identity') or data.get('phone') or data.get('email') or data.get('username') or '').strip()
     password = str(data.get('password') or data.get('pass') or '').strip()
 
     if not identity or not password:
         return jsonify({"success": False, "message": "Mobile/Email and Password are required."}), 400
 
-    user = db.users.find_one({"$or": [{"email": identity}, {"phone": identity}, {"_id": identity}, {"name": {"$regex": f"^{identity}$", "$options": "i"}}]})
+    user = db.users.find_one({
+        "$or": [
+            {"email": {"$regex": f"^{identity}$", "$options": "i"}},
+            {"phone": identity},
+            {"_id": identity},
+            {"name": {"$regex": f"^{identity}$", "$options": "i"}}
+        ]
+    })
     
     # Fallback to check admin credentials if admin user was queried
-    if not user and identity in ['admin', 'admin@agriseed.in', '9998887776'] and password == 'admin123':
+    if not user and identity.lower() in ['admin', 'admin@agriseed.in', '9998887776'] and password == 'admin123':
         user = db.users.find_one({"role": "admin"})
 
     if not user or not check_password_hash(user.get('password_hash', ''), password):

@@ -3,6 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Sprout, ShieldCheck, UserCheck, Sparkles, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+  'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+  'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+  'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Jammu & Kashmir'
+];
+
 export const AuthPage = () => {
   const navigate = useNavigate();
   const { login, register, demoLogin } = useAuth();
@@ -13,9 +21,11 @@ export const AuthPage = () => {
     name: '',
     phone: '',
     email: '',
+    farmSize: '5 Acres',
     village: 'Rampur Khurd',
     district: 'Karnal',
-    farmSize: '5 Acres',
+    state: 'Haryana',
+    pincode: '132001',
     password: 'farmer123'
   });
 
@@ -30,8 +40,8 @@ export const AuthPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!regForm.name || !regForm.phone) {
-      setErrorMsg('Name and Mobile number are required.');
+    if (!regForm.name || (!regForm.phone && !regForm.email)) {
+      setErrorMsg('Full Name and either Mobile Number or Email are required.');
       return;
     }
     setLoading(true);
@@ -121,7 +131,7 @@ export const AuthPage = () => {
                 value={regForm.name}
                 onChange={(e) => setRegForm({ ...regForm, name: e.target.value })}
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
               />
             </div>
 
@@ -134,40 +144,79 @@ export const AuthPage = () => {
                   value={regForm.phone}
                   onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
                   required
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
                 />
               </div>
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Farm Size</label>
+                <label className="block font-bold text-slate-700 mb-1">Email Address</label>
                 <input
-                  type="text"
-                  placeholder="e.g. 5 Acres"
-                  value={regForm.farmSize}
-                  onChange={(e) => setRegForm({ ...regForm, farmSize: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                  type="email"
+                  placeholder="farmer@agriseed.in"
+                  value={regForm.email}
+                  onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
+                <label className="block font-bold text-slate-700 mb-1">Farm Land Holding</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 5 Acres"
+                  value={regForm.farmSize}
+                  onChange={(e) => setRegForm({ ...regForm, farmSize: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                />
+              </div>
+              <div>
                 <label className="block font-bold text-slate-700 mb-1">Village / Town *</label>
                 <input
                   type="text"
+                  placeholder="e.g. Rampur Khurd"
                   value={regForm.village}
                   onChange={(e) => setRegForm({ ...regForm, village: e.target.value })}
                   required
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">District *</label>
                 <input
                   type="text"
+                  placeholder="Karnal"
                   value={regForm.district}
                   onChange={(e) => setRegForm({ ...regForm, district: e.target.value })}
                   required
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">State *</label>
+                <select
+                  value={regForm.state}
+                  onChange={(e) => setRegForm({ ...regForm, state: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium text-slate-800 cursor-pointer focus:border-emerald-500"
+                >
+                  {INDIAN_STATES.map((st) => (
+                    <option key={st} value={st}>{st}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">PIN Code *</label>
+                <input
+                  type="text"
+                  placeholder="132001"
+                  maxLength={6}
+                  value={regForm.pincode}
+                  onChange={(e) => setRegForm({ ...regForm, pincode: e.target.value })}
+                  required
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
                 />
               </div>
             </div>
@@ -180,7 +229,7 @@ export const AuthPage = () => {
                   value={regForm.password}
                   onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
                   required
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 pr-10 outline-none font-medium focus:border-emerald-500"
                 />
                 <button
                   type="button"
@@ -204,26 +253,26 @@ export const AuthPage = () => {
         ) : (
           <form onSubmit={handleLogin} className="space-y-4 text-xs">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Mobile Number or Email</label>
+              <label className="block font-bold text-slate-700 mb-1">Mobile Number or Email Address *</label>
               <input
                 type="text"
                 placeholder="e.g. 9876543210 or farmer@agriseed.in"
                 value={loginForm.identity}
                 onChange={(e) => setLoginForm({ ...loginForm, identity: e.target.value })}
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Password</label>
+              <label className="block font-bold text-slate-700 mb-1">Password *</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={loginForm.password}
                   onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                   required
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 pr-10 outline-none font-medium focus:border-emerald-500"
                 />
                 <button
                   type="button"

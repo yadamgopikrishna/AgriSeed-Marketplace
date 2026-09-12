@@ -3,6 +3,14 @@ import { X, Sprout, ShieldCheck, UserCheck, Phone, Lock, MapPin, Sparkles, Eye, 
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+  'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+  'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+  'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Jammu & Kashmir'
+];
+
 export const AuthModal = () => {
   const { isAuthModalOpen, authModalTab, closeAuthModal, openAuthModal, login, register, demoLogin } = useAuth();
   const { t } = useLanguage();
@@ -13,9 +21,11 @@ export const AuthModal = () => {
     name: '',
     phone: '',
     email: '',
+    farmSize: '5 Acres',
     village: 'Rampur Khurd',
     district: 'Karnal',
-    farmSize: '5 Acres',
+    state: 'Haryana',
+    pincode: '132001',
     password: 'farmer123'
   });
 
@@ -32,8 +42,8 @@ export const AuthModal = () => {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    if (!regForm.name || !regForm.phone) {
-      setErrorMsg('Please fill in Farmer Name and Mobile Number.');
+    if (!regForm.name || (!regForm.phone && !regForm.email)) {
+      setErrorMsg('Please fill in Full Name and either Mobile Number or Email.');
       return;
     }
     setLoading(true);
@@ -132,75 +142,114 @@ export const AuthModal = () => {
 
           {/* Register Form */}
           {authModalTab === 'register' ? (
-            <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+            <form onSubmit={handleRegisterSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{t('fullNameInput')}</label>
+                <label className="block font-bold text-slate-700 mb-1">Farmer Full Name *</label>
                 <input
                   type="text"
                   placeholder="e.g. Ramesh Kumar Singh"
                   value={regForm.name}
                   onChange={(e) => setRegForm({ ...regForm, name: e.target.value })}
                   required
-                  className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('phoneInput')}</label>
+                  <label className="block font-bold text-slate-700 mb-1">Mobile Number *</label>
                   <input
                     type="tel"
                     placeholder="9876543210"
                     value={regForm.phone}
                     onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
                     required
-                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Farm Land Size</label>
+                  <label className="block font-bold text-slate-700 mb-1">Email Address</label>
                   <input
-                    type="text"
-                    placeholder="e.g. 5 Acres"
-                    value={regForm.farmSize}
-                    onChange={(e) => setRegForm({ ...regForm, farmSize: e.target.value })}
-                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
+                    type="email"
+                    placeholder="farmer@agriseed.in"
+                    value={regForm.email}
+                    onChange={(e) => setRegForm({ ...regForm, email: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('villageInput')}</label>
+                  <label className="block font-bold text-slate-700 mb-1">Farm Land Holding</label>
                   <input
                     type="text"
-                    value={regForm.village}
-                    onChange={(e) => setRegForm({ ...regForm, village: e.target.value })}
-                    required
-                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
+                    placeholder="e.g. 5 Acres"
+                    value={regForm.farmSize}
+                    onChange={(e) => setRegForm({ ...regForm, farmSize: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">{t('districtInput')}</label>
+                  <label className="block font-bold text-slate-700 mb-1">Village / Town *</label>
                   <input
                     type="text"
+                    placeholder="e.g. Rampur Khurd"
+                    value={regForm.village}
+                    onChange={(e) => setRegForm({ ...regForm, village: e.target.value })}
+                    required
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">District *</label>
+                  <input
+                    type="text"
+                    placeholder="Karnal"
                     value={regForm.district}
                     onChange={(e) => setRegForm({ ...regForm, district: e.target.value })}
                     required
-                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">State *</label>
+                  <select
+                    value={regForm.state}
+                    onChange={(e) => setRegForm({ ...regForm, state: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium text-slate-800 cursor-pointer"
+                  >
+                    {INDIAN_STATES.map((st) => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">PIN Code *</label>
+                  <input
+                    type="text"
+                    placeholder="132001"
+                    maxLength={6}
+                    value={regForm.pincode}
+                    onChange={(e) => setRegForm({ ...regForm, pincode: e.target.value })}
+                    required
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Account Password *</label>
+                <label className="block font-bold text-slate-700 mb-1">Account Password *</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={regForm.password}
                     onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
                     required
-                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 pr-10 outline-none font-medium"
                   />
                   <button
                     type="button"
@@ -218,25 +267,25 @@ export const AuthModal = () => {
                 disabled={loading}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
               >
-                {loading ? 'Registering Farm...' : `🌱 ${t('registerFarmBtn')} (+100)`}
+                {loading ? 'Registering Farm...' : `🌱 Register Farm Account (+100 Kisan Points)`}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">{t('phoneInput')}</label>
+                <label className="block font-bold text-slate-700 mb-1">Mobile Number or Email Address *</label>
                 <input
                   type="text"
                   placeholder="e.g. 9876543210 or farmer@agriseed.in"
                   value={loginForm.identity}
                   onChange={(e) => setLoginForm({ ...loginForm, identity: e.target.value })}
                   required
-                  className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                <label className="block font-bold text-slate-700 mb-1">Password *</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -244,7 +293,7 @@ export const AuthModal = () => {
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                     required
-                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 pr-10 outline-none font-medium"
                   />
                   <button
                     type="button"
@@ -262,7 +311,7 @@ export const AuthModal = () => {
                 disabled={loading}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
               >
-                {loading ? 'Signing In...' : `🔑 ${t('login')}`}
+                {loading ? 'Signing In...' : `🔑 Sign In to AgriSeed`}
               </button>
             </form>
           )}
