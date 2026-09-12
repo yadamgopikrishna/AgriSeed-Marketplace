@@ -1,16 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DEMO_USERS } from '../data/mockData';
+import { authService } from '../services/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('agriseed_user');
-    return saved ? JSON.parse(saved) : DEMO_USERS.farmer; // Default to demo farmer for instant review
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState('register'); // 'login' | 'register'
+  const [isLoadingAuth, setIsLoadingAuth] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -20,75 +22,71 @@ export const AuthProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  const login = async (identity, password) => {
-    // Try live API if available, fallback to mock demo user
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identity, password })
-      });
-      const data = await res.json();
-      if (data.success && data.user) {
-        setCurrentUser(data.user);
-        return { success: true, message: data.message };
+  // Sync session with MongoDB on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const savedUser = localStorage.getItem('agriseed_user');
+      const userId = savedUser ? JSON.parse(savedUser).id : null;
+      const res = await authService.getMe(userId);
+      if (res.success && res.authenticated && res.user) {
+        setCurrentUser(res.user);
       }
-    } catch (e) {
-      console.warn('Using client-side auth fallback:', e);
-    }
+    };
+    checkSession();
+  }, []);
 
-    if (identity.includes('admin')) {
-      setCurrentUser(DEMO_USERS.admin);
-      return { success: true, message: 'Signed in as Admin!' };
-    } else {
-      setCurrentUser({
-        ...DEMO_USERS.farmer,
-        email: identity.includes('@') ? identity : `${identity}@agriseed.in`,
-        phone: !identity.includes('@') ? identity : DEMO_USERS.farmer.phone
-      });
-      return { success: true, message: 'Signed in successfully!' };
+  const login = async (identity, password) => {
+    setIsLoadingAuth(true);
+    try {
+      const res = await authService.login(identity, password);
+      setIsLoadingAuth(false);
+      if (res.success && res.user) {
+        setCurrentUser(res.user);
+        return { success: true, message: res.message || 'Signed in successfully!' };
+      }
+      return { success: false, message: res.message || 'Invalid login credentials.' };
+    } catch (e) {
+      setIsLoadingAuth(false);
+      return { success: false, message: 'Server communication failed.' };
     }
   };
 
   const register = async (userData) => {
-    const newUser = {
-      id: `user_${Date.now()}`,
-      name: userData.name,
-      email: userData.email || `${userData.phone}@agriseed.in`,
-      phone: userData.phone,
-      role: 'farmer',
-      farmSize: userData.farmSize || '5 Acres',
-      primaryCrops: userData.primaryCrops || ['Paddy / Rice', 'Wheat'],
-      village: userData.village || 'Rampur Khurd',
-      district: userData.district || 'Karnal',
-      state: userData.state || 'Haryana',
-      kisanRewards: 100, // +100 welcome bonus points
-      createdAt: new Date().toISOString()
-    };
-
+    setIsLoadingAuth(true);
     try {
-      await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-      });
+      const res = await authService.register(userData);
+      setIsLoadingAuth(false);
+      if (res.success && res.user) {
+        setCurrentUser(res.user);
+        return { success: true, message: res.message || 'Account created successfully (+100 Kisan Points)!' };
+      }
+      return { success: false, message: res.message || 'Registration failed.' };
     } catch (e) {
-      console.warn('API sync warning:', e);
-    }
-
-    setCurrentUser(newUser);
-    return { success: true, message: `Welcome ${newUser.name}! +100 Kisan Points Credited.` };
-  };
-
-  const demoLogin = (role = 'farmer') => {
-    if (role === 'admin') {
-      setCurrentUser(DEMO_USERS.admin);
-    } else {
-      setCurrentUser(DEMO_USERS.farmer);
+      setIsLoadingAuth(false);
+      return { success: false, message: 'Server communication failed.' };
     }
   };
 
-  const logout = () => {
+  const demoLogin = async (role = 'farmer') => {
+    try {
+      const res = await authService.demoLogin(role);
+      if (res.success && res.user) {
+        setCurrentUser(res.user);
+        return;
+      }
+    } catch (e) {
+      console.warn('Demo login API fallback:', e);
+    }
+    // Fallback to local demo profile if backend server is not running
+    setCurrentUser(role === 'admin' ? DEMO_USERS.admin : DEMO_USERS.farmer);
+  };
+
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (e) {
+      console.warn('Logout API warning:', e);
+    }
     setCurrentUser(null);
     localStorage.removeItem('agriseed_user');
   };

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { CROP_DISEASES_DB } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
+import { cropDoctorService } from '../services/api';
 
 export const CropDoctorPage = () => {
   const { currentLang, t, localizeDisease } = useLanguage();
@@ -46,15 +47,24 @@ export const CropDoctorPage = () => {
     { label: t('sampleWheatRust'), crop: 'Wheat', url: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80', resultIndex: 2 }
   ];
 
-  const handleAnalyze = (sampleIndex = 0, imgUrl = null) => {
+  const handleAnalyze = async (sampleIndex = 0, imgUrl = null) => {
     setIsAnalyzing(true);
     setDiagnosisResult(null);
-    setPreviewImage(imgUrl || sampleImages[sampleIndex].url);
+    const targetUrl = imgUrl || sampleImages[sampleIndex].url;
+    setPreviewImage(targetUrl);
 
-    setTimeout(() => {
-      setIsAnalyzing(false);
+    try {
+      const res = await cropDoctorService.diagnose(sampleIndex, targetUrl);
+      if (res.success && res.diagnosis) {
+        setDiagnosisResult(res.diagnosis);
+      } else {
+        setDiagnosisResult(CROP_DISEASES_DB[sampleIndex]);
+      }
+    } catch (e) {
       setDiagnosisResult(CROP_DISEASES_DB[sampleIndex]);
-    }, 1500);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleFileUpload = (e) => {

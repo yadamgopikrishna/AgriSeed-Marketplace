@@ -26,6 +26,7 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ProductCard } from '../components/product/ProductCard';
+import { productService } from '../services/api';
 
 export const ProductDetailPage = () => {
   const { id } = useParams();
@@ -34,7 +35,24 @@ export const ProductDetailPage = () => {
   const { currentLang, t, localizeProduct } = useLanguage();
   const { isInWishlist, toggleWishlist } = useWishlist();
 
-  const rawProduct = INITIAL_PRODUCTS.find(p => p.id === id) || INITIAL_PRODUCTS[0];
+  const [rawProduct, setRawProduct] = useState(() => {
+    return INITIAL_PRODUCTS.find(p => p.id === id) || INITIAL_PRODUCTS[0];
+  });
+
+  useEffect(() => {
+    const fetchLiveDetail = async () => {
+      try {
+        const res = await productService.getById(id);
+        if (res.success && res.product) {
+          setRawProduct(res.product);
+        }
+      } catch (e) {
+        console.warn('Live product detail fetch fallback:', e);
+      }
+    };
+    fetchLiveDetail();
+  }, [id]);
+
   const lp = localizeProduct(rawProduct);
   const isWished = isInWishlist(rawProduct.id);
   const seller = INITIAL_SELLERS.find(s => s.id === rawProduct.sellerId) || INITIAL_SELLERS[0];

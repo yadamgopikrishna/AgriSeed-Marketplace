@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, INITIAL_ORDERS, INITIAL_SELLERS } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
+import { adminService, orderService, productService } from '../services/api';
 
 export const AdminDashboardPage = () => {
   const { t, getLocalizedProductName, getLocalizedCategory } = useLanguage();
@@ -26,6 +27,30 @@ export const AdminDashboardPage = () => {
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'products' | 'farmers' | 'sellers'
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  // Fetch live orders and products from MongoDB
+  React.useEffect(() => {
+    const fetchAdminData = async () => {
+      try {
+        const [ordersRes, prodsRes] = await Promise.all([
+          orderService.getAll(),
+          productService.getAll()
+        ]);
+        if (ordersRes.success && ordersRes.orders && ordersRes.orders.length > 0) {
+          const local = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
+          const combined = [...ordersRes.orders, ...local];
+          const unique = Array.from(new Map(combined.map(item => [item.id || item.orderId, item])).values());
+          setOrders(unique);
+        }
+        if (prodsRes.success && prodsRes.products && prodsRes.products.length > 0) {
+          setProducts(prodsRes.products);
+        }
+      } catch (e) {
+        console.warn('Admin live sync fallback:', e);
+      }
+    };
+    fetchAdminData();
+  }, []);
+
   const [newProd, setNewProd] = useState({
     name: '',
     category: 'Seeds',
@@ -37,7 +62,8 @@ export const AdminDashboardPage = () => {
     dosageGuide: '5 kg per acre'
   });
 
-  const handleStatusChange = (orderId, newStatus) => {
+  const handleStatusChange = async (orderId, newStatus) => {
+    // 1. Update state locally
     const updated = orders.map(o => {
       if ((o.id || o.orderId) === orderId) {
         return {
@@ -57,6 +83,13 @@ export const AdminDashboardPage = () => {
     });
     setOrders(updated);
     localStorage.setItem('agriseed_orders', JSON.stringify(updated));
+
+    // 2. Persist to MongoDB
+    try {
+      await adminService.updateOrderStatus(orderId, newStatus);
+    } catch (e) {
+      console.warn('Admin status sync warning:', e);
+    }
   };
 
   const handleAddProduct = (e) => {

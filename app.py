@@ -13,12 +13,14 @@ if sys.platform == 'win32':
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_cors import CORS
 from config import Config
 from database import DatabaseManager
 from seed_data import seed_database, SAMPLE_PRODUCTS, SAMPLE_SELLERS, SAMPLE_USERS, SAMPLE_REVIEWS, SAMPLE_ORDERS
 
 app = Flask(__name__)
 app.config.from_object(Config)
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 # Initialize Database and seed if empty
 db = DatabaseManager.get_db()
@@ -34,8 +36,96 @@ def get_current_user():
         # Don't expose password hash in session/context
         user_copy = dict(user)
         user_copy.pop('password_hash', None)
+        user_copy['id'] = user_copy.get('_id')
         return user_copy
     return None
+
+def format_user(u):
+    if not u:
+        return None
+    u_dict = dict(u)
+    u_dict.pop('password_hash', None)
+    uid = str(u_dict.get('_id', u_dict.get('id', '')))
+    u_dict['id'] = uid
+    u_dict['_id'] = uid
+    u_dict['farmSize'] = u_dict.get('farmSize', u_dict.get('farm_size', '2 Acres'))
+    u_dict['primaryCrops'] = u_dict.get('primaryCrops', u_dict.get('primary_crops', ['Paddy', 'Wheat']))
+    u_dict['kisanRewards'] = u_dict.get('kisanRewards', u_dict.get('kisan_rewards', 100))
+    return u_dict
+
+def format_product(p):
+    if not p:
+        return None
+    p_dict = dict(p)
+    pid = str(p_dict.get('_id', p_dict.get('id', '')))
+    unit = p_dict.get('unit', '1 Pack')
+    price = p_dict.get('price', 0)
+    pack_sizes = p_dict.get('pack_sizes', p_dict.get('packSizes', [{'size': unit, 'price': price}]))
+    
+    return {
+        "id": pid,
+        "_id": pid,
+        "name": p_dict.get("name", ""),
+        "category": p_dict.get("category", "Seeds"),
+        "categoryIcon": p_dict.get("categoryIcon", p_dict.get("category_icon", "🌾")),
+        "price": price,
+        "originalPrice": p_dict.get("originalPrice", p_dict.get("original_price", price)),
+        "unit": unit,
+        "packSizes": pack_sizes,
+        "stock": p_dict.get("stock", 50),
+        "rating": p_dict.get("rating", 4.8),
+        "reviewCount": p_dict.get("reviewCount", p_dict.get("review_count", 25)),
+        "imageUrl": p_dict.get("imageUrl", p_dict.get("image_url", "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80")),
+        "cropSuitability": p_dict.get("cropSuitability", p_dict.get("crop_suitability", "All Crops")),
+        "season": p_dict.get("season", "All Seasons"),
+        "germinationRate": p_dict.get("germinationRate", p_dict.get("germination_rate", "92%")),
+        "purity": p_dict.get("purity", "98%"),
+        "maturityPeriod": p_dict.get("maturityPeriod", p_dict.get("maturity_period", "120-140 Days")),
+        "yieldPotential": p_dict.get("yieldPotential", p_dict.get("yield_potential", "20-25 Quintals/Acre")),
+        "sellerId": p_dict.get("sellerId", p_dict.get("seller_id", "seller_1")),
+        "sellerName": p_dict.get("sellerName", p_dict.get("seller_name", "Kisan Vikas Agro Kendra")),
+        "verifiedSeller": p_dict.get("verifiedSeller", p_dict.get("verified_seller", True)),
+        "sellerLicense": p_dict.get("sellerLicense", p_dict.get("seller_license", "DL-AGR-2023-8821")),
+        "description": p_dict.get("description", ""),
+        "dosageGuide": p_dict.get("dosageGuide", p_dict.get("dosage_guide", "Refer to packet instructions.")),
+        "isFeatured": p_dict.get("isFeatured", p_dict.get("is_featured", False)),
+        "isPopular": p_dict.get("isPopular", p_dict.get("is_popular", False)),
+        "tags": p_dict.get("tags", [])
+    }
+
+def format_order(o):
+    if not o:
+        return None
+    o_dict = dict(o)
+    oid = str(o_dict.get('_id', o_dict.get('id', o_dict.get('orderId', ''))))
+    del_addr = o_dict.get("deliveryAddress", o_dict.get("delivery_address", {}))
+    return {
+        "id": oid,
+        "_id": oid,
+        "orderId": oid,
+        "userId": o_dict.get("userId", o_dict.get("user_id", "guest")),
+        "userName": o_dict.get("userName", o_dict.get("user_name", del_addr.get('name', 'Farmer Patron'))),
+        "phone": o_dict.get("phone", del_addr.get('phone', '')),
+        "deliveryAddress": del_addr,
+        "items": o_dict.get("items", []),
+        "subtotal": o_dict.get("subtotal", 0),
+        "discount": o_dict.get("discount", 0),
+        "couponCode": o_dict.get("couponCode", o_dict.get("coupon_code", None)),
+        "deliveryCharge": o_dict.get("deliveryCharge", o_dict.get("delivery_charge", 0)),
+        "totalAmount": o_dict.get("totalAmount", o_dict.get("total_amount", 0)),
+        "paymentMethod": o_dict.get("paymentMethod", o_dict.get("payment_method", "Cash on Delivery")),
+        "paymentStatus": o_dict.get("paymentStatus", o_dict.get("payment_status", "Pending")),
+        "status": o_dict.get("status", "Ordered"),
+        "statusHistory": o_dict.get("statusHistory", o_dict.get("status_history", [])),
+        "courierPartner": o_dict.get("courierPartner", o_dict.get("courier_partner", "AgriExpress Rural Fleet")),
+        "trackingNumber": o_dict.get("trackingNumber", o_dict.get("tracking_number", f"AX-KNL-{oid.replace('AGRI-', '')}")),
+        "trackingAwb": o_dict.get("trackingAwb", o_dict.get("tracking_number", f"AWB-{oid}-DL")),
+        "driverName": o_dict.get("driverName", o_dict.get("driver_name", "Sukhwinder Singh")),
+        "driverPhone": o_dict.get("driverPhone", o_dict.get("driver_phone", "+91 98123 77654")),
+        "vehicleNumber": o_dict.get("vehicleNumber", o_dict.get("vehicle_number", "HR-05-AB-7721")),
+        "estimatedDelivery": o_dict.get("estimatedDelivery", o_dict.get("estimated_delivery", "2-3 Business Days")),
+        "createdAt": o_dict.get("createdAt", o_dict.get("created_at", datetime.utcnow().isoformat()))
+    }
 
 @app.context_processor
 def inject_globals():
@@ -275,6 +365,20 @@ def presentation_page():
 # REST API ENDPOINTS
 # ==========================================
 
+@app.route('/api/health', methods=['GET'])
+def api_health():
+    """System health check and MongoDB connection telemetry."""
+    is_live = DatabaseManager.is_live_mongo()
+    return jsonify({
+        "success": True,
+        "status": "healthy",
+        "database": "MongoDB (agriseed_db)",
+        "is_live_mongo": is_live,
+        "users_count": db.users.count_documents({}),
+        "products_count": db.products.count_documents({}),
+        "orders_count": db.orders.count_documents({})
+    })
+
 # --- AUTH APIs ---
 
 @app.route('/api/auth/register', methods=['POST'])
@@ -287,15 +391,14 @@ def api_register():
     village = data.get('village', '').strip()
     district = data.get('district', '').strip()
     state = data.get('state', '').strip()
-    farm_size = data.get('farm_size', '2 Acres').strip()
-    primary_crops = data.get('primary_crops', ['Wheat', 'Rice'])
+    farm_size = data.get('farm_size', data.get('farmSize', '2 Acres')).strip()
+    primary_crops = data.get('primary_crops', data.get('primaryCrops', ['Wheat', 'Rice']))
 
     if not name:
         return jsonify({"success": False, "message": "Full Name is required."}), 400
     if not phone and not email:
         return jsonify({"success": False, "message": "Please provide either a Mobile Number or Email."}), 400
     if not password:
-        # Default fallback password for quick 1-step registration
         password = phone or "farmer123"
 
     # Check if user already exists
@@ -315,15 +418,18 @@ def api_register():
         "email": email or f"{phone}@agriseed.in",
         "phone": phone or "9876543210",
         "password_hash": generate_password_hash(password),
-        "role": "farmer",
+        "role": data.get('role', 'farmer'),
         "farm_size": farm_size or "5 Acres",
+        "farmSize": farm_size or "5 Acres",
         "primary_crops": primary_crops if isinstance(primary_crops, list) else [c.strip() for c in str(primary_crops).split(',') if c.strip()],
+        "primaryCrops": primary_crops if isinstance(primary_crops, list) else [c.strip() for c in str(primary_crops).split(',') if c.strip()],
         "village": village or "Krishi Nagar",
         "taluk": data.get('taluk', 'Taluk Center'),
         "district": district or "District Hub",
         "state": state or "Punjab",
         "pincode": data.get('pincode', '140001'),
         "kisan_rewards": 100, # 100 bonus welcome points
+        "kisanRewards": 100,
         "registered_host": request.host,
         "created_at": now_iso
     }
@@ -332,7 +438,7 @@ def api_register():
     db.users.insert_one(new_user)
     session.permanent = True
     session['user_id'] = new_user['_id']
-    session['user_role'] = 'farmer'
+    session['user_role'] = new_user.get('role', 'farmer')
     session['user_name'] = new_user['name']
 
     print(f"[AUTH-REGISTRATION] Successfully saved user '{name}' ({new_user['phone']}) to MongoDB! Host: {request.host}")
@@ -341,19 +447,19 @@ def api_register():
         "success": True,
         "message": f"Welcome to AgriSeed, {name}! Your farmer account is registered (+100 Kisan Points).",
         "redirect": "/dashboard",
-        "user": {k: v for k, v in new_user.items() if k != 'password_hash'}
+        "user": format_user(new_user)
     })
 
 @app.route('/api/auth/login', methods=['POST'])
 def api_login():
     data = request.get_json(silent=True) or request.form.to_dict() or {}
-    identity = data.get('identity', '').strip().lower()
+    identity = data.get('identity', data.get('phone', data.get('email', ''))).strip().lower()
     password = data.get('password', '')
 
     if not identity or not password:
         return jsonify({"success": False, "message": "Mobile/Email and Password are required."}), 400
 
-    user = db.users.find_one({"$or": [{"email": identity}, {"phone": identity}]})
+    user = db.users.find_one({"$or": [{"email": identity}, {"phone": identity}, {"_id": identity}]})
     if not user or not check_password_hash(user.get('password_hash', ''), password):
         return jsonify({"success": False, "message": "Invalid mobile number, email, or password."}), 401
 
@@ -368,6 +474,7 @@ def api_login():
         "success": True,
         "message": f"Welcome back, {user['name']}!",
         "role": user.get('role', 'farmer'),
+        "user": format_user(user),
         "redirect": "/admin" if user.get('role') == 'admin' else "/dashboard"
     })
 
@@ -393,8 +500,19 @@ def api_demo_login():
         "success": True,
         "message": f"Logged in as Demo {role.capitalize()}: {user['name']}",
         "role": user.get('role', 'farmer'),
+        "user": format_user(user),
         "redirect": "/admin" if user.get('role') == 'admin' else "/dashboard"
     })
+
+@app.route('/api/auth/me', methods=['GET'])
+def api_auth_me():
+    user_id = session.get('user_id') or request.args.get('user_id')
+    if not user_id:
+        return jsonify({"success": False, "authenticated": False, "user": None}), 200
+    user = db.users.find_one({"_id": user_id})
+    if not user:
+        return jsonify({"success": False, "authenticated": False, "user": None}), 200
+    return jsonify({"success": True, "authenticated": True, "user": format_user(user)})
 
 @app.route('/api/auth/logout', methods=['GET', 'POST'])
 def api_logout():
@@ -429,17 +547,18 @@ def api_get_products():
             {'category': {'$regex': search, '$options': 'i'}}
         ]
 
-    products = list(db.products.find(query))
-    return jsonify({"success": True, "count": len(products), "products": products})
+    raw_products = list(db.products.find(query))
+    formatted_products = [format_product(p) for p in raw_products]
+    return jsonify({"success": True, "count": len(formatted_products), "products": formatted_products})
 
 @app.route('/api/products/<product_id>', methods=['GET'])
 def api_get_product_detail(product_id):
-    product = db.products.find_one({"_id": product_id})
+    product = db.products.find_one({"$or": [{"_id": product_id}, {"id": product_id}]})
     if not product:
         return jsonify({"success": False, "message": "Product not found"}), 404
-    reviews = list(db.reviews.find({"product_id": product_id}))
+    reviews = list(db.reviews.find({"product_id": product.get('_id', product_id)}))
     seller = db.sellers.find_one({"_id": product.get('seller_id')}) or {}
-    return jsonify({"success": True, "product": product, "seller": seller, "reviews": reviews})
+    return jsonify({"success": True, "product": format_product(product), "seller": seller, "reviews": reviews})
 
 @app.route('/api/products/<product_id>/reviews', methods=['POST'])
 def api_add_review(product_id):
@@ -602,30 +721,41 @@ def api_apply_coupon():
 
 # --- ORDERS & CHECKOUT APIs ---
 
-@app.route('/api/orders/create', methods=['POST'])
-def api_create_order():
-    data = request.get_json() or {}
-    cart = session.get('cart', [])
-    if not cart:
-        return jsonify({"success": False, "message": "Cart is empty."}), 400
+@app.route('/api/orders', methods=['GET', 'POST'])
+def api_orders():
+    if request.method == 'GET':
+        user_id = request.args.get('user_id')
+        if user_id:
+            orders = list(db.orders.find({"$or": [{"user_id": user_id}, {"userId": user_id}]}))
+        else:
+            orders = list(db.orders.find({}))
+        formatted_orders = [format_order(o) for o in orders]
+        return jsonify({"success": True, "count": len(formatted_orders), "orders": formatted_orders})
+
+    # POST - Create New Order
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    items = data.get('items') or session.get('cart', [])
+    if not items:
+        return jsonify({"success": False, "message": "No items provided in order."}), 400
 
     current_user = get_current_user()
-    user_id = current_user['_id'] if current_user else "guest_farmer"
+    user_id = data.get('userId') or data.get('user_id') or (current_user['_id'] if current_user else "guest_farmer")
+    
+    delivery_addr = data.get('deliveryAddress') or data.get('delivery_address') or {}
+    name = delivery_addr.get('fullName') or delivery_addr.get('name') or data.get('name') or (current_user['name'] if current_user else "Farmer Patron")
+    phone = delivery_addr.get('phone') or data.get('phone') or (current_user.get('phone') if current_user else "9876543210")
+    village = delivery_addr.get('village') or data.get('village', 'Village Farm')
+    taluk = delivery_addr.get('taluk') or data.get('taluk', 'Tehsil')
+    district = delivery_addr.get('district') or data.get('district', 'District')
+    state = delivery_addr.get('state') or data.get('state', 'State')
+    pincode = delivery_addr.get('pincode') or data.get('pincode', '110001')
+    payment_method = data.get('paymentMethod') or data.get('payment_method', 'Cash on Delivery')
 
-    name = data.get('name', 'Farmer Patron')
-    phone = data.get('phone', '9876543210')
-    village = data.get('village', 'Village Farm')
-    taluk = data.get('taluk', 'Tehsil')
-    district = data.get('district', 'District')
-    state = data.get('state', 'State')
-    pincode = data.get('pincode', '110001')
-    payment_method = data.get('payment_method', 'Cash on Delivery')
-
-    subtotal = sum(item['price'] * item['quantity'] for item in cart)
-    discount = session.get('cart_discount', 0)
-    coupon_code = session.get('coupon_code', None)
-    delivery_charge = 0 if subtotal >= 999 else 75
-    total_amount = max(0, subtotal - discount + delivery_charge)
+    subtotal = float(data.get('subtotal', sum((item.get('price', 0) * item.get('quantity', 1)) for item in items)))
+    discount = float(data.get('discount', session.get('cart_discount', 0)))
+    coupon_code = data.get('couponCode', session.get('coupon_code', None))
+    delivery_charge = float(data.get('deliveryCharge', 0 if subtotal >= 999 else 75))
+    total_amount = float(data.get('totalAmount', max(0, subtotal - discount + delivery_charge)))
 
     # Generate unique readable Order ID
     order_id = f"AGRI-{random.randint(100000, 999999)}"
@@ -634,10 +764,15 @@ def api_create_order():
 
     new_order = {
         "_id": order_id,
+        "id": order_id,
+        "orderId": order_id,
         "user_id": user_id,
+        "userId": user_id,
         "user_name": name,
+        "userName": name,
         "phone": phone,
         "delivery_address": {
+            "fullName": name,
             "name": name,
             "village": village,
             "taluk": taluk,
@@ -646,13 +781,27 @@ def api_create_order():
             "pincode": pincode,
             "phone": phone
         },
-        "items": cart,
+        "deliveryAddress": {
+            "fullName": name,
+            "name": name,
+            "village": village,
+            "taluk": taluk,
+            "district": district,
+            "state": state,
+            "pincode": pincode,
+            "phone": phone
+        },
+        "items": items,
         "subtotal": subtotal,
         "discount": discount,
         "coupon_code": coupon_code,
+        "couponCode": coupon_code,
         "delivery_charge": delivery_charge,
+        "deliveryCharge": delivery_charge,
         "total_amount": total_amount,
+        "totalAmount": total_amount,
         "payment_method": payment_method,
+        "paymentMethod": payment_method,
         "payment_status": "Paid" if "UPI" in payment_method or "Card" in payment_method else "Pay on Delivery",
         "status": "Ordered",
         "status_history": [
@@ -663,32 +812,136 @@ def api_create_order():
             }
         ],
         "courier_partner": "AgriExpress Rural Fleet",
-        "tracking_number": f"AX-{random.randint(100000, 999999)}",
-        "driver_name": "Agri Logistics Team (+91 98000 12345)",
+        "courierPartner": "AgriExpress Rural Fleet",
+        "tracking_number": f"AX-KNL-{order_id.replace('AGRI-', '')}",
+        "trackingNumber": f"AX-KNL-{order_id.replace('AGRI-', '')}",
+        "trackingAwb": f"AWB-{order_id}-DL",
+        "driver_name": "Sukhwinder Singh",
+        "driverName": "Sukhwinder Singh",
+        "driver_phone": "+91 98123 77654",
+        "driverPhone": "+91 98123 77654",
+        "vehicle_number": "HR-05-AB-7721",
+        "vehicleNumber": "HR-05-AB-7721",
         "estimated_delivery": estimated_del,
+        "estimatedDelivery": "2-3 Business Days",
         "created_at": datetime.utcnow().isoformat()
     }
 
     db.orders.insert_one(new_order)
 
-    # Reduce product stock
-    for item in cart:
-        db.products.update_one(
-            {"_id": item['product_id']},
-            {"$inc": {"stock": -item['quantity']}}
+    # Reduce product stock in database
+    for item in items:
+        pid = item.get('id') or item.get('productId') or item.get('product_id')
+        qty = int(item.get('quantity', 1))
+        if pid:
+            db.products.update_one(
+                {"$or": [{"_id": pid}, {"id": pid}]},
+                {"$inc": {"stock": -qty}}
+            )
+
+    # Add Kisan Rewards loyalty points to user in database
+    if user_id and user_id != "guest_farmer":
+        db.users.update_one(
+            {"$or": [{"_id": user_id}, {"id": user_id}]},
+            {"$inc": {"kisan_rewards": 20, "kisanRewards": 20}}
         )
 
-    # Clear cart
+    # Clear session cart if present
     session['cart'] = []
     session.pop('cart_discount', None)
     session.pop('coupon_code', None)
     session.modified = True
 
+    print(f"[ORDERS] Successfully created real order #{order_id} for user '{name}' ({phone}) in MongoDB!")
+
     return jsonify({
         "success": True,
         "message": f"Order #{order_id} placed successfully!",
         "order_id": order_id,
-        "redirect": f"/orders/track/{order_id}"
+        "order": format_order(new_order),
+        "redirect": f"/track?orderId={order_id}"
+    })
+
+@app.route('/api/orders/create', methods=['POST'])
+def api_create_order():
+    return api_orders()
+
+@app.route('/api/orders/<order_id>', methods=['GET'])
+@app.route('/api/orders/track/<order_id>', methods=['GET'])
+def api_get_order_track(order_id):
+    order = db.orders.find_one({"$or": [{"_id": order_id}, {"id": order_id}, {"orderId": order_id}]})
+    if not order:
+        return jsonify({"success": False, "message": f"Order #{order_id} not found."}), 404
+    return jsonify({"success": True, "order": format_order(order)})
+
+@app.route('/api/orders/user/<user_id>', methods=['GET'])
+def api_get_user_orders(user_id):
+    orders = list(db.orders.find({"$or": [{"user_id": user_id}, {"userId": user_id}]}))
+    return jsonify({"success": True, "count": len(orders), "orders": [format_order(o) for o in orders]})
+
+# --- CROP DOCTOR AI DIAGNOSTIC API ---
+
+@app.route('/api/crop-doctor/diagnose', methods=['POST'])
+def api_crop_doctor_diagnose():
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    sample_index = int(data.get('sampleIndex', data.get('sample_index', 0)))
+    image_url = data.get('imageUrl') or data.get('image_url')
+    
+    diagnoses_kb = [
+        {
+            "crop": "Paddy / Rice",
+            "name": "Paddy Blast (Magnaporthe oryzae)",
+            "symptoms": "Spindle-shaped lesions with grey center and reddish-brown borders on leaf blades.",
+            "recommendedTreatment": {
+                "productId": "prod_7",
+                "productName": "Bio-Neem Shield & Tricyclazole 75 WP",
+                "dosage": "120g in 200L water per acre",
+                "preventativeTip": "Avoid excess nitrogen fertilizer during cloudy high-humidity weather."
+            }
+        },
+        {
+            "crop": "Cotton",
+            "name": "Pink Bollworm (Pectinophora gossypiella)",
+            "symptoms": "Rosetted flowers and punctured squares on developing bolls.",
+            "recommendedTreatment": {
+                "productId": "prod_8",
+                "productName": "Proclaim 5% SG Emamectin Benzoate",
+                "dosage": "80g in 200L water per acre",
+                "preventativeTip": "Install pheromone traps at 5 traps/acre for early monitoring."
+            }
+        },
+        {
+            "crop": "Wheat",
+            "name": "Yellow Rust / Stripe Rust (Puccinia striiformis)",
+            "symptoms": "Yellowish stripe-like pustules arranged along the veins of leaves.",
+            "recommendedTreatment": {
+                "productId": "prod_7",
+                "productName": "Propiconazole 25% EC (Tilt)",
+                "dosage": "200ml in 200L water per acre",
+                "preventativeTip": "Sow rust-resistant ICAR certified seed lots early in November."
+            }
+        }
+    ]
+    
+    chosen = diagnoses_kb[min(sample_index, len(diagnoses_kb)-1)]
+    diag_record = {
+        "_id": f"diag_{uuid.uuid4().hex[:8]}",
+        "user_id": session.get('user_id', 'guest'),
+        "crop": chosen['crop'],
+        "pathogen": chosen['name'],
+        "diagnosis": chosen,
+        "image_url": image_url,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    try:
+        db.diagnoses.insert_one(diag_record)
+    except Exception:
+        pass
+        
+    return jsonify({
+        "success": True,
+        "diagnosis": chosen,
+        "record_id": diag_record["_id"]
     })
 
 # --- ADMIN APIs ---
@@ -774,9 +1027,9 @@ def api_admin_delete_product(product_id):
     res = db.products.delete_one({"_id": product_id})
     return jsonify({"success": True, "message": "Product removed successfully."})
 
-@app.route('/api/admin/orders/<order_id>/status', methods=['PUT'])
+@app.route('/api/admin/orders/<order_id>/status', methods=['PUT', 'POST'])
 def api_admin_update_order_status(order_id):
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
     new_status = data.get('status')
     valid_statuses = ['Ordered', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled']
 
@@ -791,10 +1044,10 @@ def api_admin_update_order_status(order_id):
     }
 
     db.orders.update_one(
-        {"_id": order_id},
+        {"$or": [{"_id": order_id}, {"id": order_id}, {"orderId": order_id}]},
         {
             "$set": {"status": new_status},
-            "$push": {"status_history": status_entry}
+            "$push": {"status_history": status_entry, "statusHistory": status_entry}
         }
     )
 

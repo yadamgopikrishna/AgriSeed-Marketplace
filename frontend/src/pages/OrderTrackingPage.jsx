@@ -18,6 +18,7 @@ import {
 import { INITIAL_ORDERS } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
 import { InvoiceModal } from '../components/common/InvoiceModal';
+import { orderService } from '../services/api';
 
 export const OrderTrackingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,11 +30,26 @@ export const OrderTrackingPage = () => {
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   useEffect(() => {
-    // Check localStorage first, then fallback to mock data
-    const localOrders = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
-    const allOrders = [...localOrders, ...INITIAL_ORDERS];
-    const found = allOrders.find(o => (o.id || o.orderId).toLowerCase() === queryOrderId.toLowerCase()) || INITIAL_ORDERS[0];
-    setCurrentOrder(found);
+    const loadOrder = async () => {
+      // 1. Try fetching from live MongoDB backend
+      try {
+        const res = await orderService.getById(queryOrderId);
+        if (res.success && res.order) {
+          setCurrentOrder(res.order);
+          return;
+        }
+      } catch (e) {
+        console.warn('Live order fetch fallback:', e);
+      }
+
+      // 2. Check localStorage cache
+      const localOrders = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
+      const allOrders = [...localOrders, ...INITIAL_ORDERS];
+      const found = allOrders.find(o => (o.id || o.orderId || '').toLowerCase() === queryOrderId.toLowerCase()) || INITIAL_ORDERS[0];
+      setCurrentOrder(found);
+    };
+
+    loadOrder();
   }, [queryOrderId]);
 
   const handleSearch = (e) => {

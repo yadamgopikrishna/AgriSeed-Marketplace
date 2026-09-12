@@ -14,6 +14,7 @@ import {
 import { INITIAL_PRODUCTS } from '../data/mockData';
 import { ProductCard } from '../components/product/ProductCard';
 import { useLanguage } from '../context/LanguageContext';
+import { productService } from '../services/api';
 
 export const CatalogPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,6 +24,7 @@ export const CatalogPage = () => {
   const initialSearch = searchParams.get('q') || '';
   const initialCrop = searchParams.get('crop') || 'All';
 
+  const [productsList, setProductsList] = useState(INITIAL_PRODUCTS);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedCrop, setSelectedCrop] = useState(initialCrop);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
@@ -30,11 +32,26 @@ export const CatalogPage = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
+  // Fetch live products from MongoDB
+  React.useEffect(() => {
+    const fetchLiveProducts = async () => {
+      try {
+        const res = await productService.getAll();
+        if (res.success && res.products && res.products.length > 0) {
+          setProductsList(res.products);
+        }
+      } catch (e) {
+        console.warn('Using local product catalog fallback:', e);
+      }
+    };
+    fetchLiveProducts();
+  }, []);
+
   const categories = ['All', 'Seeds', 'Fertilizers', 'Pesticides', 'Farming Equipment'];
   const cropList = ['All', 'Paddy / Rice', 'Wheat', 'Cotton', 'Vegetables', 'All Crops'];
 
   const filteredProducts = useMemo(() => {
-    return INITIAL_PRODUCTS.filter(item => {
+    return productsList.filter(item => {
       // Category match
       if (selectedCategory !== 'All' && item.category !== selectedCategory) {
         return false;

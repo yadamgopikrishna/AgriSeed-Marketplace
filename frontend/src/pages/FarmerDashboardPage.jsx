@@ -17,10 +17,35 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { INITIAL_ORDERS } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
+import { orderService } from '../services/api';
 
 export const FarmerDashboardPage = () => {
   const { currentUser, logout, openAuthModal } = useAuth();
   const { t, getLocalizedProductName } = useLanguage();
+  const [orders, setOrders] = useState(() => {
+    const localOrders = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
+    return [...localOrders, ...INITIAL_ORDERS];
+  });
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const fetchUserOrders = async () => {
+      try {
+        const uid = currentUser.id || currentUser._id;
+        const res = await orderService.getByUserId(uid);
+        if (res.success && res.orders && res.orders.length > 0) {
+          const localOrders = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
+          // Deduplicate by ID
+          const combined = [...res.orders, ...localOrders];
+          const unique = Array.from(new Map(combined.map(item => [item.id || item.orderId, item])).values());
+          setOrders(unique);
+        }
+      } catch (e) {
+        console.warn('Live farmer orders fetch fallback:', e);
+      }
+    };
+    fetchUserOrders();
+  }, [currentUser]);
 
   if (!currentUser) {
     return (
@@ -35,9 +60,6 @@ export const FarmerDashboardPage = () => {
       </div>
     );
   }
-
-  const localOrders = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
-  const orders = [...localOrders, ...INITIAL_ORDERS];
 
   const activeOrders = orders.filter(o => o.status !== 'Delivered');
   const pastOrders = orders.filter(o => o.status === 'Delivered');

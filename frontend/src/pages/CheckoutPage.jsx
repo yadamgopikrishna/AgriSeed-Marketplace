@@ -17,6 +17,7 @@ import confetti from 'canvas-confetti';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { orderService } from '../services/api';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -54,10 +55,10 @@ export const CheckoutPage = () => {
     e.preventDefault();
     setIsProcessing(true);
 
-    const orderId = `AGRI-${Math.floor(100000 + Math.random() * 900000)}`;
+    let confirmedOrderId = `AGRI-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const orderPayload = {
-      orderId,
+      orderId: confirmedOrderId,
       items: cartItems,
       subtotal,
       discount,
@@ -66,6 +67,9 @@ export const CheckoutPage = () => {
       couponCode: appliedCoupon,
       paymentMethod: paymentMethod === 'upi' ? 'UPI (QR Code Verification)' : paymentMethod === 'card' ? 'Debit/Credit Card' : 'Cash on Delivery (COD)',
       deliveryAddress,
+      userId: currentUser ? (currentUser.id || currentUser._id) : 'guest_farmer',
+      userName: deliveryAddress.fullName,
+      phone: deliveryAddress.phone,
       status: 'Ordered',
       statusHistory: [
         { status: 'Ordered', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), details: 'Order placed & certified batch allocated.' }
@@ -73,20 +77,18 @@ export const CheckoutPage = () => {
       estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
 
-    // Save order to localStorage for tracking
-    const existingOrders = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
-    localStorage.setItem('agriseed_orders', JSON.stringify([orderPayload, ...existingOrders]));
-
-    // Try sending to Flask API
     try {
-      await fetch('/api/orders/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderPayload)
-      });
+      const res = await orderService.create(orderPayload);
+      if (res.success && res.order_id) {
+        confirmedOrderId = res.order_id;
+      }
     } catch (err) {
-      console.warn('API sync fallback');
+      console.warn('MongoDB API sync fallback:', err);
     }
+
+    // Save order to localStorage as offline cache
+    const existingOrders = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
+    localStorage.setItem('agriseed_orders', JSON.stringify([{ ...orderPayload, id: confirmedOrderId, orderId: confirmedOrderId }, ...existingOrders]));
 
     setTimeout(() => {
       setIsProcessing(false);
@@ -96,8 +98,8 @@ export const CheckoutPage = () => {
         spread: 70,
         origin: { y: 0.6 }
       });
-      navigate(`/track?orderId=${orderId}`);
-    }, 1500);
+      navigate(`/track?orderId=${confirmedOrderId}`);
+    }, 1200);
   };
 
   return (
