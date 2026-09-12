@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgCont" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="botCont" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#f8fafc"/>
+      <stop offset="70%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <filter id="shCont" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#15803d" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" fill="url(#bgCont)" rx="24"/>
+  <g filter="url(#shCont)" transform="translate(0, -10)">
+    <ellipse cx="300" cy="535" rx="135" ry="22" fill="#0f172a" opacity="0.2"/>
+    <rect x="255" y="70" width="90" height="65" rx="10" fill="#15803d"/>
+    <rect x="245" y="125" width="110" height="15" rx="4" fill="#14532d"/>
+    <path d="M265,140 L265,175 L230,225 L230,495 Q230,520 255,520 L345,520 Q370,520 370,495 L370,225 L335,140 Z" fill="url(#botCont)"/>
+    <rect x="235" y="235" width="130" height="245" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="235" y="235" width="130" height="38" rx="8" fill="#1e3a8a"/>
+    <text x="300" y="258" font-family="Arial, sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle" letter-spacing="1">TATA RALLIS</text>
+    <text x="300" y="269" font-family="Arial, sans-serif" font-weight="600" font-size="7" fill="#dbeafe" text-anchor="middle">SYSTEMIC FUNGICIDE</text>
+    <text x="300" y="305" font-family="Arial, sans-serif" font-weight="900" font-size="17" fill="#15803d" text-anchor="middle">CONTAF PLUS</text>
+    <text x="300" y="322" font-family="Arial, sans-serif" font-weight="800" font-size="9" fill="#0f172a" text-anchor="middle">Hexaconazole 5% SC</text>
+    <g transform="translate(280, 340)">
+      <polygon points="20,0 40,26 0,26" fill="#3b82f6" stroke="#2563eb" stroke-width="1.5"/>
+      <polygon points="20,26 0,26 20,36" fill="#3b82f6"/>
+      <polygon points="20,26 40,26 20,36" fill="#3b82f6"/>
+      <text x="20" y="21" font-family="Arial, sans-serif" font-weight="900" font-size="8" fill="#ffffff" text-anchor="middle">CAUTION</text>
+    </g>
+    <text x="300" y="415" font-family="Arial, sans-serif" font-weight="800" font-size="8" fill="#15803d" text-anchor="middle">🛡️ SHEATH BLIGHT &amp; RUST</text>
+    <text x="300" y="428" font-family="Arial, sans-serif" font-weight="600" font-size="7" fill="#64748b" text-anchor="middle">Protective &amp; Eradicative Action</text>
+    <rect x="250" y="445" width="100" height="26" rx="13" fill="#15803d"/>
+    <text x="300" y="462" font-family="Arial, sans-serif" font-weight="900" font-size="11" fill="#ffffff" text-anchor="middle">500 ml BOTTLE</text>
+  </g>
+</svg>

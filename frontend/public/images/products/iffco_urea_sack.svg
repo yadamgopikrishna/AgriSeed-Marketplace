@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgUrea" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="sackWhite" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#f8fafc"/>
+      <stop offset="70%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <filter id="shUrea" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#15803d" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" fill="url(#bgUrea)" rx="24"/>
+  <g filter="url(#shUrea)">
+    <ellipse cx="300" cy="525" rx="160" ry="24" fill="#0f172a" opacity="0.2"/>
+    <path d="M180,150 Q300,130 420,150 L445,470 Q445,510 400,515 L200,515 Q155,510 155,470 Z" fill="url(#sackWhite)"/>
+    <rect x="175" y="140" width="250" height="22" fill="#15803d" rx="4"/>
+    <line x1="185" y1="151" x2="415" y2="151" stroke="#ffffff" stroke-width="3" stroke-dasharray="8,6"/>
+    <rect x="195" y="190" width="210" height="295" rx="12" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+    <rect x="195" y="190" width="210" height="50" rx="12" fill="#166534"/>
+    <text x="300" y="222" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#ffffff" text-anchor="middle" letter-spacing="3">IFFCO</text>
+    <text x="300" y="270" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#15803d" text-anchor="middle">NEEM COATED</text>
+    <text x="300" y="295" font-family="Arial, sans-serif" font-weight="900" font-size="26" fill="#166534" text-anchor="middle">UREA</text>
+    <circle cx="300" cy="340" r="26" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="300" y="348" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#15803d" text-anchor="middle">46% N</text>
+    <rect x="220" y="380" width="160" height="36" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+    <text x="300" y="398" font-family="Arial, sans-serif" font-weight="800" font-size="10" fill="#166534" text-anchor="middle">🌿 100% NEEM ENRICHED</text>
+    <text x="300" y="410" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="#64748b" text-anchor="middle">Govt Subsidized Urea / High Nitrogen</text>
+    <rect x="230" y="426" width="140" height="34" rx="17" fill="#15803d"/>
+    <text x="300" y="448" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">45 KG BAG</text>
+  </g>
+</svg>

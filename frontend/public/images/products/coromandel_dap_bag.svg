@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgDap" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+    <linearGradient id="dapGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="35%" stop-color="#f97316"/>
+      <stop offset="70%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <filter id="shDap" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#9a3412" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" fill="url(#bgDap)" rx="24"/>
+  <g filter="url(#shDap)">
+    <ellipse cx="300" cy="525" rx="160" ry="24" fill="#0f172a" opacity="0.2"/>
+    <path d="M180,150 Q300,130 420,150 L445,470 Q445,510 400,515 L200,515 Q155,510 155,470 Z" fill="url(#dapGrad)"/>
+    <rect x="175" y="140" width="250" height="22" fill="#9a3412" rx="4"/>
+    <line x1="185" y1="151" x2="415" y2="151" stroke="#ffffff" stroke-width="3" stroke-dasharray="8,6"/>
+    <rect x="195" y="190" width="210" height="295" rx="12" fill="#ffffff"/>
+    <rect x="195" y="190" width="210" height="50" rx="12" fill="#c2410c"/>
+    <text x="300" y="222" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#ffffff" text-anchor="middle" letter-spacing="2">COROMANDEL GROMOR</text>
+    <text x="300" y="270" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#ea580c" text-anchor="middle">DAP</text>
+    <text x="300" y="292" font-family="Arial, sans-serif" font-weight="800" font-size="12" fill="#9a3412" text-anchor="middle">DI-AMMONIUM PHOSPHATE</text>
+    <g transform="translate(235, 310)">
+      <rect width="60" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.5"/>
+      <text x="30" y="25" font-family="Arial, sans-serif" font-weight="900" font-size="14" fill="#9a3412" text-anchor="middle">18% N</text>
+      <rect x="70" width="60" height="40" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.5"/>
+      <text x="100" y="25" font-family="Arial, sans-serif" font-weight="900" font-size="14" fill="#9a3412" text-anchor="middle">46% P</text>
+    </g>
+    <rect x="220" y="375" width="160" height="36" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1"/>
+    <text x="300" y="394" font-family="Arial, sans-serif" font-weight="800" font-size="10" fill="#9a3412" text-anchor="middle">🌱 ROOT DEVELOPMENT</text>
+    <text x="300" y="406" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="#64748b" text-anchor="middle">Basal Application for Paddy &amp; Wheat</text>
+    <rect x="230" y="425" width="140" height="34" rx="17" fill="#ea580c"/>
+    <text x="300" y="447" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">50 KG BAG</text>
+  </g>
+</svg>

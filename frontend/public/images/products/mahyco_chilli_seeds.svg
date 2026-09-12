@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgChi" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff1f2"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </linearGradient>
+    <linearGradient id="pouchChi" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="50%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <filter id="shChi" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#991b1b" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" fill="url(#bgChi)" rx="24"/>
+  <g filter="url(#shChi)">
+    <ellipse cx="300" cy="525" rx="150" ry="24" fill="#0f172a" opacity="0.18"/>
+    <path d="M190,130 Q300,110 410,130 L430,470 Q430,500 390,505 L210,505 Q170,500 170,470 Z" fill="url(#pouchChi)"/>
+    <rect x="190" y="125" width="220" height="25" fill="#7f1d1d" rx="4"/>
+    <rect x="205" y="170" width="190" height="300" rx="12" fill="#ffffff"/>
+    <rect x="205" y="170" width="190" height="50" rx="12" fill="#15803d"/>
+    <text x="300" y="202" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#ffffff" text-anchor="middle" letter-spacing="2">MAHYCO</text>
+    <text x="300" y="255" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#dc2626" text-anchor="middle">TEJASWINI F1</text>
+    <text x="300" y="278" font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="#15803d" text-anchor="middle">HYBRID HOT CHILLI SEEDS</text>
+    <circle cx="300" cy="335" r="26" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+    <text x="300" y="345" font-size="24" text-anchor="middle">🌶️</text>
+    <rect x="220" y="375" width="160" height="36" rx="8" fill="#fff1f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="300" y="394" font-family="Arial, sans-serif" font-weight="800" font-size="10" fill="#b91c1c" text-anchor="middle">🔥 HIGH PUNGENCY &amp; YIELD</text>
+    <text x="300" y="406" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="#64748b" text-anchor="middle">Virus Tolerant / Continuous Picking</text>
+    <rect x="235" y="425" width="130" height="34" rx="17" fill="#dc2626"/>
+    <text x="300" y="447" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">10G FOIL PACK</text>
+  </g>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgSsp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="sspGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e40af"/>
+      <stop offset="35%" stop-color="#2563eb"/>
+      <stop offset="70%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <filter id="shSsp" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#1e3a8a" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="600" height="600" fill="url(#bgSsp)" rx="24"/>
+  <g filter="url(#shSsp)">
+    <ellipse cx="300" cy="525" rx="160" ry="24" fill="#0f172a" opacity="0.2"/>
+    <path d="M180,150 Q300,130 420,150 L445,470 Q445,510 400,515 L200,515 Q155,510 155,470 Z" fill="url(#sspGrad)"/>
+    <rect x="175" y="140" width="250" height="22" fill="#1e3a8a" rx="4"/>
+    <line x1="185" y1="151" x2="415" y2="151" stroke="#ffffff" stroke-width="3" stroke-dasharray="8,6"/>
+    <rect x="195" y="190" width="210" height="295" rx="12" fill="#ffffff"/>
+    <rect x="195" y="190" width="210" height="50" rx="12" fill="#1e3a8a"/>
+    <text x="300" y="222" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#ffffff" text-anchor="middle" letter-spacing="2">KHAITAN AGRI</text>
+    <text x="300" y="270" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#1e40af" text-anchor="middle">SSP</text>
+    <text x="300" y="292" font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="#1e3a8a" text-anchor="middle">SINGLE SUPER PHOSPHATE</text>
+    <g transform="translate(235, 310)">
+      <rect width="60" height="40" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="30" y="25" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#1e40af" text-anchor="middle">16% P</text>
+      <rect x="70" width="60" height="40" rx="6" fill="#fef9c3" stroke="#eab308" stroke-width="1.5"/>
+      <text x="100" y="25" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#854d0e" text-anchor="middle">11% S</text>
+    </g>
+    <rect x="220" y="375" width="160" height="36" rx="8" fill="#f0f9ff" stroke="#93c5fd" stroke-width="1"/>
+    <text x="300" y="394" font-family="Arial, sans-serif" font-weight="800" font-size="10" fill="#1e40af" text-anchor="middle">⚡ PHOSPHORUS + SULPHUR</text>
+    <text x="300" y="406" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="#64748b" text-anchor="middle">Essential for Oilseeds, Pulses &amp; Cereals</text>
+    <rect x="230" y="425" width="140" height="34" rx="17" fill="#1e40af"/>
+    <text x="300" y="447" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">50 KG BAG</text>
+  </g>
+</svg>
