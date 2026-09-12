@@ -91,6 +91,48 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('agriseed_user');
   };
 
+  const updateUserProfile = async (profileData) => {
+    if (!currentUser) return { success: false, message: 'Not logged in.' };
+    const uid = currentUser.id || currentUser._id;
+    try {
+      const res = await authService.updateProfile(uid, profileData);
+      if (res.success && res.user) {
+        setCurrentUser(res.user);
+        return { success: true, message: res.message || 'Profile updated successfully!' };
+      }
+      return { success: false, message: res.message || 'Update failed.' };
+    } catch (e) {
+      return { success: false, message: 'Server communication failed.' };
+    }
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    if (!currentUser) return { success: false, message: 'Not logged in.' };
+    const uid = currentUser.id || currentUser._id;
+    try {
+      const res = await authService.changePassword(uid, currentPassword, newPassword);
+      return res;
+    } catch (e) {
+      return { success: false, message: 'Server communication failed.' };
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (!currentUser) return { success: false, message: 'Not logged in.' };
+    const uid = currentUser.id || currentUser._id;
+    try {
+      const res = await authService.deleteAccount(uid);
+      if (res.success) {
+        setCurrentUser(null);
+        localStorage.removeItem('agriseed_user');
+        return { success: true, message: res.message || 'Account deleted.' };
+      }
+      return { success: false, message: res.message || 'Deletion failed.' };
+    } catch (e) {
+      return { success: false, message: 'Server communication failed.' };
+    }
+  };
+
   const openAuthModal = (tab = 'register') => {
     setAuthModalTab(tab);
     setIsAuthModalOpen(true);
@@ -108,6 +150,9 @@ export const AuthProvider = ({ children }) => {
         register,
         demoLogin,
         logout,
+        updateUserProfile,
+        changePassword,
+        deleteAccount,
         isAuthModalOpen,
         authModalTab,
         openAuthModal,

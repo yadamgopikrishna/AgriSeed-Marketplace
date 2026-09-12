@@ -66,6 +66,26 @@ export const authService = {
     return request(`/auth/me${query}`, { method: 'GET' });
   },
 
+  async updateProfile(userId, profileData) {
+    return request(`/users/${encodeURIComponent(userId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(profileData)
+    });
+  },
+
+  async changePassword(userId, currentPassword, newPassword) {
+    return request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ userId, currentPassword, newPassword })
+    });
+  },
+
+  async deleteAccount(userId) {
+    return request(`/users/${encodeURIComponent(userId)}`, {
+      method: 'DELETE'
+    });
+  },
+
   async logout() {
     return request('/auth/logout', { method: 'POST' });
   }
@@ -148,6 +168,26 @@ export const cropDoctorService = {
 export const adminService = {
   async getUsers() {
     return request('/admin/users', { method: 'GET' });
+  },
+
+  async updateUser(userId, userData) {
+    return request(`/admin/users/${encodeURIComponent(userId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  async resetUserPassword(userId, newPassword) {
+    return request(`/admin/users/${encodeURIComponent(userId)}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ newPassword })
+    });
+  },
+
+  async deleteUser(userId) {
+    return request(`/admin/users/${encodeURIComponent(userId)}`, {
+      method: 'DELETE'
+    });
   },
 
   async updateOrderStatus(orderId, status) {

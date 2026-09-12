@@ -369,6 +369,109 @@ def api_logout():
     session.pop('user_name', None)
     return jsonify({"success": True, "message": "Logged out successfully.", "redirect": "/"})
 
+# --- USER PROFILE & ACCOUNT MANAGEMENT ---
+
+@app.route('/api/auth/profile', methods=['PUT'])
+@app.route('/api/users/<user_id>', methods=['PUT'])
+def api_update_profile(user_id=None):
+    """Updates user profile information in MongoDB."""
+    current_uid = user_id or session.get('user_id') or request.args.get('user_id')
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    
+    target_id = current_uid or data.get('id') or data.get('_id') or data.get('userId')
+    if not target_id:
+        return jsonify({"success": False, "message": "User identifier required."}), 400
+
+    user = db.users.find_one({"$or": [{"_id": target_id}, {"id": target_id}]})
+    if not user:
+        return jsonify({"success": False, "message": "User not found."}), 404
+
+    update_fields = {}
+    if 'name' in data or 'fullName' in data or 'full_name' in data:
+        update_fields['name'] = (data.get('name') or data.get('fullName') or data.get('full_name')).strip()
+    if 'phone' in data or 'mobile' in data:
+        update_fields['phone'] = str(data.get('phone') or data.get('mobile')).strip()
+    if 'email' in data:
+        update_fields['email'] = str(data.get('email')).strip().lower()
+    if 'farmSize' in data or 'farm_size' in data or 'landSize' in data:
+        fs = str(data.get('farmSize') or data.get('farm_size') or data.get('landSize')).strip()
+        update_fields['farmSize'] = fs
+        update_fields['farm_size'] = fs
+    if 'village' in data:
+        update_fields['village'] = str(data.get('village')).strip()
+    if 'district' in data:
+        update_fields['district'] = str(data.get('district')).strip()
+    if 'state' in data:
+        update_fields['state'] = str(data.get('state')).strip()
+    if 'pincode' in data:
+        update_fields['pincode'] = str(data.get('pincode')).strip()
+    if 'primaryCrops' in data or 'primary_crops' in data:
+        crops = data.get('primaryCrops') or data.get('primary_crops')
+        if isinstance(crops, str):
+            crops = [c.strip() for c in crops.split(',') if c.strip()]
+        update_fields['primaryCrops'] = crops
+        update_fields['primary_crops'] = crops
+
+    if update_fields:
+        db.users.update_one({"_id": user['_id']}, {"$set": update_fields})
+        if 'name' in update_fields:
+            session['user_name'] = update_fields['name']
+
+    updated_user = db.users.find_one({"_id": user['_id']})
+    return jsonify({
+        "success": True,
+        "message": "Farmer profile updated successfully in MongoDB!",
+        "user": format_user(updated_user)
+    })
+
+@app.route('/api/auth/change-password', methods=['POST'])
+def api_change_password():
+    """Validates current password and updates with new hashed password in MongoDB."""
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    user_id = data.get('userId') or data.get('user_id') or session.get('user_id')
+    current_pass = data.get('currentPassword') or data.get('current_password') or ''
+    new_pass = data.get('newPassword') or data.get('new_password') or ''
+
+    if not user_id:
+        return jsonify({"success": False, "message": "User session not found. Please log in."}), 400
+    if not current_pass or not new_pass:
+        return jsonify({"success": False, "message": "Current password and new password are required."}), 400
+    if len(new_pass) < 4:
+        return jsonify({"success": False, "message": "New password must be at least 4 characters long."}), 400
+
+    user = db.users.find_one({"$or": [{"_id": user_id}, {"id": user_id}]})
+    if not user:
+        return jsonify({"success": False, "message": "User account not found."}), 404
+
+    # Check current password hash or default password fallback
+    if not check_password_hash(user.get('password_hash', ''), current_pass):
+        if not (user.get('role') == 'admin' and current_pass == 'admin123') and not (user.get('role') == 'farmer' and current_pass == 'farmer123'):
+            return jsonify({"success": False, "message": "Current password is incorrect."}), 401
+
+    new_hash = generate_password_hash(new_pass)
+    db.users.update_one({"_id": user['_id']}, {"$set": {"password_hash": new_hash}})
+    return jsonify({"success": True, "message": "Password updated successfully in MongoDB! Please use your new password next time you sign in."})
+
+@app.route('/api/auth/account', methods=['DELETE'])
+@app.route('/api/users/<user_id>', methods=['DELETE'])
+def api_delete_account(user_id=None):
+    """Permanently deletes user account from MongoDB."""
+    target_id = user_id or session.get('user_id') or request.args.get('user_id')
+    if not target_id:
+        return jsonify({"success": False, "message": "User identifier required."}), 400
+
+    user = db.users.find_one({"$or": [{"_id": target_id}, {"id": target_id}]})
+    if not user:
+        return jsonify({"success": False, "message": "User not found."}), 404
+
+    db.users.delete_one({"_id": user['_id']})
+    
+    # If deleting current session user, clear session
+    if session.get('user_id') == user['_id']:
+        session.clear()
+
+    return jsonify({"success": True, "message": f"Account for '{user.get('name')}' has been permanently deleted from MongoDB."})
+
 # --- PRODUCT APIs ---
 
 @app.route('/api/products', methods=['GET'])
@@ -910,6 +1013,71 @@ def api_admin_users():
         "users": [format_user(u) for u in users],
         "total": len(users)
     })
+
+@app.route('/api/admin/users/<user_id>', methods=['PUT'])
+def api_admin_update_user(user_id):
+    """Admin endpoint to modify any user's role, name, phone, kisan points, etc."""
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    user = db.users.find_one({"$or": [{"_id": user_id}, {"id": user_id}]})
+    if not user:
+        return jsonify({"success": False, "message": "User not found."}), 404
+
+    update_fields = {}
+    if 'name' in data: update_fields['name'] = str(data['name']).strip()
+    if 'phone' in data: update_fields['phone'] = str(data['phone']).strip()
+    if 'email' in data: update_fields['email'] = str(data['email']).strip().lower()
+    if 'role' in data and data['role'] in ['farmer', 'admin', 'seller']:
+        update_fields['role'] = data['role']
+    if 'farmSize' in data or 'farm_size' in data:
+        fs = str(data.get('farmSize') or data.get('farm_size')).strip()
+        update_fields['farmSize'] = fs
+        update_fields['farm_size'] = fs
+    if 'kisanRewards' in data or 'kisan_rewards' in data:
+        try:
+            pts = int(data.get('kisanRewards') or data.get('kisan_rewards'))
+            update_fields['kisanRewards'] = pts
+            update_fields['kisan_rewards'] = pts
+        except ValueError:
+            pass
+    if 'village' in data: update_fields['village'] = str(data['village']).strip()
+    if 'district' in data: update_fields['district'] = str(data['district']).strip()
+    if 'state' in data: update_fields['state'] = str(data['state']).strip()
+
+    if update_fields:
+        db.users.update_one({"_id": user['_id']}, {"$set": update_fields})
+
+    updated_user = db.users.find_one({"_id": user['_id']})
+    return jsonify({
+        "success": True,
+        "message": f"User '{updated_user.get('name')}' updated successfully in MongoDB.",
+        "user": format_user(updated_user)
+    })
+
+@app.route('/api/admin/users/<user_id>/reset-password', methods=['POST'])
+def api_admin_reset_user_password(user_id):
+    """Admin endpoint to reset a user's password."""
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    new_password = data.get('newPassword') or data.get('new_password') or data.get('password')
+    if not new_password or len(new_password) < 4:
+        return jsonify({"success": False, "message": "Valid new password of at least 4 characters is required."}), 400
+
+    user = db.users.find_one({"$or": [{"_id": user_id}, {"id": user_id}]})
+    if not user:
+        return jsonify({"success": False, "message": "User not found."}), 404
+
+    new_hash = generate_password_hash(new_password)
+    db.users.update_one({"_id": user['_id']}, {"$set": {"password_hash": new_hash}})
+    return jsonify({"success": True, "message": f"Password for '{user.get('name')}' has been reset successfully."})
+
+@app.route('/api/admin/users/<user_id>', methods=['DELETE'])
+def api_admin_delete_user(user_id):
+    """Admin endpoint to delete a user from MongoDB."""
+    user = db.users.find_one({"$or": [{"_id": user_id}, {"id": user_id}]})
+    if not user:
+        return jsonify({"success": False, "message": "User not found."}), 404
+
+    db.users.delete_one({"_id": user['_id']})
+    return jsonify({"success": True, "message": f"User '{user.get('name')}' deleted from MongoDB."})
 
 @app.route('/api/reset_demo_data', methods=['POST'])
 def api_reset_demo_data():

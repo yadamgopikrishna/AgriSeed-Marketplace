@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sprout, ShieldCheck, UserCheck, Sparkles, ArrowRight, Lock } from 'lucide-react';
+import { Sprout, ShieldCheck, UserCheck, Sparkles, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const AuthPage = () => {
@@ -8,6 +8,7 @@ export const AuthPage = () => {
   const { login, register, demoLogin } = useAuth();
 
   const [tab, setTab] = useState('register'); // 'register' | 'login'
+  const [showPassword, setShowPassword] = useState(false);
   const [regForm, setRegForm] = useState({
     name: '',
     phone: '',
@@ -173,13 +174,23 @@ export const AuthPage = () => {
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">Password *</label>
-              <input
-                type="password"
-                value={regForm.password}
-                onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
-                required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={regForm.password}
+                  onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
+                  required
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-emerald-700 cursor-pointer p-0.5"
+                  title={showPassword ? "Hide Password" : "Show Password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button
@@ -206,13 +217,23 @@ export const AuthPage = () => {
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">Password</label>
-              <input
-                type="password"
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  required
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-emerald-700 cursor-pointer p-0.5"
+                  title={showPassword ? "Hide Password" : "Show Password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             <button

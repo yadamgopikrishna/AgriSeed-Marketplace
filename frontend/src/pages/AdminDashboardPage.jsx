@@ -10,7 +10,13 @@ import {
   Edit,
   CheckCircle2,
   Truck,
-  RotateCcw
+  RotateCcw,
+  Key,
+  Eye,
+  EyeOff,
+  Save,
+  X,
+  UserCheck
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, INITIAL_ORDERS, INITIAL_SELLERS } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
@@ -28,31 +34,47 @@ export const AdminDashboardPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [registeredUsers, setRegisteredUsers] = useState([]);
 
+  // Modals for User Management
+  const [editingUser, setEditingUser] = useState(null);
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+
+  const [resetPassUser, setResetPassUser] = useState(null);
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [showAdminResetPass, setShowAdminResetPass] = useState(false);
+  const [isResetPassModalOpen, setIsResetPassModalOpen] = useState(false);
+
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
+
+  const [actionAlert, setActionAlert] = useState(null);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+
   // Fetch live orders, products, and users from MongoDB
-  React.useEffect(() => {
-    const fetchAdminData = async () => {
-      try {
-        const [ordersRes, prodsRes, usersRes] = await Promise.all([
-          orderService.getAll(),
-          productService.getAll(),
-          adminService.getUsers()
-        ]);
-        if (ordersRes.success && ordersRes.orders && ordersRes.orders.length > 0) {
-          const local = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
-          const combined = [...ordersRes.orders, ...local];
-          const unique = Array.from(new Map(combined.map(item => [item.id || item.orderId, item])).values());
-          setOrders(unique);
-        }
-        if (prodsRes.success && prodsRes.products && prodsRes.products.length > 0) {
-          setProducts(prodsRes.products);
-        }
-        if (usersRes.success && usersRes.users && usersRes.users.length > 0) {
-          setRegisteredUsers(usersRes.users);
-        }
-      } catch (e) {
-        console.warn('Admin live sync fallback:', e);
+  const fetchAdminData = async () => {
+    try {
+      const [ordersRes, prodsRes, usersRes] = await Promise.all([
+        orderService.getAll(),
+        productService.getAll(),
+        adminService.getUsers()
+      ]);
+      if (ordersRes.success && ordersRes.orders && ordersRes.orders.length > 0) {
+        const local = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
+        const combined = [...ordersRes.orders, ...local];
+        const unique = Array.from(new Map(combined.map(item => [item.id || item.orderId, item])).values());
+        setOrders(unique);
       }
-    };
+      if (prodsRes.success && prodsRes.products && prodsRes.products.length > 0) {
+        setProducts(prodsRes.products);
+      }
+      if (usersRes.success && usersRes.users && usersRes.users.length > 0) {
+        setRegisteredUsers(usersRes.users);
+      }
+    } catch (e) {
+      console.warn('Admin live sync fallback:', e);
+    }
+  };
+
+  React.useEffect(() => {
     fetchAdminData();
   }, []);
 
@@ -144,11 +166,120 @@ export const AdminDashboardPage = () => {
     }
   };
 
+  // Farmer & User Management Handlers
+  const handleOpenEditUser = (user) => {
+    setEditingUser({
+      id: user.id || user._id,
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      role: user.role || 'farmer',
+      village: user.village || '',
+      district: user.district || '',
+      state: user.state || '',
+      farmSize: user.farmSize || '5 Acres',
+      kisanRewards: user.kisanRewards || 100
+    });
+    setIsEditUserModalOpen(true);
+  };
+
+  const handleSaveUser = async (e) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setIsActionLoading(true);
+    setActionAlert(null);
+    try {
+      const res = await adminService.updateUser(editingUser.id, editingUser);
+      if (res.success) {
+        setActionAlert({ type: 'success', text: `Profile updated for ${editingUser.name}!` });
+        setRegisteredUsers(prev => prev.map(u => ((u.id || u._id) === editingUser.id ? { ...u, ...editingUser } : u)));
+        setIsEditUserModalOpen(false);
+      } else {
+        setActionAlert({ type: 'error', text: res.message || 'Failed to update user.' });
+      }
+    } catch (err) {
+      setActionAlert({ type: 'error', text: 'Error saving user details.' });
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleOpenResetPass = (user) => {
+    setResetPassUser(user);
+    setNewAdminPassword('');
+    setShowAdminResetPass(false);
+    setIsResetPassModalOpen(true);
+  };
+
+  const handleSaveResetPass = async (e) => {
+    e.preventDefault();
+    if (!resetPassUser || !newAdminPassword) return;
+    setIsActionLoading(true);
+    setActionAlert(null);
+    try {
+      const userId = resetPassUser.id || resetPassUser._id;
+      const res = await adminService.resetUserPassword(userId, newAdminPassword);
+      if (res.success) {
+        setActionAlert({ type: 'success', text: `Password successfully reset for ${resetPassUser.name}!` });
+        setIsResetPassModalOpen(false);
+      } else {
+        setActionAlert({ type: 'error', text: res.message || 'Failed to reset password.' });
+      }
+    } catch (err) {
+      setActionAlert({ type: 'error', text: 'Error resetting password.' });
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleOpenDeleteUser = (user) => {
+    setDeletingUser(user);
+    setIsDeleteUserModalOpen(true);
+  };
+
+  const handleConfirmDeleteUser = async () => {
+    if (!deletingUser) return;
+    setIsActionLoading(true);
+    setActionAlert(null);
+    try {
+      const userId = deletingUser.id || deletingUser._id;
+      const res = await adminService.deleteUser(userId);
+      if (res.success) {
+        setActionAlert({ type: 'success', text: `User ${deletingUser.name} permanently removed from database.` });
+        setRegisteredUsers(prev => prev.filter(u => (u.id || u._id) !== userId));
+        setIsDeleteUserModalOpen(false);
+      } else {
+        setActionAlert({ type: 'error', text: res.message || 'Failed to delete user.' });
+      }
+    } catch (err) {
+      setActionAlert({ type: 'error', text: 'Error deleting user.' });
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
   const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
   const lowStock = products.filter(p => p.stock <= 45);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      
+      {/* Action Notification Alert */}
+      {actionAlert && (
+        <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold border transition-all ${
+          actionAlert.type === 'success'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+            : 'bg-rose-50 border-rose-200 text-rose-900'
+        }`}>
+          <div className="flex items-center gap-2">
+            {actionAlert.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertTriangle className="w-4 h-4 text-rose-600" />}
+            <span>{actionAlert.text}</span>
+          </div>
+          <button onClick={() => setActionAlert(null)} className="text-slate-400 hover:text-slate-700 p-1">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl">
@@ -389,41 +520,70 @@ export const AdminDashboardPage = () => {
                   <th className="p-3">Village / District</th>
                   <th className="p-3">Farm Land Holding</th>
                   <th className="p-3">Primary Crops</th>
-                  <th className="p-3 text-right">Kisan Loyalty Points</th>
+                  <th className="p-3">Kisan Rewards</th>
+                  <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
-                {registeredUsers.map((u) => (
-                  <tr key={u.id || u._id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs">
-                          {u.role === 'admin' ? '🛡️' : '👨‍🌾'}
+                {registeredUsers.map((u) => {
+                  const userId = u.id || u._id;
+                  return (
+                    <tr key={userId} className="hover:bg-slate-50 transition-colors">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs">
+                            {u.role === 'admin' ? '🛡️' : '👨‍🌾'}
+                          </div>
+                          <span className="font-bold text-slate-900">{u.name}</span>
                         </div>
-                        <span className="font-bold text-slate-900">{u.name}</span>
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                        u.role === 'admin' ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-800'
-                      }`}>
-                        {u.role || 'farmer'}
-                      </span>
-                    </td>
-                    <td className="p-3 text-slate-600">
-                      <div>{u.phone || 'N/A'}</div>
-                      <div className="text-[11px] text-slate-400">{u.email}</div>
-                    </td>
-                    <td className="p-3 text-slate-600">{u.village ? `${u.village}, ${u.district || ''}` : u.district || 'India'}</td>
-                    <td className="p-3 font-semibold">{u.farmSize || '5 Acres'}</td>
-                    <td className="p-3 text-slate-600">
-                      {Array.isArray(u.primaryCrops) ? u.primaryCrops.join(', ') : u.primaryCrops || 'Paddy, Wheat'}
-                    </td>
-                    <td className="p-3 text-right font-black text-emerald-700">
-                      ⭐ {u.kisanRewards || 100} Pts
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          u.role === 'admin' ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-800'
+                        }`}>
+                          {u.role || 'farmer'}
+                        </span>
+                      </td>
+                      <td className="p-3 text-slate-600">
+                        <div>{u.phone || 'N/A'}</div>
+                        <div className="text-[11px] text-slate-400">{u.email}</div>
+                      </td>
+                      <td className="p-3 text-slate-600">{u.village ? `${u.village}, ${u.district || ''}` : u.district || 'India'}</td>
+                      <td className="p-3 font-semibold">{u.farmSize || '5 Acres'}</td>
+                      <td className="p-3 text-slate-600">
+                        {Array.isArray(u.primaryCrops) ? u.primaryCrops.join(', ') : u.primaryCrops || 'Paddy, Wheat'}
+                      </td>
+                      <td className="p-3 font-black text-emerald-700">
+                        ⭐ {u.kisanRewards || 100} Pts
+                      </td>
+                      <td className="p-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleOpenEditUser(u)}
+                            className="p-1.5 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-800 rounded-lg transition-colors cursor-pointer"
+                            title="Edit Farmer Profile & Role"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenResetPass(u)}
+                            className="p-1.5 bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-800 rounded-lg transition-colors cursor-pointer"
+                            title="Reset User Password"
+                          >
+                            <Key className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenDeleteUser(u)}
+                            className="p-1.5 bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-800 rounded-lg transition-colors cursor-pointer"
+                            title="Delete User from Database"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -522,6 +682,235 @@ export const AdminDashboardPage = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {isEditUserModalOpen && editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                  <Edit className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Edit User Details</h3>
+                  <p className="text-[11px] text-slate-400">{editingUser.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsEditUserModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveUser} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    value={editingUser.name}
+                    onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                    required
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Mobile Number</label>
+                  <input
+                    type="tel"
+                    value={editingUser.phone}
+                    onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">System Role</label>
+                  <select
+                    value={editingUser.role}
+                    onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-bold text-slate-800 focus:border-emerald-500 cursor-pointer"
+                  >
+                    <option value="farmer">👨‍🌾 Farmer</option>
+                    <option value="admin">🛡️ Store Admin</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Land Holding</label>
+                  <input
+                    type="text"
+                    value={editingUser.farmSize}
+                    onChange={(e) => setEditingUser({ ...editingUser, farmSize: e.target.value })}
+                    placeholder="e.g. 5 Acres"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Village / Town</label>
+                  <input
+                    type="text"
+                    value={editingUser.village}
+                    onChange={(e) => setEditingUser({ ...editingUser, village: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">District</label>
+                  <input
+                    type="text"
+                    value={editingUser.district}
+                    onChange={(e) => setEditingUser({ ...editingUser, district: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Kisan Loyalty Reward Points (⭐)</label>
+                <input
+                  type="number"
+                  value={editingUser.kisanRewards}
+                  onChange={(e) => setEditingUser({ ...editingUser, kisanRewards: Number(e.target.value) })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-bold text-emerald-800 focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsEditUserModalOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isActionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors disabled:opacity-50"
+                >
+                  {isActionLoading ? 'Saving...' : 'Save User Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Reset Password Modal */}
+      {isResetPassModalOpen && resetPassUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
+                  <Key className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Reset Password</h3>
+                  <p className="text-[11px] text-slate-400">{resetPassUser.name} ({resetPassUser.email})</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsResetPassModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveResetPass} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Set New Password</label>
+                <div className="relative">
+                  <input
+                    type={showAdminResetPass ? "text" : "password"}
+                    placeholder="Enter new password (min 6 characters)"
+                    value={newAdminPassword}
+                    onChange={(e) => setNewAdminPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 pr-10 outline-none font-medium focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminResetPass(!showAdminResetPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    {showAdminResetPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  The password will be securely hashed with SHA-256 and saved in MongoDB.
+                </p>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsResetPassModalOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isActionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-colors disabled:opacity-50"
+                >
+                  {isActionLoading ? 'Updating...' : 'Set Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Delete User Confirmation Modal */}
+      {isDeleteUserModalOpen && deletingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-rose-100">
+            <div className="flex items-center gap-3 mb-4 text-rose-600">
+              <div className="w-10 h-10 rounded-2xl bg-rose-100 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Delete User Account</h3>
+                <p className="text-[11px] text-rose-500 font-bold uppercase">Permanent MongoDB Action</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed mb-4">
+              Are you sure you want to permanently delete <strong className="text-slate-900">{deletingUser.name}</strong> ({deletingUser.email})? All associated records will be removed. This cannot be undone.
+            </p>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setIsDeleteUserModalOpen(false)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteUser}
+                disabled={isActionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors disabled:opacity-50"
+              >
+                {isActionLoading ? 'Deleting...' : 'Yes, Delete User'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { X, Sprout, ShieldCheck, UserCheck, Phone, Lock, MapPin, Sparkles } from 'lucide-react';
+import { X, Sprout, ShieldCheck, UserCheck, Phone, Lock, MapPin, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const AuthModal = () => {
   const { isAuthModalOpen, authModalTab, closeAuthModal, openAuthModal, login, register, demoLogin } = useAuth();
   const { t } = useLanguage();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const [regForm, setRegForm] = useState({
     name: '',
@@ -192,13 +194,23 @@ export const AuthModal = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Account Password *</label>
-                <input
-                  type="password"
-                  value={regForm.password}
-                  onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
-                  required
-                  className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={regForm.password}
+                    onChange={(e) => setRegForm({ ...regForm, password: e.target.value })}
+                    required
+                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-emerald-700 cursor-pointer p-0.5"
+                    title={showPassword ? "Hide Password" : "Show Password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -225,14 +237,24 @@ export const AuthModal = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                  required
-                  className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    required
+                    className="w-full text-xs bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-2.5 pr-10 outline-none font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-emerald-700 cursor-pointer p-0.5"
+                    title={showPassword ? "Hide Password" : "Show Password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <button
