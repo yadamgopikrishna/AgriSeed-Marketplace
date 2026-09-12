@@ -749,26 +749,29 @@ SAMPLE_ORDERS = [
 ]
 
 def seed_database(db):
-    """Populates collections with rich sample data if empty or resets."""
-    # Check if products exist
-    if db.products.count_documents({}) == 0:
-        print("[SEED] Seeding Products...")
-        db.products.insert_many(SAMPLE_PRODUCTS)
-    
-    if db.sellers.count_documents({}) == 0:
-        print("[SEED] Seeding Sellers...")
-        db.sellers.insert_many(SAMPLE_SELLERS)
+    """Populates collections with rich sample data and guarantees admin presence."""
+    # Ensure all sellers exist
+    for s in SAMPLE_SELLERS:
+        db.sellers.update_one({"_id": s["_id"]}, {"$setOnInsert": s}, upsert=True)
 
-    if db.users.count_documents({}) == 0:
-        print("[SEED] Seeding Users (Farmers & Admin)...")
-        db.users.insert_many(SAMPLE_USERS)
+    # Ensure all products exist
+    for p in SAMPLE_PRODUCTS:
+        db.products.update_one({"_id": p["_id"]}, {"$setOnInsert": p}, upsert=True)
 
-    if db.reviews.count_documents({}) == 0:
-        print("[SEED] Seeding Product Reviews...")
-        db.reviews.insert_many(SAMPLE_REVIEWS)
+    # Ensure all sample users including ADMIN exist
+    for u in SAMPLE_USERS:
+        db.users.update_one(
+            {"$or": [{"_id": u["_id"]}, {"email": u["email"]}, {"phone": u["phone"]}]},
+            {"$setOnInsert": u},
+            upsert=True
+        )
 
-    if db.orders.count_documents({}) == 0:
-        print("[SEED] Seeding Demo Orders...")
-        db.orders.insert_many(SAMPLE_ORDERS)
+    # Ensure sample reviews exist
+    for r in SAMPLE_REVIEWS:
+        db.reviews.update_one({"_id": r["_id"]}, {"$setOnInsert": r}, upsert=True)
 
-    print("[SEED] Database seeding complete! Ready for evaluation & demo.")
+    # Ensure sample orders exist
+    for o in SAMPLE_ORDERS:
+        db.orders.update_one({"_id": o["_id"]}, {"$setOnInsert": o}, upsert=True)
+
+    print("[SEED] Database seeding & admin verification complete! Ready for evaluation & demo.")

@@ -26,14 +26,16 @@ export const AdminDashboardPage = () => {
 
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'products' | 'farmers' | 'sellers'
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [registeredUsers, setRegisteredUsers] = useState([]);
 
-  // Fetch live orders and products from MongoDB
+  // Fetch live orders, products, and users from MongoDB
   React.useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const [ordersRes, prodsRes] = await Promise.all([
+        const [ordersRes, prodsRes, usersRes] = await Promise.all([
           orderService.getAll(),
-          productService.getAll()
+          productService.getAll(),
+          adminService.getUsers()
         ]);
         if (ordersRes.success && ordersRes.orders && ordersRes.orders.length > 0) {
           const local = JSON.parse(localStorage.getItem('agriseed_orders') || '[]');
@@ -43,6 +45,9 @@ export const AdminDashboardPage = () => {
         }
         if (prodsRes.success && prodsRes.products && prodsRes.products.length > 0) {
           setProducts(prodsRes.products);
+        }
+        if (usersRes.success && usersRes.users && usersRes.users.length > 0) {
+          setRegisteredUsers(usersRes.users);
         }
       } catch (e) {
         console.warn('Admin live sync fallback:', e);
@@ -247,6 +252,15 @@ export const AdminDashboardPage = () => {
           >
             🏢 {t('tabVerifiedVendors')} ({INITIAL_SELLERS.length})
           </button>
+
+          <button
+            onClick={() => setActiveTab('farmers')}
+            className={`py-4 border-b-2 transition-colors cursor-pointer ${
+              activeTab === 'farmers' ? 'border-emerald-600 text-emerald-900' : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            👨‍🌾 Registered Farmers ({registeredUsers.length})
+          </button>
         </div>
 
         {/* Tab 1: Orders Coordinator */}
@@ -360,6 +374,58 @@ export const AdminDashboardPage = () => {
                 <p className="text-slate-600">{t('contactLabel')} {s.phone}</p>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Tab 4: Registered Farmers & Users */}
+        {activeTab === 'farmers' && (
+          <div className="p-6 overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                <tr>
+                  <th className="p-3">Farmer / User Name</th>
+                  <th className="p-3">Role</th>
+                  <th className="p-3">Mobile & Email</th>
+                  <th className="p-3">Village / District</th>
+                  <th className="p-3">Farm Land Holding</th>
+                  <th className="p-3">Primary Crops</th>
+                  <th className="p-3 text-right">Kisan Loyalty Points</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+                {registeredUsers.map((u) => (
+                  <tr key={u.id || u._id} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs">
+                          {u.role === 'admin' ? '🛡️' : '👨‍🌾'}
+                        </div>
+                        <span className="font-bold text-slate-900">{u.name}</span>
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                        u.role === 'admin' ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {u.role || 'farmer'}
+                      </span>
+                    </td>
+                    <td className="p-3 text-slate-600">
+                      <div>{u.phone || 'N/A'}</div>
+                      <div className="text-[11px] text-slate-400">{u.email}</div>
+                    </td>
+                    <td className="p-3 text-slate-600">{u.village ? `${u.village}, ${u.district || ''}` : u.district || 'India'}</td>
+                    <td className="p-3 font-semibold">{u.farmSize || '5 Acres'}</td>
+                    <td className="p-3 text-slate-600">
+                      {Array.isArray(u.primaryCrops) ? u.primaryCrops.join(', ') : u.primaryCrops || 'Paddy, Wheat'}
+                    </td>
+                    <td className="p-3 text-right font-black text-emerald-700">
+                      ⭐ {u.kisanRewards || 100} Pts
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 

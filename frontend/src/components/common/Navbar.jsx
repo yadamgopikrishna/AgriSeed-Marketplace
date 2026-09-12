@@ -32,6 +32,7 @@ export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+  const [isDemoMenuOpen, setIsDemoMenuOpen] = useState(false);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -248,17 +249,53 @@ export const Navbar = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => openAuthModal('register')}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-3 py-2 rounded-xl transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
                 >
                   🌱 {t('register')}
                 </button>
                 <button
-                  onClick={() => demoLogin('farmer')}
-                  className="hidden sm:inline-flex bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-2.5 py-2 rounded-xl transition-colors cursor-pointer"
-                  title="1-Click Evaluation Login"
+                  onClick={() => openAuthModal('login')}
+                  className="hidden sm:inline-flex bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-3 py-2 rounded-xl transition-colors cursor-pointer"
                 >
-                  ⚡ Demo
+                  🔑 {t('login')}
                 </button>
+
+                {/* 1-Click Demo Evaluation Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsDemoMenuOpen(!isDemoMenuOpen)}
+                    className="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs px-2.5 py-2 rounded-xl transition-colors cursor-pointer flex items-center gap-1"
+                    title="1-Click Evaluation Login"
+                  >
+                    <span>⚡ Demo</span>
+                    <span className="text-[10px]">▾</span>
+                  </button>
+
+                  {isDemoMenuOpen && (
+                    <div className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-amber-200 py-1.5 z-50 animate-fadeIn text-xs">
+                      <button
+                        onClick={() => {
+                          demoLogin('farmer');
+                          setIsDemoMenuOpen(false);
+                          navigate('/dashboard');
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-emerald-50 text-emerald-950 font-bold flex items-center gap-2 cursor-pointer transition-colors"
+                      >
+                        <span>👨‍🌾 Demo Farmer</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          demoLogin('admin');
+                          setIsDemoMenuOpen(false);
+                          navigate('/admin');
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-amber-50 text-amber-950 font-bold flex items-center gap-2 cursor-pointer transition-colors border-t border-slate-100"
+                      >
+                        <span>🛡️ Demo Admin</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

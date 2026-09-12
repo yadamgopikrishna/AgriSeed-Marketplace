@@ -146,6 +146,10 @@ export const cropDoctorService = {
 // ADMIN STORE MANAGEMENT SERVICES
 // ----------------------------------------------------------------------
 export const adminService = {
+  async getUsers() {
+    return request('/admin/users', { method: 'GET' });
+  },
+
   async updateOrderStatus(orderId, status) {
     return request(`/admin/orders/${encodeURIComponent(orderId)}/status`, {
       method: 'POST',

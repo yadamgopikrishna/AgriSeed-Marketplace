@@ -1,20 +1,25 @@
 @echo off
 title AgriSeed Direct - Fullstack System Launcher
+cd /d "%~dp0"
+
 echo ===================================================================
 echo     🌾 AgriSeed Direct - Smart Agricultural Marketplace 🌾
 echo ===================================================================
-echo [1/2] Starting Flask REST Backend Server on http://127.0.0.1:5000 (MongoDB)...
-start "AgriSeed Backend (Flask/MongoDB)" cmd /k "cd /d G:\agri(proto) && python app.py"
+echo.
+echo [1/2] Starting Flask Backend & MongoDB REST Server on port 5000...
+start "AgriSeed Backend (Flask/MongoDB)" cmd /k "cd /d ""%~dp0"" && python app.py"
 
-echo [2/2] Starting React Modern Frontend Server on http://localhost:5173...
-start "AgriSeed Frontend (React/Vite)" cmd /k "cd /d G:\agri(proto)\frontend && npm run dev"
+echo [2/2] Starting Modern React Frontend on port 5173...
+start "AgriSeed Frontend (React/Vite)" cmd /k "cd /d ""%~dp0frontend"" && npm run dev"
 
 echo.
 echo ===================================================================
-echo  ✅ Fullstack System is Live!
-echo  🌐 React Web App : http://localhost:5173
-echo  ⚙️ Flask REST API : http://127.0.0.1:5000
-echo  📦 Database      : MongoDB (agriseed_db)
+echo  ✅ AgriSeed Services are starting!
+echo  🌐 Modern React Web App : http://localhost:5173
+echo  ⚙️ Flask Backend & API   : http://localhost:5000
+echo  📦 Database              : MongoDB (agriseed_db)
 echo ===================================================================
 echo.
-pause
+echo Opening browser in 3 seconds...
+timeout /t 3 /nobreak >nul
+start http://localhost:5173

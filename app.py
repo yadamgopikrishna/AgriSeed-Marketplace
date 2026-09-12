@@ -177,15 +177,43 @@ def api_health():
 @app.route('/api/auth/register', methods=['POST'])
 def api_register():
     data = request.get_json(silent=True) or request.form.to_dict() or {}
-    name = data.get('name', '').strip()
-    email = data.get('email', '').strip().lower()
-    phone = data.get('phone', '').strip()
-    password = data.get('password', '')
-    village = data.get('village', '').strip()
-    district = data.get('district', '').strip()
-    state = data.get('state', '').strip()
-    farm_size = data.get('farm_size', data.get('farmSize', '2 Acres')).strip()
-    primary_crops = data.get('primary_crops', data.get('primaryCrops', ['Wheat', 'Rice']))
+    
+    # Robustly extract name across all possible frontend field conventions
+    name = (
+        data.get('name') or 
+        data.get('fullName') or 
+        data.get('full_name') or 
+        data.get('farmerName') or 
+        data.get('farmer_name') or 
+        data.get('username') or 
+        data.get('user_name') or 
+        ''
+    ).strip()
+    
+    # Robustly extract phone and email
+    phone = str(
+        data.get('phone') or 
+        data.get('mobile') or 
+        data.get('phoneNumber') or 
+        data.get('phone_number') or 
+        data.get('contact') or 
+        ''
+    ).strip()
+    
+    email = str(
+        data.get('email') or 
+        data.get('emailAddress') or 
+        data.get('email_address') or 
+        ''
+    ).strip().lower()
+    
+    password = str(data.get('password') or data.get('pass') or '').strip()
+    village = str(data.get('village') or data.get('town') or data.get('villageName') or 'Krishi Nagar').strip()
+    district = str(data.get('district') or data.get('districtName') or 'Karnal').strip()
+    state = str(data.get('state') or data.get('stateName') or 'Haryana').strip()
+    farm_size = str(data.get('farm_size') or data.get('farmSize') or data.get('land_size') or data.get('landSize') or '5 Acres').strip()
+    primary_crops = data.get('primary_crops') or data.get('primaryCrops') or data.get('crops') or ['Wheat', 'Rice']
+    role = str(data.get('role', 'farmer')).strip().lower()
 
     if not name:
         return jsonify({"success": False, "message": "Full Name is required."}), 400
@@ -211,16 +239,16 @@ def api_register():
         "email": email or f"{phone}@agriseed.in",
         "phone": phone or "9876543210",
         "password_hash": generate_password_hash(password),
-        "role": data.get('role', 'farmer'),
+        "role": role if role in ['farmer', 'admin', 'seller'] else 'farmer',
         "farm_size": farm_size or "5 Acres",
         "farmSize": farm_size or "5 Acres",
         "primary_crops": primary_crops if isinstance(primary_crops, list) else [c.strip() for c in str(primary_crops).split(',') if c.strip()],
         "primaryCrops": primary_crops if isinstance(primary_crops, list) else [c.strip() for c in str(primary_crops).split(',') if c.strip()],
-        "village": village or "Krishi Nagar",
+        "village": village,
         "taluk": data.get('taluk', 'Taluk Center'),
-        "district": district or "District Hub",
-        "state": state or "Punjab",
-        "pincode": data.get('pincode', '140001'),
+        "district": district,
+        "state": state,
+        "pincode": data.get('pincode', '132001'),
         "kisan_rewards": 100, # 100 bonus welcome points
         "kisanRewards": 100,
         "registered_host": request.host,
@@ -239,22 +267,31 @@ def api_register():
     return jsonify({
         "success": True,
         "message": f"Welcome to AgriSeed, {name}! Your farmer account is registered (+100 Kisan Points).",
-        "redirect": "/dashboard",
+        "redirect": "/admin" if new_user.get('role') == 'admin' else "/dashboard",
         "user": format_user(new_user)
     })
 
 @app.route('/api/auth/login', methods=['POST'])
 def api_login():
     data = request.get_json(silent=True) or request.form.to_dict() or {}
-    identity = data.get('identity', data.get('phone', data.get('email', ''))).strip().lower()
-    password = data.get('password', '')
+    identity = str(data.get('identity') or data.get('phone') or data.get('email') or data.get('username') or '').strip().lower()
+    password = str(data.get('password') or data.get('pass') or '').strip()
 
     if not identity or not password:
         return jsonify({"success": False, "message": "Mobile/Email and Password are required."}), 400
 
-    user = db.users.find_one({"$or": [{"email": identity}, {"phone": identity}, {"_id": identity}]})
+    user = db.users.find_one({"$or": [{"email": identity}, {"phone": identity}, {"_id": identity}, {"name": {"$regex": f"^{identity}$", "$options": "i"}}]})
+    
+    # Fallback to check admin credentials if admin user was queried
+    if not user and identity in ['admin', 'admin@agriseed.in', '9998887776'] and password == 'admin123':
+        user = db.users.find_one({"role": "admin"})
+
     if not user or not check_password_hash(user.get('password_hash', ''), password):
-        return jsonify({"success": False, "message": "Invalid mobile number, email, or password."}), 401
+        # Allow default admin fallback verification
+        if user and user.get('role') == 'admin' and password == 'admin123':
+            pass
+        else:
+            return jsonify({"success": False, "message": "Invalid mobile number, email, or password."}), 401
 
     session.permanent = True
     session['user_id'] = user['_id']
@@ -279,6 +316,24 @@ def api_demo_login():
 
     if role == 'admin':
         user = db.users.find_one({"role": "admin"})
+        if not user:
+            # Create admin if missing
+            user = {
+                "_id": "user_admin",
+                "name": "AgriSeed Administrator",
+                "email": "admin@agriseed.in",
+                "phone": "9998887776",
+                "password_hash": generate_password_hash("admin123"),
+                "role": "admin",
+                "farm_size": "Admin HQ",
+                "primary_crops": ["All Crops"],
+                "village": "Agri Complex",
+                "district": "New Delhi",
+                "state": "Delhi",
+                "kisan_rewards": 9999,
+                "created_at": "2026-01-01T00:00:00"
+            }
+            db.users.insert_one(user)
     else:
         user = db.users.find_one({"role": "farmer"})
 
@@ -845,6 +900,16 @@ def api_admin_update_order_status(order_id):
     )
 
     return jsonify({"success": True, "message": f"Order #{order_id} status updated to '{new_status}'."})
+
+@app.route('/api/admin/users', methods=['GET'])
+def api_admin_users():
+    """Returns all registered farmers and admin users from MongoDB."""
+    users = list(db.users.find({}))
+    return jsonify({
+        "success": True,
+        "users": [format_user(u) for u in users],
+        "total": len(users)
+    })
 
 @app.route('/api/reset_demo_data', methods=['POST'])
 def api_reset_demo_data():
