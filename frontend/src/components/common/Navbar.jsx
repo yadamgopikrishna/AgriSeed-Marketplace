@@ -223,7 +223,17 @@ export const Navbar = () => {
                     className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-xs shadow-amber-500/20"
                   >
                     <ShieldCheck className="w-4 h-4" />
-                    <span className="hidden sm:inline">{t('admin')}</span>
+                    <span className="hidden sm:inline">Admin Hub</span>
+                  </Link>
+                ) : currentUser.role === 'seller' ? (
+                  <Link
+                    to="/seller"
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-xs shadow-blue-600/20"
+                  >
+                    <div className="w-5 h-5 rounded-full bg-blue-800 text-white flex items-center justify-center text-xs">
+                      🏢
+                    </div>
+                    <span className="hidden sm:inline">{currentUser.shopName ? currentUser.shopName.split(' ')[0] : 'Seller Hub'}</span>
                   </Link>
                 ) : (
                   <Link
@@ -233,7 +243,7 @@ export const Navbar = () => {
                     <div className="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs">
                       👨‍🌾
                     </div>
-                    <span className="hidden sm:inline">{currentUser.name.split(' ')[0]}</span>
+                    <span className="hidden sm:inline">{currentUser.name ? currentUser.name.split(' ')[0] : 'Farmer'}</span>
                   </Link>
                 )}
 
@@ -272,10 +282,10 @@ export const Navbar = () => {
                   </button>
 
                   {isDemoMenuOpen && (
-                    <div className="absolute right-0 mt-1 w-44 bg-white rounded-2xl shadow-xl border border-amber-200 py-1.5 z-50 animate-fadeIn text-xs">
+                    <div className="absolute right-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-amber-200 py-1.5 z-50 animate-fadeIn text-xs">
                       <button
-                        onClick={() => {
-                          demoLogin('farmer');
+                        onClick={async () => {
+                          await demoLogin('farmer');
                           setIsDemoMenuOpen(false);
                           navigate('/dashboard');
                         }}
@@ -284,8 +294,18 @@ export const Navbar = () => {
                         <span>👨‍🌾 Demo Farmer</span>
                       </button>
                       <button
-                        onClick={() => {
-                          demoLogin('admin');
+                        onClick={async () => {
+                          await demoLogin('seller');
+                          setIsDemoMenuOpen(false);
+                          navigate('/seller');
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-blue-50 text-blue-950 font-bold flex items-center gap-2 cursor-pointer transition-colors border-t border-slate-100"
+                      >
+                        <span>🏢 Demo Seller (Kendra)</span>
+                      </button>
+                      <button
+                        onClick={async () => {
+                          await demoLogin('admin');
                           setIsDemoMenuOpen(false);
                           navigate('/admin');
                         }}

@@ -22,6 +22,7 @@ import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderTrackingPage } from './pages/OrderTrackingPage';
 import { FarmerDashboardPage } from './pages/FarmerDashboardPage';
+import { SellerDashboardPage } from './pages/SellerDashboardPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { CropDoctorPage } from './pages/CropDoctorPage';
 import { PresentationDeckPage } from './pages/PresentationDeckPage';
@@ -53,6 +54,7 @@ export function App() {
                       <Route path="/checkout" element={<CheckoutPage />} />
                       <Route path="/track" element={<OrderTrackingPage />} />
                       <Route path="/dashboard" element={<FarmerDashboardPage />} />
+                      <Route path="/seller" element={<SellerDashboardPage />} />
                       <Route path="/admin" element={<AdminDashboardPage />} />
                       <Route path="/crop-doctor" element={<CropDoctorPage />} />
                       <Route path="/presentation" element={<PresentationDeckPage />} />

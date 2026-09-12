@@ -199,7 +199,23 @@ export const ProductDetailPage = () => {
               <span className="bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
                 📅 {lp.season}
               </span>
+              <span className="bg-blue-100 text-blue-900 text-xs font-extrabold px-3 py-1 rounded-full flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                <span>{rawProduct.qcStatus || 'QC Passed'}</span>
+              </span>
             </div>
+
+            {/* Brand Header */}
+            {rawProduct.brand && (
+              <div className="flex items-center gap-2">
+                <span className="bg-emerald-800 text-white text-xs font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
+                  {rawProduct.brand}
+                </span>
+                <span className="text-xs text-slate-500 font-mono font-bold">
+                  Lab Cert: <strong className="text-blue-700">{rawProduct.labCertId || 'CIB-RC/2024-QC'}</strong>
+                </span>
+              </div>
+            )}
 
             <div className="flex items-start justify-between gap-4">
               <h1 className="text-2xl sm:text-3xl font-black font-serif text-slate-950 leading-snug">
@@ -429,6 +445,43 @@ export const ProductDetailPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-800 font-medium">
+                  {rawProduct.brand && (
+                    <tr>
+                      <td className="p-3.5 font-bold text-slate-600">Manufacturer / Brand</td>
+                      <td className="p-3.5 font-extrabold text-emerald-800">{rawProduct.brand}</td>
+                    </tr>
+                  )}
+                  {rawProduct.activeIngredient && (
+                    <tr>
+                      <td className="p-3.5 font-bold text-slate-600">Active Chemical / Formulation</td>
+                      <td className="p-3.5 font-mono text-slate-900 font-bold">{rawProduct.activeIngredient}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td className="p-3.5 font-bold text-slate-600">Quality Check Status</td>
+                    <td className="p-3.5 font-extrabold text-emerald-700 flex items-center gap-1">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      <span>{rawProduct.qcStatus || 'Quality Check Passed (Govt Certified)'}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 font-bold text-slate-600">Govt Lab Certificate ID</td>
+                    <td className="p-3.5 font-mono font-bold text-blue-700">{rawProduct.labCertId || 'CIB-RC/2024-QC'}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 font-bold text-slate-600">Lot / Batch Number</td>
+                    <td className="p-3.5 font-mono text-slate-700">{rawProduct.batchNumber || 'LOT-2024-AGR'}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 font-bold text-slate-600">Expiry / Retest Date</td>
+                    <td className="p-3.5 text-slate-700">{rawProduct.expiryDate || '2026-12-31'}</td>
+                  </tr>
+                  {rawProduct.cibRegNo && (
+                    <tr>
+                      <td className="p-3.5 font-bold text-slate-600">CIB&RC Registration No.</td>
+                      <td className="p-3.5 font-mono text-slate-700">{rawProduct.cibRegNo}</td>
+                    </tr>
+                  )}
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramGermination')}</td>
                     <td className="p-3.5 text-emerald-700 font-extrabold">{rawProduct.germinationRate}</td>

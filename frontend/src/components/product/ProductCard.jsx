@@ -113,19 +113,36 @@ export const ProductCard = ({ product }) => {
             )}
           </div>
 
-          {/* Title */}
-          <Link to={`/product/${product.id}`}>
-            <h3 className="font-bold text-slate-900 text-sm hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
-              {lp.name}
-            </h3>
-          </Link>
+          {/* Title and Brand */}
+          <div className="mt-1">
+            {product.brand && (
+              <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-wider block w-fit mb-1">
+                {product.brand}
+              </span>
+            )}
+            <Link to={`/product/${product.id}`}>
+              <h3 className="font-bold text-slate-900 text-sm hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
+                {lp.name}
+              </h3>
+            </Link>
+          </div>
 
-          {/* Season & Sowing Tags */}
-          {lp.season && (
+          {/* Active chemical / formulation or Season */}
+          {product.activeIngredient ? (
+            <p className="text-[11px] text-slate-500 mt-1 line-clamp-1 font-mono">
+              🧪 {product.activeIngredient}
+            </p>
+          ) : lp.season ? (
             <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1 font-medium">
               <span>📅 {t('paramSeason')}:</span> <strong className="text-slate-700">{lp.season}</strong>
             </p>
-          )}
+          ) : null}
+
+          {/* QC Lab Certificate Tag */}
+          <div className="mt-2 flex items-center gap-1 text-[10px] text-blue-700 bg-blue-50/80 px-2 py-0.5 rounded-md border border-blue-100 font-mono">
+            <ShieldCheck className="w-3 h-3 text-blue-600 shrink-0" />
+            <span className="truncate">Cert: {product.labCertId || 'CIB-RC/2024-QC'}</span>
+          </div>
 
           {/* Dynamic Pack Size Selector */}
           {packs && packs.length > 1 && (

@@ -222,10 +222,35 @@ export const adminService = {
   }
 };
 
+// ----------------------------------------------------------------------
+// SELLER DASHBOARD & QUALITY VERIFICATION SERVICES
+// ----------------------------------------------------------------------
+export const sellerService = {
+  async getDashboard(sellerId = null) {
+    const query = sellerId ? `?seller_id=${encodeURIComponent(sellerId)}` : '';
+    return request(`/seller/dashboard${query}`, { method: 'GET' });
+  },
+
+  async addCertifiedProduct(productData) {
+    return request('/seller/products', {
+      method: 'POST',
+      body: JSON.stringify(productData)
+    });
+  },
+
+  async fulfillOrder(orderId, trackingData = {}) {
+    return request(`/seller/orders/${encodeURIComponent(orderId)}/fulfill`, {
+      method: 'POST',
+      body: JSON.stringify(trackingData)
+    });
+  }
+};
+
 export default {
   auth: authService,
   products: productService,
   orders: orderService,
   cropDoctor: cropDoctorService,
-  admin: adminService
+  admin: adminService,
+  seller: sellerService
 };

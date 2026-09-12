@@ -72,13 +72,15 @@ export const AuthProvider = ({ children }) => {
       const res = await authService.demoLogin(role);
       if (res.success && res.user) {
         setCurrentUser(res.user);
-        return;
+        return { success: true, role: res.user.role || role, redirect: res.redirect || (role === 'admin' ? '/admin' : (role === 'seller' ? '/seller' : '/dashboard')) };
       }
     } catch (e) {
       console.warn('Demo login API fallback:', e);
     }
     // Fallback to local demo profile if backend server is not running
-    setCurrentUser(role === 'admin' ? DEMO_USERS.admin : DEMO_USERS.farmer);
+    const fallbackUser = role === 'admin' ? DEMO_USERS.admin : (role === 'seller' ? DEMO_USERS.seller : DEMO_USERS.farmer);
+    setCurrentUser(fallbackUser);
+    return { success: true, role: fallbackUser.role, redirect: role === 'admin' ? '/admin' : (role === 'seller' ? '/seller' : '/dashboard') };
   };
 
   const logout = async () => {
