@@ -259,22 +259,24 @@ def api_register():
     now_iso = datetime.now().isoformat()
     seller_id = f"seller_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(10, 99)}" if role == 'seller' else ''
 
+    valid_role = role if role in ['farmer', 'customer', 'seller', 'admin'] else 'farmer'
+
     new_user = {
         "_id": f"user_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(100, 999)}",
         "name": name,
-        "email": email or (f"{phone}@agriseed.in" if phone else "farmer@agriseed.in"),
+        "email": email or (f"{phone}@agriseed.in" if phone else f"{valid_role}@agriseed.in"),
         "phone": phone,
         "password_hash": generate_password_hash(password),
-        "role": role if role in ['farmer', 'admin', 'seller'] else 'farmer',
+        "role": valid_role,
         "seller_id": seller_id,
         "sellerId": seller_id,
-        "shop_name": shop_name if role == 'seller' else '',
-        "shopName": shop_name if role == 'seller' else '',
-        "license_number": license_number if role == 'seller' else '',
-        "licenseNumber": license_number if role == 'seller' else '',
-        "gstin": gstin if role == 'seller' else '',
-        "farm_size": farm_size or "5 Acres",
-        "farmSize": farm_size or "5 Acres",
+        "shop_name": shop_name if valid_role == 'seller' else '',
+        "shopName": shop_name if valid_role == 'seller' else '',
+        "license_number": license_number if valid_role == 'seller' else '',
+        "licenseNumber": license_number if valid_role == 'seller' else '',
+        "gstin": gstin if valid_role == 'seller' else '',
+        "farm_size": farm_size if valid_role == 'farmer' else ("Retail Buyer" if valid_role == 'customer' else ("Admin HQ" if valid_role == 'admin' else "Kendra")),
+        "farmSize": farm_size if valid_role == 'farmer' else ("Retail Buyer" if valid_role == 'customer' else ("Admin HQ" if valid_role == 'admin' else "Kendra")),
         "primary_crops": primary_crops if isinstance(primary_crops, list) else [c.strip() for c in str(primary_crops).split(',') if c.strip()],
         "primaryCrops": primary_crops if isinstance(primary_crops, list) else [c.strip() for c in str(primary_crops).split(',') if c.strip()],
         "village": village,
@@ -282,14 +284,14 @@ def api_register():
         "district": district,
         "state": state,
         "pincode": pincode,
-        "kisan_rewards": 100, # 100 bonus welcome points
-        "kisanRewards": 100,
+        "kisan_rewards": 9999 if valid_role == 'admin' else 100,
+        "kisanRewards": 9999 if valid_role == 'admin' else 100,
         "registered_host": request.host,
         "created_at": now_iso
     }
 
     # If seller, also insert into db.sellers
-    if role == 'seller':
+    if valid_role == 'seller':
         new_seller_record = {
             "_id": seller_id or "seller_1",
             "name": shop_name or name,
@@ -319,15 +321,22 @@ def api_register():
     session['user_role'] = new_user.get('role', 'farmer')
     session['user_name'] = new_user['name']
 
-    redirect_url = "/admin" if new_user.get('role') == 'admin' else ("/seller" if new_user.get('role') == 'seller' else "/dashboard")
+    redirect_url = "/admin" if valid_role == 'admin' else ("/seller" if valid_role == 'seller' else "/dashboard")
 
-    print(f"[AUTH-REGISTRATION] Successfully saved user '{name}' ({new_user.get('phone') or new_user.get('email')}) with role '{new_user.get('role')}' to MongoDB!")
+    role_titles = {
+        'farmer': 'Farmer (+100 Kisan Points)',
+        'customer': 'Customer / Buyer',
+        'seller': 'Certified Seller & Distributor',
+        'admin': 'Store Administrator'
+    }
+
+    print(f"[AUTH-REGISTRATION] Successfully registered user '{name}' ({new_user.get('phone') or new_user.get('email')}) as {valid_role.upper()} in MongoDB!")
 
     return jsonify({
         "success": True,
-        "message": f"Welcome to AgriSeed, {name}! Your {'Seller & Distributor' if role == 'seller' else 'Farmer'} account is registered.",
+        "message": f"Welcome to AgriSeed, {name}! Your {role_titles.get(valid_role, 'User')} account is registered.",
         "redirect": redirect_url,
-        "role": new_user.get('role', 'farmer'),
+        "role": valid_role,
         "user": format_user(new_user)
     })
 
@@ -357,11 +366,17 @@ def api_login():
     if not user and identity.lower() in ['seller', 'seller@agriseed.in', '9811122334'] and password == 'seller123':
         user = db.users.find_one({"role": "seller"})
 
+    # Fallback to check customer credentials if customer was queried
+    if not user and identity.lower() in ['customer', 'customer@agriseed.in', '9870001122'] and password == 'customer123':
+        user = db.users.find_one({"role": "customer"})
+
     if not user or not check_password_hash(user.get('password_hash', ''), password):
         # Allow default fallbacks for demo accounts
         if user and user.get('role') == 'admin' and password == 'admin123':
             pass
         elif user and user.get('role') == 'seller' and password == 'seller123':
+            pass
+        elif user and user.get('role') == 'customer' and password == 'customer123':
             pass
         elif user and user.get('role') == 'farmer' and password == 'farmer123':
             pass
@@ -387,7 +402,7 @@ def api_login():
 
 @app.route('/api/auth/demo_login', methods=['POST'])
 def api_demo_login():
-    """Instant 1-click login for college project demonstration."""
+    """Instant 1-click login for demonstration."""
     data = request.get_json() or {}
     role = data.get('role', 'farmer')
 
@@ -433,6 +448,26 @@ def api_demo_login():
                 "pincode": "132001",
                 "kisan_rewards": 500,
                 "created_at": "2026-01-01T00:00:00"
+            }
+            db.users.insert_one(user)
+    elif role == 'customer':
+        user = db.users.find_one({"role": "customer"})
+        if not user:
+            user = {
+                "_id": "user_customer",
+                "name": "Vikram Choudhary (Retail Buyer)",
+                "email": "customer@agriseed.in",
+                "phone": "9870001122",
+                "password_hash": generate_password_hash("customer123"),
+                "role": "customer",
+                "farm_size": "Retail Home Garden",
+                "primary_crops": ["Vegetables", "Flowers"],
+                "village": "Sector 14 Urban Estate",
+                "district": "Karnal",
+                "state": "Haryana",
+                "pincode": "132001",
+                "kisan_rewards": 100,
+                "created_at": "2026-02-10T10:00:00"
             }
             db.users.insert_one(user)
     else:

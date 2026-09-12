@@ -883,6 +883,23 @@ SAMPLE_USERS = [
         "created_at": "2026-01-01T00:00:00"
     },
     {
+        "_id": "user_customer",
+        "name": "Vikram Choudhary (Retail Buyer)",
+        "email": "customer@agriseed.in",
+        "phone": "9870001122",
+        "password_hash": generate_password_hash("customer123"),
+        "role": "customer",
+        "farm_size": "Retail Home Garden",
+        "primary_crops": ["Vegetables", "Flowers"],
+        "village": "Sector 14 Urban Estate",
+        "taluk": "Karnal",
+        "district": "Karnal",
+        "state": "Haryana",
+        "pincode": "132001",
+        "kisan_rewards": 100,
+        "created_at": "2026-02-10T10:00:00"
+    },
+    {
         "_id": "user_admin",
         "name": "AgriSeed Administrator",
         "email": "admin@agriseed.in",

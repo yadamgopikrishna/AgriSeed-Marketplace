@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
       console.warn('Demo login API fallback:', e);
     }
     // Fallback to local demo profile if backend server is not running
-    const fallbackUser = role === 'admin' ? DEMO_USERS.admin : (role === 'seller' ? DEMO_USERS.seller : DEMO_USERS.farmer);
+    const fallbackUser = role === 'admin' ? DEMO_USERS.admin : (role === 'seller' ? DEMO_USERS.seller : (role === 'customer' ? DEMO_USERS.customer : DEMO_USERS.farmer));
     setCurrentUser(fallbackUser);
     return { success: true, role: fallbackUser.role, redirect: role === 'admin' ? '/admin' : (role === 'seller' ? '/seller' : '/dashboard') };
   };

@@ -295,6 +295,16 @@ export const Navbar = () => {
                       </button>
                       <button
                         onClick={async () => {
+                          await demoLogin('customer');
+                          setIsDemoMenuOpen(false);
+                          navigate('/dashboard');
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-emerald-50 text-emerald-950 font-bold flex items-center gap-2 cursor-pointer transition-colors border-t border-slate-100"
+                      >
+                        <span>🛒 Demo Customer</span>
+                      </button>
+                      <button
+                        onClick={async () => {
                           await demoLogin('seller');
                           setIsDemoMenuOpen(false);
                           navigate('/seller');

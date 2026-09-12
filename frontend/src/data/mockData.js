@@ -984,6 +984,19 @@ export const DEMO_USERS = {
     verified: true,
     qcPassed: true
   },
+  customer: {
+    id: 'user_customer',
+    name: 'Vikram Choudhary (Retail Buyer)',
+    email: 'customer@agriseed.in',
+    phone: '9870001122',
+    role: 'customer',
+    farmSize: 'Home Garden',
+    village: 'Sector 14 Urban Estate',
+    district: 'Karnal',
+    state: 'Haryana',
+    pincode: '132001',
+    kisanRewards: 100
+  },
   admin: {
     id: 'user_admin',
     name: 'AgriSeed Administrator',
