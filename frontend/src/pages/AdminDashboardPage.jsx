@@ -46,6 +46,12 @@ export const AdminDashboardPage = () => {
   const [deletingUser, setDeletingUser] = useState(null);
   const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
 
+  // Modals for Product Management
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false);
+  const [deletingProduct, setDeletingProduct] = useState(null);
+  const [isDeleteProductModalOpen, setIsDeleteProductModalOpen] = useState(false);
+
   const [actionAlert, setActionAlert] = useState(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
@@ -82,11 +88,15 @@ export const AdminDashboardPage = () => {
     name: '',
     category: 'Seeds',
     price: 500,
+    originalPrice: 600,
+    unit: '1 Pack',
     stock: 50,
     cropSuitability: 'Paddy / Rice',
     season: 'Kharif Season',
     germinationRate: '92%',
-    dosageGuide: '5 kg per acre'
+    dosageGuide: '5 kg per acre',
+    imageUrl: '',
+    description: ''
   });
 
   const handleStatusChange = async (orderId, newStatus) => {
@@ -119,50 +129,131 @@ export const AdminDashboardPage = () => {
     }
   };
 
-  const handleAddProduct = (e) => {
+  const handleAddProduct = async (e) => {
     e.preventDefault();
+    setIsActionLoading(true);
+    setActionAlert(null);
     const created = {
       id: `prod_${Date.now()}`,
       name: newProd.name,
       category: newProd.category,
-      categoryIcon: newProd.category === 'Seeds' ? '🌾' : newProd.category === 'Fertilizers' ? '🧪' : '🌱',
+      categoryIcon: newProd.category === 'Seeds' ? '🌾' : newProd.category === 'Fertilizers' ? '🧪' : newProd.category === 'Pesticides' ? '🌱' : '🚜',
       price: Number(newProd.price),
-      originalPrice: Number(newProd.price) + 100,
-      unit: '1 Bag',
-      packSizes: [{ size: 'Standard Pack', price: Number(newProd.price) }],
+      originalPrice: Number(newProd.originalPrice || (Number(newProd.price) + 100)),
+      unit: newProd.unit || '1 Pack',
+      packSizes: [{ size: newProd.unit || 'Standard Pack', price: Number(newProd.price) }],
       stock: Number(newProd.stock),
       rating: 5.0,
       reviewCount: 1,
-      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
+      imageUrl: newProd.imageUrl || 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
       cropSuitability: newProd.cropSuitability,
       season: newProd.season,
       germinationRate: newProd.germinationRate,
       purity: '99%',
       maturityPeriod: '120 Days',
-      yieldPotential: '20 Quintals/Acre',
+      yieldPotential: 'High Yield Potential',
       sellerId: 'seller_1',
       sellerName: 'Kisan Vikas Agro Kendra',
       verifiedSeller: true,
-      description: 'Newly added certified seed lot.',
+      description: newProd.description || `High-grade certified agricultural ${newProd.category.toLowerCase()} lot.`,
       dosageGuide: newProd.dosageGuide
     };
-    setProducts([created, ...products]);
-    setIsAddModalOpen(false);
-    setNewProd({
-      name: '',
-      category: 'Seeds',
-      price: 500,
-      stock: 50,
-      cropSuitability: 'Paddy / Rice',
-      season: 'Kharif Season',
-      germinationRate: '92%',
-      dosageGuide: '5 kg per acre'
-    });
+
+    try {
+      const res = await adminService.addProduct(created);
+      if (res.success && res.product) {
+        setProducts([res.product, ...products]);
+      } else {
+        setProducts([created, ...products]);
+      }
+      setActionAlert({ type: 'success', text: `Product '${created.name}' created and saved to MongoDB catalog!` });
+      setIsAddModalOpen(false);
+      setNewProd({
+        name: '',
+        category: 'Seeds',
+        price: 500,
+        originalPrice: 600,
+        unit: '1 Pack',
+        stock: 50,
+        cropSuitability: 'Paddy / Rice',
+        season: 'Kharif Season',
+        germinationRate: '92%',
+        dosageGuide: '5 kg per acre',
+        imageUrl: '',
+        description: ''
+      });
+    } catch (err) {
+      setProducts([created, ...products]);
+      setIsAddModalOpen(false);
+      setActionAlert({ type: 'success', text: `Product '${created.name}' added to catalog.` });
+    } finally {
+      setIsActionLoading(false);
+    }
   };
 
-  const handleDeleteProduct = (id) => {
-    if (confirm('Delete this product from agricultural catalog?')) {
-      setProducts(products.filter(p => p.id !== id));
+  const handleOpenEditProduct = (prod) => {
+    setEditingProduct({
+      id: prod.id || prod._id,
+      name: prod.name || '',
+      category: prod.category || 'Seeds',
+      price: prod.price || 0,
+      originalPrice: prod.originalPrice || prod.original_price || (prod.price ? prod.price + 100 : 0),
+      unit: prod.unit || '1 Pack',
+      stock: prod.stock || 0,
+      cropSuitability: prod.cropSuitability || prod.crop_suitability || '',
+      season: prod.season || '',
+      germinationRate: prod.germinationRate || prod.germination_rate || '',
+      dosageGuide: prod.dosageGuide || prod.dosage_guide || '',
+      description: prod.description || '',
+      imageUrl: prod.imageUrl || prod.image_url || ''
+    });
+    setIsEditProductModalOpen(true);
+  };
+
+  const handleSaveEditProduct = async (e) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    setIsActionLoading(true);
+    setActionAlert(null);
+    try {
+      const res = await adminService.updateProduct(editingProduct.id, editingProduct);
+      if (res.success) {
+        setActionAlert({ type: 'success', text: `Product '${editingProduct.name}' updated successfully in MongoDB!` });
+        setProducts(prev => prev.map(p => ((p.id || p._id) === editingProduct.id ? { ...p, ...editingProduct } : p)));
+        setIsEditProductModalOpen(false);
+      } else {
+        setActionAlert({ type: 'error', text: res.message || 'Failed to update product.' });
+      }
+    } catch (err) {
+      setActionAlert({ type: 'error', text: 'Error updating product in database.' });
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleOpenDeleteProduct = (prod) => {
+    setDeletingProduct(prod);
+    setIsDeleteProductModalOpen(true);
+  };
+
+  const handleConfirmDeleteProduct = async () => {
+    if (!deletingProduct) return;
+    setIsActionLoading(true);
+    setActionAlert(null);
+    try {
+      const prodId = deletingProduct.id || deletingProduct._id;
+      const res = await adminService.deleteProduct(prodId);
+      if (res.success) {
+        setActionAlert({ type: 'success', text: `Product '${deletingProduct.name}' removed from catalog database.` });
+        setProducts(prev => prev.filter(p => (p.id || p._id) !== prodId));
+        setIsDeleteProductModalOpen(false);
+      } else {
+        setActionAlert({ type: 'error', text: res.message || 'Failed to delete product.' });
+      }
+    } catch (err) {
+      setActionAlert({ type: 'error', text: 'Error deleting product from database.' });
+    } finally {
+      setIsActionLoading(false);
     }
   };
 
@@ -474,13 +565,22 @@ export const AdminDashboardPage = () => {
                     </td>
                     <td className="p-3 text-emerald-700 font-extrabold">{p.germinationRate}</td>
                     <td className="p-3 text-right">
-                      <button
-                        onClick={() => handleDeleteProduct(p.id)}
-                        className="text-rose-600 hover:text-rose-800 p-1 cursor-pointer"
-                        title="Delete product"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleOpenEditProduct(p)}
+                          className="p-1.5 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-800 rounded-lg transition-colors cursor-pointer"
+                          title="Edit Product Details"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleOpenDeleteProduct(p)}
+                          className="p-1.5 bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-800 rounded-lg transition-colors cursor-pointer"
+                          title="Delete product"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -642,7 +742,7 @@ export const AdminDashboardPage = () => {
                     type="number"
                     value={newProd.stock}
                     onChange={(e) => setNewProd({ ...newProd, stock: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
                   />
                 </div>
                 <div>
@@ -656,13 +756,58 @@ export const AdminDashboardPage = () => {
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Crop Suitability</label>
+                  <input
+                    type="text"
+                    value={newProd.cropSuitability}
+                    onChange={(e) => setNewProd({ ...newProd, cropSuitability: e.target.value })}
+                    placeholder="e.g. Paddy / Rice"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Season</label>
+                  <input
+                    type="text"
+                    value={newProd.season}
+                    onChange={(e) => setNewProd({ ...newProd, season: e.target.value })}
+                    placeholder="e.g. Kharif / Rabi"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block font-bold text-slate-700 mb-1">{t('dosageGuideInput')}</label>
                 <input
                   type="text"
                   value={newProd.dosageGuide}
                   onChange={(e) => setNewProd({ ...newProd, dosageGuide: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Image URL (Optional Unsplash Link)</label>
+                <input
+                  type="url"
+                  placeholder="https://images.unsplash.com/..."
+                  value={newProd.imageUrl}
+                  onChange={(e) => setNewProd({ ...newProd, imageUrl: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-mono text-[11px]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Product Description</label>
+                <textarea
+                  rows={2}
+                  placeholder="Certified disease resistant agricultural lot..."
+                  value={newProd.description}
+                  onChange={(e) => setNewProd({ ...newProd, description: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium"
                 />
               </div>
 
@@ -670,18 +815,238 @@ export const AdminDashboardPage = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors cursor-pointer"
                 >
                   {t('cancelBtn')}
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                  disabled={isActionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-md shadow-emerald-700/20"
                 >
-                  {t('saveProductBtn')}
+                  {isActionLoading ? 'Adding...' : t('saveProductBtn')}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Product Modal */}
+      {isEditProductModalOpen && editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                  <Edit className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Edit Catalog Product</h3>
+                  <p className="text-[11px] text-slate-400 font-mono">{editingProduct.id}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsEditProductModalOpen(false)}
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditProduct} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Product Name</label>
+                <input
+                  type="text"
+                  value={editingProduct.name}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                  required
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Department</label>
+                  <select
+                    value={editingProduct.category}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-bold focus:border-emerald-500 cursor-pointer"
+                  >
+                    <option value="Seeds">🌾 Seeds</option>
+                    <option value="Fertilizers">🧪 Fertilizers</option>
+                    <option value="Pesticides">🌱 Pesticides</option>
+                    <option value="Farming Equipment">🚜 Farming Equipment</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Unit / Pack Size</label>
+                  <input
+                    type="text"
+                    value={editingProduct.unit}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, unit: e.target.value })}
+                    placeholder="e.g. 10 kg Bag"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Discounted Selling Price (₹)</label>
+                  <input
+                    type="number"
+                    value={editingProduct.price}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })}
+                    required
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-bold text-emerald-900 focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Original MRP Price (₹)</label>
+                  <input
+                    type="number"
+                    value={editingProduct.originalPrice}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, originalPrice: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Available Stock (Units)</label>
+                  <input
+                    type="number"
+                    value={editingProduct.stock}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, stock: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Germination / Efficacy Rate</label>
+                  <input
+                    type="text"
+                    value={editingProduct.germinationRate}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, germinationRate: e.target.value })}
+                    placeholder="e.g. 95% or N/A"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-bold text-emerald-800 focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Crop Suitability</label>
+                  <input
+                    type="text"
+                    value={editingProduct.cropSuitability}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, cropSuitability: e.target.value })}
+                    placeholder="e.g. Paddy / Rice"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Recommended Season</label>
+                  <input
+                    type="text"
+                    value={editingProduct.season}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, season: e.target.value })}
+                    placeholder="e.g. Kharif / Rabi"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Dosage & Usage Guide</label>
+                <input
+                  type="text"
+                  value={editingProduct.dosageGuide}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, dosageGuide: e.target.value })}
+                  placeholder="e.g. 5 kg per acre"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">High-Resolution Image URL</label>
+                <input
+                  type="url"
+                  value={editingProduct.imageUrl}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, imageUrl: e.target.value })}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-mono text-[11px] focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Product Description</label>
+                <textarea
+                  rows={2}
+                  value={editingProduct.description}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsEditProductModalOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isActionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-md shadow-emerald-700/20"
+                >
+                  {isActionLoading ? 'Saving...' : 'Save Product Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Delete Product Confirmation Modal */}
+      {isDeleteProductModalOpen && deletingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-rose-100">
+            <div className="flex items-center gap-3 mb-4 text-rose-600">
+              <div className="w-10 h-10 rounded-2xl bg-rose-100 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Delete Product</h3>
+                <p className="text-[11px] text-rose-500 font-bold uppercase">Permanent Catalog Deletion</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed mb-4">
+              Are you sure you want to permanently delete <strong className="text-slate-900">{deletingProduct.name}</strong> from the agricultural marketplace catalog? This will also remove it from MongoDB.
+            </p>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setIsDeleteProductModalOpen(false)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteProduct}
+                disabled={isActionLoading}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-md shadow-rose-700/20"
+              >
+                {isActionLoading ? 'Deleting...' : 'Yes, Delete Product'}
+              </button>
+            </div>
           </div>
         </div>
       )}

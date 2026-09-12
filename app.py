@@ -907,21 +907,27 @@ def api_crop_doctor_diagnose():
 
 @app.route('/api/admin/products', methods=['POST'])
 def api_admin_add_product():
-    data = request.get_json() or {}
-    name = data.get('name', '').strip()
-    category = data.get('category', 'Seeds')
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+    name = str(data.get('name') or '').strip()
+    category = str(data.get('category') or 'Seeds').strip()
     price = float(data.get('price', 100))
-    original_price = float(data.get('original_price', price * 1.2))
+    original_price = float(data.get('originalPrice') or data.get('original_price') or (price * 1.2))
     stock = int(data.get('stock', 50))
-    unit = data.get('unit', '1 Pack')
-    crop_suitability = data.get('crop_suitability', 'All Crops')
-    description = data.get('description', '')
-    image_url = data.get('image_url') or 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80'
+    unit = str(data.get('unit') or '1 Pack').strip()
+    crop_suitability = str(data.get('cropSuitability') or data.get('crop_suitability') or 'All Crops').strip()
+    season = str(data.get('season') or 'All Seasons').strip()
+    germination_rate = str(data.get('germinationRate') or data.get('germination_rate') or '92%').strip()
+    purity = str(data.get('purity') or '99%').strip()
+    maturity_period = str(data.get('maturityPeriod') or data.get('maturity_period') or '120-140 Days').strip()
+    yield_potential = str(data.get('yieldPotential') or data.get('yield_potential') or 'High Yield').strip()
+    description = str(data.get('description') or f"High grade certified agricultural product for {crop_suitability}.").strip()
+    dosage_guide = str(data.get('dosageGuide') or data.get('dosage_guide') or 'Refer to package instructions.').strip()
+    image_url = str(data.get('imageUrl') or data.get('image_url') or 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80').strip()
 
     if not name or price <= 0:
         return jsonify({"success": False, "message": "Product name and valid price are required."}), 400
 
-    new_prod_id = f"prod_{uuid.uuid4().hex[:6]}"
+    new_prod_id = f"prod_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(100, 999)}"
     category_icons = {
         'Seeds': '🌾',
         'Fertilizers': '🧪',
@@ -934,57 +940,117 @@ def api_admin_add_product():
         "name": name,
         "category": category,
         "category_icon": category_icons.get(category, '🌾'),
+        "categoryIcon": category_icons.get(category, '🌾'),
         "price": price,
         "original_price": original_price,
+        "originalPrice": original_price,
         "unit": unit,
         "pack_sizes": [
+            {"size": unit, "price": price}
+        ],
+        "packSizes": [
             {"size": unit, "price": price}
         ],
         "stock": stock,
         "rating": 5.0,
         "review_count": 1,
+        "reviewCount": 1,
         "image_url": image_url,
+        "imageUrl": image_url,
         "crop_suitability": crop_suitability,
-        "season": data.get('season', 'All Season'),
-        "germination_rate": data.get('germination_rate', '90%'),
-        "purity": data.get('purity', '99%'),
-        "maturity_period": data.get('maturity_period', '90-120 Days'),
-        "yield_potential": data.get('yield_potential', 'High Yield'),
+        "cropSuitability": crop_suitability,
+        "season": season,
+        "germination_rate": germination_rate,
+        "germinationRate": germination_rate,
+        "purity": purity,
+        "maturity_period": maturity_period,
+        "maturityPeriod": maturity_period,
+        "yield_potential": yield_potential,
+        "yieldPotential": yield_potential,
         "seller_id": "seller_1",
         "seller_name": "Kisan Vikas Agro Kendra",
         "verified_seller": True,
-        "description": description or f"High grade agricultural product for {crop_suitability}.",
-        "dosage_guide": data.get('dosage_guide', 'Apply as per package instructions.'),
-        "is_featured": bool(data.get('is_featured', False)),
-        "is_popular": False,
-        "tags": ["Verified Seller", "Certified Quality"]
+        "description": description,
+        "dosage_guide": dosage_guide,
+        "dosageGuide": dosage_guide,
+        "is_featured": bool(data.get('isFeatured', data.get('is_featured', False))),
+        "is_popular": bool(data.get('isPopular', data.get('is_popular', False))),
+        "tags": ["Certified Quality", "Verified Lot"]
     }
 
     db.products.insert_one(new_product)
-    return jsonify({"success": True, "message": f"Product '{name}' added successfully!", "product": new_product})
+    return jsonify({
+        "success": True,
+        "message": f"Product '{name}' added successfully to catalog!",
+        "product": format_product(new_product)
+    })
 
 @app.route('/api/admin/products/<product_id>', methods=['PUT'])
 def api_admin_update_product(product_id):
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
     update_fields = {}
 
-    if 'name' in data: update_fields['name'] = data['name']
-    if 'price' in data: update_fields['price'] = float(data['price'])
-    if 'stock' in data: update_fields['stock'] = int(data['stock'])
-    if 'category' in data: update_fields['category'] = data['category']
-    if 'crop_suitability' in data: update_fields['crop_suitability'] = data['crop_suitability']
-    if 'description' in data: update_fields['description'] = data['description']
+    if 'name' in data: update_fields['name'] = str(data['name']).strip()
+    if 'price' in data: 
+        try:
+            update_fields['price'] = float(data['price'])
+        except ValueError:
+            pass
+    if 'originalPrice' in data or 'original_price' in data:
+        try:
+            val = float(data.get('originalPrice') or data.get('original_price'))
+            update_fields['original_price'] = val
+            update_fields['originalPrice'] = val
+        except ValueError:
+            pass
+    if 'stock' in data: 
+        try:
+            update_fields['stock'] = int(data['stock'])
+        except ValueError:
+            pass
+    if 'unit' in data: update_fields['unit'] = str(data['unit']).strip()
+    if 'category' in data: 
+        cat = str(data['category']).strip()
+        update_fields['category'] = cat
+        category_icons = {'Seeds': '🌾', 'Fertilizers': '🧪', 'Pesticides': '🌱', 'Farming Equipment': '🚜'}
+        update_fields['category_icon'] = category_icons.get(cat, '🌾')
+        update_fields['categoryIcon'] = category_icons.get(cat, '🌾')
+    if 'cropSuitability' in data or 'crop_suitability' in data: 
+        cs = str(data.get('cropSuitability') or data.get('crop_suitability')).strip()
+        update_fields['crop_suitability'] = cs
+        update_fields['cropSuitability'] = cs
+    if 'season' in data: update_fields['season'] = str(data['season']).strip()
+    if 'germinationRate' in data or 'germination_rate' in data:
+        gr = str(data.get('germinationRate') or data.get('germination_rate')).strip()
+        update_fields['germination_rate'] = gr
+        update_fields['germinationRate'] = gr
+    if 'dosageGuide' in data or 'dosage_guide' in data:
+        dg = str(data.get('dosageGuide') or data.get('dosage_guide')).strip()
+        update_fields['dosage_guide'] = dg
+        update_fields['dosageGuide'] = dg
+    if 'imageUrl' in data or 'image_url' in data:
+        img = str(data.get('imageUrl') or data.get('image_url')).strip()
+        update_fields['image_url'] = img
+        update_fields['imageUrl'] = img
+    if 'description' in data: update_fields['description'] = str(data['description']).strip()
 
     if not update_fields:
         return jsonify({"success": False, "message": "No fields to update."}), 400
 
-    db.products.update_one({"_id": product_id}, {"$set": update_fields})
-    return jsonify({"success": True, "message": "Product updated successfully!"})
+    db.products.update_one({"$or": [{"_id": product_id}, {"id": product_id}]}, {"$set": update_fields})
+    updated = db.products.find_one({"$or": [{"_id": product_id}, {"id": product_id}]})
+    return jsonify({
+        "success": True,
+        "message": f"Product '{updated.get('name') if updated else product_id}' updated successfully in catalog!",
+        "product": format_product(updated) if updated else None
+    })
 
 @app.route('/api/admin/products/<product_id>', methods=['DELETE'])
 def api_admin_delete_product(product_id):
-    res = db.products.delete_one({"_id": product_id})
-    return jsonify({"success": True, "message": "Product removed successfully."})
+    prod = db.products.find_one({"$or": [{"_id": product_id}, {"id": product_id}]})
+    name = prod.get('name', product_id) if prod else product_id
+    db.products.delete_one({"$or": [{"_id": product_id}, {"id": product_id}]})
+    return jsonify({"success": True, "message": f"Product '{name}' permanently deleted from catalog."})
 
 @app.route('/api/admin/orders/<order_id>/status', methods=['PUT', 'POST'])
 def api_admin_update_order_status(order_id):
