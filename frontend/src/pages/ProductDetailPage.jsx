@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Star,
@@ -19,14 +19,20 @@ import {
   Tag,
   Volume2,
   VolumeX,
-  Flame
+  Flame,
+  Calculator,
+  AlertTriangle,
+  QrCode,
+  Clock,
+  Box,
+  BadgePercent
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, INITIAL_SELLERS } from '../data/mockData';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ProductCard } from '../components/product/ProductCard';
-import ProductImage from '../components/common/ProductImage';
+import ProductGallery from '../components/product/ProductGallery';
 import { productService } from '../services/api';
 
 export const ProductDetailPage = () => {
@@ -37,7 +43,7 @@ export const ProductDetailPage = () => {
   const { isInWishlist, toggleWishlist } = useWishlist();
 
   const [rawProduct, setRawProduct] = useState(() => {
-    return INITIAL_PRODUCTS.find(p => p.id === id) || INITIAL_PRODUCTS[0];
+    return INITIAL_PRODUCTS.find(p => p.id === id || p._id === id) || INITIAL_PRODUCTS[0];
   });
 
   useEffect(() => {
@@ -55,9 +61,10 @@ export const ProductDetailPage = () => {
   }, [id]);
 
   const lp = localizeProduct(rawProduct);
-  const isWished = isInWishlist(rawProduct.id);
-  const seller = INITIAL_SELLERS.find(s => s.id === rawProduct.sellerId) || INITIAL_SELLERS[0];
-  const relatedProducts = INITIAL_PRODUCTS.filter(p => p.category === rawProduct.category && p.id !== rawProduct.id).slice(0, 3);
+  const productId = rawProduct.id || rawProduct._id;
+  const isWished = isInWishlist(productId);
+  const seller = INITIAL_SELLERS.find(s => s.id === rawProduct.sellerId || s._id === rawProduct.sellerId) || INITIAL_SELLERS[0];
+  const relatedProducts = INITIAL_PRODUCTS.filter(p => p.category === rawProduct.category && (p.id !== productId && p._id !== productId)).slice(0, 3);
 
   const [isSpeaking, setIsSpeaking] = useState(false);
 
@@ -86,8 +93,11 @@ export const ProductDetailPage = () => {
   const selectedPack = currentPack.size;
 
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState('specs'); // 'specs' | 'dosage' | 'reviews' | 'seller'
+  const [activeTab, setActiveTab] = useState('specs'); // 'specs' | 'calculator' | 'dosage' | 'reviews' | 'seller'
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  // Farm Acreage Calculator State
+  const [farmAcres, setFarmAcres] = useState(2);
 
   // Review state
   const [reviewsList, setReviewsList] = useState([
@@ -106,7 +116,7 @@ export const ProductDetailPage = () => {
       location: 'Karnal, Haryana',
       rating: 5,
       date: '2026-08-15',
-      comment: 'Authentic ICAR tested tag on the bag. Fast dispatch directly to Gharaunda village gate.',
+      comment: 'Authentic ICAR tested tag on the bag with fresh 2026 manufacturing date. Fast dispatch directly to village gate.',
       crop: 'Paddy / Rice'
     }
   ]);
@@ -122,6 +132,11 @@ export const ProductDetailPage = () => {
     addToCart(rawProduct, selectedPack, quantity);
     setIsCartDrawerOpen(false);
     navigate('/checkout');
+  };
+
+  const handleAddAcreageToCart = (calcQty) => {
+    addToCart(rawProduct, selectedPack, Math.max(1, calcQty));
+    setIsCartDrawerOpen(true);
   };
 
   const handleReviewSubmit = (e) => {
@@ -143,6 +158,43 @@ export const ProductDetailPage = () => {
     setNewReview({ name: '', rating: 5, comment: '', crop: lp.cropSuitability });
   };
 
+  // Dosage computation based on product category
+  const getDosageRate = () => {
+    if (rawProduct.category === 'Seeds') return { rate: 6, unit: 'kg/acre' };
+    if (rawProduct.category === 'Fertilizers') {
+      if (rawProduct.name.toLowerCase().includes('urea')) return { rate: 45, unit: 'kg/acre' };
+      if (rawProduct.name.toLowerCase().includes('dap')) return { rate: 50, unit: 'kg/acre' };
+      return { rate: 25, unit: 'kg/acre' };
+    }
+    if (rawProduct.category === 'Pesticides') {
+      if (rawProduct.name.toLowerCase().includes('pexalon')) return { rate: 235, unit: 'ml/acre' };
+      if (rawProduct.name.toLowerCase().includes('coragen')) return { rate: 150, unit: 'ml/acre' };
+      if (rawProduct.name.toLowerCase().includes('confidor')) return { rate: 250, unit: 'ml/acre' };
+      return { rate: 500, unit: 'ml/acre' };
+    }
+    return { rate: 1, unit: 'unit/acre' };
+  };
+
+  const dosageInfo = getDosageRate();
+  const totalRequiredQuantity = farmAcres * dosageInfo.rate;
+  const recommendedPacks = Math.ceil(totalRequiredQuantity / (parseFloat(selectedPack) || 1));
+
+  // Determine toxicity badge
+  const getToxicityBadge = () => {
+    if (rawProduct.category === 'Seeds') {
+      return { label: 'Certified Agricultural Seed Lot (Zero Toxicity)', color: 'bg-emerald-100 text-emerald-900 border-emerald-300', triangle: '🟢' };
+    }
+    if (rawProduct.category === 'Fertilizers') {
+      return { label: 'Plant Nutrient - Non Hazardous / FCO Approved', color: 'bg-emerald-100 text-emerald-900 border-emerald-300', triangle: '🟢' };
+    }
+    if (rawProduct.name.toLowerCase().includes('saaf') || rawProduct.name.toLowerCase().includes('blitox') || rawProduct.name.toLowerCase().includes('contaf')) {
+      return { label: 'Slightly Toxic (Blue Label - Fungicide/Bactericide)', color: 'bg-blue-100 text-blue-900 border-blue-300', triangle: '🔵' };
+    }
+    return { label: 'Moderately Toxic (Yellow Label - Insecticide / Herbicide)', color: 'bg-amber-100 text-amber-900 border-amber-300', triangle: '🟡' };
+  };
+
+  const toxicity = getToxicityBadge();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       
@@ -152,44 +204,35 @@ export const ProductDetailPage = () => {
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         <Link to="/catalog" className="hover:text-emerald-700">{t('catalog')}</Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+        <Link to={`/catalog?category=${rawProduct.category}`} className="hover:text-emerald-700">{rawProduct.category}</Link>
+        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         <span className="text-slate-800 font-bold truncate max-w-xs">{lp.name}</span>
       </div>
 
       {/* Main Product Hero Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/80 shadow-sm">
         
-        {/* Left Column: Image View & Badges */}
+        {/* Left Column: Interactive Product Gallery with 360° Studio */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-            <ProductImage
-              src={rawProduct.imageUrl}
-              alt={lp.name}
-              category={rawProduct.category}
-              className="w-full h-full object-cover"
-            />
-            {rawProduct.germinationRate && rawProduct.germinationRate !== 'N/A' && (
-              <span className="absolute top-3 left-3 bg-emerald-700 text-white font-black text-xs px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
-                <Check className="w-4 h-4 stroke-[3]" />
-                <span>{rawProduct.germinationRate} {t('germinationGuaranteed')}</span>
-              </span>
-            )}
-          </div>
+          <ProductGallery product={rawProduct} localizedProduct={lp} />
 
+          {/* Guarantee & License Footer */}
           <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-emerald-900 font-bold">
-              <Award className="w-5 h-5 text-emerald-600" />
+              <Award className="w-5 h-5 text-emerald-600 shrink-0" />
               <span>{t('testedCertifiedLot')}</span>
             </div>
-            <span className="text-[11px] font-semibold text-emerald-700">
-              {t('officialLicense')} {seller.licenseNo}
+            <span className="text-[11px] font-semibold text-emerald-700 font-mono">
+              Lic: {seller.licenseNo || 'AGRI/GOV/2026'}
             </span>
           </div>
         </div>
 
-        {/* Right Column: Title, Pack Sizing, Pricing & Actions */}
+        {/* Right Column: Title, Dates, Sizing, Pricing & Actions */}
         <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             
+            {/* Category and Suitability Tags */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                 <span>{rawProduct.categoryIcon}</span>
@@ -267,30 +310,73 @@ export const ProductDetailPage = () => {
               </div>
             </div>
 
-            {/* Pricing Card */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-baseline justify-between">
-              <div>
-                <span className="text-xs text-slate-500 font-bold block mb-0.5">{t('specialPriceLabel')}</span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-black text-emerald-950 font-sans">
-                    ₹{currentPrice}
-                  </span>
-                  {rawProduct.originalPrice && rawProduct.originalPrice > currentPrice && (
-                    <span className="text-sm text-slate-400 line-through">
-                      ₹{rawProduct.originalPrice}
+            {/* KEY MANUFACTURING & EXPIRY DATES HIGHLIGHT BOX */}
+            <div className="bg-gradient-to-r from-emerald-50 via-slate-50 to-blue-50 p-4 rounded-2xl border border-emerald-100/80 shadow-xs space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold pb-2 border-b border-slate-200/60">
+                <span className="text-slate-700 flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-emerald-600" />
+                  <span>Manufacturing & Shelf-Life Verification</span>
+                </span>
+                <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                  Fresh 2026 Batch
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
+                <div>
+                  <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">MFG Date</span>
+                  <strong className="text-slate-900 font-mono text-sm">{rawProduct.mfgDate || '15-FEB-2026'}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">EXP / Best Before</span>
+                  <strong className="text-emerald-700 font-mono text-sm">{rawProduct.expiryDate || '14-FEB-2028'}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">Batch Number</span>
+                  <span className="text-slate-800 font-mono font-bold">{rawProduct.batchNumber || 'PB-1121-B4-2026'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">Shelf Life</span>
+                  <span className="text-blue-800 font-bold">{rawProduct.shelfLife || '24 Months'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing & Subsidy Card */}
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <span className="text-xs text-slate-500 font-bold block mb-0.5">{t('specialPriceLabel')}</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-emerald-950 font-sans">
+                      ₹{currentPrice}
                     </span>
-                  )}
-                  <span className="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                    {t('saveLabel')} ₹{(rawProduct.originalPrice || currentPrice) - currentPrice + 50}
+                    {rawProduct.originalPrice && rawProduct.originalPrice > currentPrice && (
+                      <span className="text-sm text-slate-400 line-through">
+                        ₹{rawProduct.originalPrice}
+                      </span>
+                    )}
+                    <span className="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                      {t('saveLabel')} ₹{(rawProduct.originalPrice || currentPrice) - currentPrice + 50}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span className="inline-block bg-emerald-600 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg">
+                    {t('inStockBadge')} ({rawProduct.stock})
                   </span>
+                  <span className="text-[11px] text-slate-400 block mt-1">{t('readyDispatch')}</span>
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="inline-block bg-emerald-600 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg">
-                  {t('inStockBadge')} ({rawProduct.stock})
+              {/* Kisan Subsidy Promo */}
+              <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center justify-between font-medium">
+                <span className="flex items-center gap-1.5">
+                  <BadgePercent className="w-4 h-4 text-amber-600" />
+                  <span>Kisan Subsidy Code: <strong>KISAN50</strong> (Extra 10% Off)</span>
                 </span>
-                <span className="text-[11px] text-slate-400 block mt-1">{t('readyDispatch')}</span>
+                <span className="text-[11px] text-amber-800 font-bold">Free Rural Shipping &gt; ₹999</span>
               </div>
             </div>
 
@@ -340,7 +426,7 @@ export const ProductDetailPage = () => {
                   </button>
                 </div>
                 <span className="text-xs text-slate-500 font-medium">
-                  {t('totalLabel')} <strong className="text-slate-900 font-extrabold">₹{currentPrice * quantity}</strong>
+                  {t('totalLabel')} <strong className="text-slate-900 font-extrabold">₹{(currentPrice * quantity).toLocaleString('en-IN')}</strong>
                 </span>
               </div>
 
@@ -361,6 +447,12 @@ export const ProductDetailPage = () => {
                   <span>{t('buyNow')}</span>
                 </button>
               </div>
+            </div>
+
+            {/* Toxicity / Safety Classification */}
+            <div className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold ${toxicity.color}`}>
+              <span className="text-base">{toxicity.triangle}</span>
+              <span>{toxicity.label}</span>
             </div>
 
           </div>
@@ -385,7 +477,7 @@ export const ProductDetailPage = () => {
 
       </div>
 
-      {/* Tabs Section: Agronomy Specs, Sowing Guide, Reviews, Seller Info */}
+      {/* Tabs Section: Agronomy Specs, Acreage Calculator, Sowing Guide, Reviews, Seller Info */}
       <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-10 shadow-xs space-y-8">
         
         <div className="flex border-b border-slate-200 gap-4 sm:gap-8 overflow-x-auto">
@@ -398,6 +490,18 @@ export const ProductDetailPage = () => {
             }`}
           >
             {t('specsTab')}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('calculator')}
+            className={`pb-4 text-sm font-black transition-colors cursor-pointer border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === 'calculator'
+                ? 'border-emerald-600 text-emerald-900'
+                : 'border-transparent text-slate-400 hover:text-slate-700'
+            }`}
+          >
+            <Calculator className="w-4 h-4 text-emerald-600" />
+            <span>Farm Acreage Calculator</span>
           </button>
 
           <button
@@ -434,7 +538,7 @@ export const ProductDetailPage = () => {
           </button>
         </div>
 
-        {/* Tab 1: Technical Agronomy Specs Table */}
+        {/* Tab 1: Technical Agronomy & Manufacturing Specs Table */}
         {activeTab === 'specs' && (
           <div className="space-y-4">
             <h3 className="text-base font-extrabold text-slate-900">{t('techParamsTitle')}</h3>
@@ -443,7 +547,7 @@ export const ProductDetailPage = () => {
                 <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                   <tr>
                     <th className="p-3.5">Parameter</th>
-                    <th className="p-3.5">Standard Specification</th>
+                    <th className="p-3.5">Official Specification</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-800 font-medium">
@@ -460,6 +564,18 @@ export const ProductDetailPage = () => {
                     </tr>
                   )}
                   <tr>
+                    <td className="p-3.5 font-bold text-slate-600">Manufacturing Date (MFG)</td>
+                    <td className="p-3.5 font-mono font-bold text-emerald-700">{rawProduct.mfgDate || '15-FEB-2026'}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 font-bold text-slate-600">Expiry Date (EXP) / Retest</td>
+                    <td className="p-3.5 font-mono font-bold text-amber-700">{rawProduct.expiryDate || '14-FEB-2028'}</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 font-bold text-slate-600">Batch / Lot Identification</td>
+                    <td className="p-3.5 font-mono text-slate-700">{rawProduct.batchNumber || 'PB-1121-B4-2026'}</td>
+                  </tr>
+                  <tr>
                     <td className="p-3.5 font-bold text-slate-600">Quality Check Status</td>
                     <td className="p-3.5 font-extrabold text-emerald-700 flex items-center gap-1">
                       <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -468,29 +584,17 @@ export const ProductDetailPage = () => {
                   </tr>
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">Govt Lab Certificate ID</td>
-                    <td className="p-3.5 font-mono font-bold text-blue-700">{rawProduct.labCertId || 'CIB-RC/2024-QC'}</td>
+                    <td className="p-3.5 font-mono font-bold text-blue-700">{rawProduct.labCertId || 'ICAR-IARI-QC-9921'}</td>
                   </tr>
-                  <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Lot / Batch Number</td>
-                    <td className="p-3.5 font-mono text-slate-700">{rawProduct.batchNumber || 'LOT-2024-AGR'}</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3.5 font-bold text-slate-600">Expiry / Retest Date</td>
-                    <td className="p-3.5 text-slate-700">{rawProduct.expiryDate || '2026-12-31'}</td>
-                  </tr>
-                  {rawProduct.cibRegNo && (
+                  {rawProduct.germinationRate && rawProduct.germinationRate !== 'N/A' && (
                     <tr>
-                      <td className="p-3.5 font-bold text-slate-600">CIB&RC Registration No.</td>
-                      <td className="p-3.5 font-mono text-slate-700">{rawProduct.cibRegNo}</td>
+                      <td className="p-3.5 font-bold text-slate-600">{t('paramGermination')}</td>
+                      <td className="p-3.5 text-emerald-700 font-extrabold">{rawProduct.germinationRate}</td>
                     </tr>
                   )}
                   <tr>
-                    <td className="p-3.5 font-bold text-slate-600">{t('paramGermination')}</td>
-                    <td className="p-3.5 text-emerald-700 font-extrabold">{rawProduct.germinationRate}</td>
-                  </tr>
-                  <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramPurity')}</td>
-                    <td className="p-3.5">{rawProduct.purity}</td>
+                    <td className="p-3.5">{rawProduct.purity || '99.0% High Purity'}</td>
                   </tr>
                   <tr>
                     <td className="p-3.5 font-bold text-slate-600">{t('paramSeason')}</td>
@@ -514,7 +618,93 @@ export const ProductDetailPage = () => {
           </div>
         )}
 
-        {/* Tab 2: Sowing & Dosage Guide */}
+        {/* Tab 2: Farm Acreage Requirement Calculator */}
+        {activeTab === 'calculator' && (
+          <div className="space-y-6 max-w-2xl">
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-emerald-600" />
+                <span>Farm Acreage Dosage & Quantity Calculator</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Enter your total cultivated farm acreage to calculate exact seed or chemical requirements.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Your Land Area (Acres)
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min="0.5"
+                    max="100"
+                    step="0.5"
+                    value={farmAcres}
+                    onChange={(e) => setFarmAcres(Math.max(0.5, parseFloat(e.target.value) || 0.5))}
+                    className="w-32 bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm font-black text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                  <div className="flex gap-2">
+                    {[1, 2, 5, 10].map(a => (
+                      <button
+                        key={a}
+                        onClick={() => setFarmAcres(a)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          farmAcres === a
+                            ? 'bg-emerald-700 text-white'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        {a} Acre{a > 1 ? 's' : ''}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Calculated Output Card */}
+              <div className="p-4 rounded-2xl bg-emerald-900 text-white space-y-3">
+                <div className="flex justify-between items-center pb-2 border-b border-emerald-800 text-xs">
+                  <span className="text-emerald-300">Recommended Application Rate:</span>
+                  <strong className="font-mono text-emerald-100">{dosageInfo.rate} {dosageInfo.unit}</strong>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <span className="text-emerald-300 block text-[11px]">Total Quantity Required:</span>
+                    <span className="text-xl font-black text-amber-300 font-mono">
+                      {totalRequiredQuantity} {dosageInfo.unit.split('/')[0]}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-emerald-300 block text-[11px]">Estimated Investment:</span>
+                    <span className="text-xl font-black text-white font-mono">
+                      ₹{(recommendedPacks * currentPrice).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-emerald-800 flex justify-between items-center">
+                  <span className="text-xs text-emerald-200">
+                    Required Pack Count: <strong>{recommendedPacks} Pack(s)</strong>
+                  </span>
+                  <button
+                    onClick={() => handleAddAcreageToCart(recommendedPacks)}
+                    className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-md cursor-pointer"
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                    <span>Add {recommendedPacks} Packs to Cart</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Sowing & Dosage Guide */}
         {activeTab === 'dosage' && (
           <div className="space-y-4">
             <h3 className="text-base font-extrabold text-slate-900">{t('dosageBestPracticesTitle')}</h3>
@@ -528,7 +718,7 @@ export const ProductDetailPage = () => {
           </div>
         )}
 
-        {/* Tab 3: Reviews */}
+        {/* Tab 4: Reviews */}
         {activeTab === 'reviews' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -571,7 +761,7 @@ export const ProductDetailPage = () => {
           </div>
         )}
 
-        {/* Tab 4: Seller Info */}
+        {/* Tab 5: Seller Info */}
         {activeTab === 'seller' && (
           <div className="space-y-4 max-w-xl">
             <h3 className="text-base font-extrabold text-slate-900">{t('sellerProfileTitle')}</h3>
@@ -640,13 +830,13 @@ export const ProductDetailPage = () => {
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer"
                 >
                   {t('cancelBtn')}
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer"
                 >
                   {t('submitReviewBtn')}
                 </button>
@@ -664,7 +854,7 @@ export const ProductDetailPage = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p.id || p._id} product={p} />
             ))}
           </div>
         </div>
@@ -673,3 +863,4 @@ export const ProductDetailPage = () => {
     </div>
   );
 };
+

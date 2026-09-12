@@ -168,7 +168,13 @@ SAMPLE_PRODUCTS = [
             "ICAR Certified",
             "94% Germination",
             "Export Quality Basmati"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_2",
@@ -244,7 +250,13 @@ SAMPLE_PRODUCTS = [
             "Rust Resistant",
             "96% Germination",
             "High Tillering"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_3",
@@ -320,7 +332,13 @@ SAMPLE_PRODUCTS = [
             "Bollgard II",
             "Pink Bollworm Shield",
             "Heavy Fruiting"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_4",
@@ -396,7 +414,13 @@ SAMPLE_PRODUCTS = [
             "ToLCV Resistant",
             "Firm Fruits",
             "Long Distance Shipping"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_5",
@@ -472,7 +496,13 @@ SAMPLE_PRODUCTS = [
             "High Brix Sweetness",
             "Uniform Cobs",
             "Corteva Pioneer"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_6",
@@ -548,7 +578,13 @@ SAMPLE_PRODUCTS = [
             "42% Oil Content",
             "Frost Tolerant",
             "UPL Advanta"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_32",
@@ -624,7 +660,13 @@ SAMPLE_PRODUCTS = [
             "High Pungency",
             "Virus Tolerant",
             "Continuous Picking"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_33",
@@ -700,7 +742,13 @@ SAMPLE_PRODUCTS = [
             "YVMV Resistant",
             "Tender Green Pods",
             "Nunhems Quality"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Non-Toxic Certified Seeds",
+        "gstRate": "0% (Exempt for Certified Seeds)"
     },
     {
         "_id": "prod_7",
@@ -776,7 +824,13 @@ SAMPLE_PRODUCTS = [
             "IFFCO Nano",
             "Replaces 1 Urea Bag",
             "Eco Friendly"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_8",
@@ -860,7 +914,13 @@ SAMPLE_PRODUCTS = [
             "100% Soluble",
             "Drip Grade",
             "IFFCO Quality"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_9",
@@ -944,7 +1004,13 @@ SAMPLE_PRODUCTS = [
             "100% Organic",
             "Anti-Nematode",
             "NPOP Certified"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_10",
@@ -1020,7 +1086,13 @@ SAMPLE_PRODUCTS = [
             "12% Zinc EDTA",
             "Cures Khaira Disease",
             "Mahadhan Quality"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_21",
@@ -1097,7 +1169,13 @@ SAMPLE_PRODUCTS = [
             "46% Nitrogen",
             "Govt Subsidized",
             "IFFCO"
-        ]
+        ],
+        "mfg_date": "2026-01-20",
+        "mfgDate": "2026-01-20",
+        "shelf_life": "3 to 5 Years Warranty",
+        "shelfLife": "3 to 5 Years Warranty",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_22",
@@ -1173,7 +1251,13 @@ SAMPLE_PRODUCTS = [
             "18:46:0 Ratio",
             "Root Strength",
             "Coromandel Gromor"
-        ]
+        ],
+        "mfg_date": "2026-01-20",
+        "mfgDate": "2026-01-20",
+        "shelf_life": "3 to 5 Years Warranty",
+        "shelfLife": "3 to 5 Years Warranty",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_23",
@@ -1241,7 +1325,13 @@ SAMPLE_PRODUCTS = [
             "60% K2O Potash",
             "Anti-Lodging",
             "IPL Certified"
-        ]
+        ],
+        "mfg_date": "2026-01-20",
+        "mfgDate": "2026-01-20",
+        "shelf_life": "3 to 5 Years Warranty",
+        "shelfLife": "3 to 5 Years Warranty",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_24",
@@ -1317,7 +1407,13 @@ SAMPLE_PRODUCTS = [
             "Phosphorus + Sulphur",
             "Oil Content Booster",
             "Khaitan SSP"
-        ]
+        ],
+        "mfg_date": "2026-01-20",
+        "mfgDate": "2026-01-20",
+        "shelf_life": "3 to 5 Years Warranty",
+        "shelfLife": "3 to 5 Years Warranty",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_25",
@@ -1402,7 +1498,13 @@ SAMPLE_PRODUCTS = [
             "Humic Enriched",
             "Soil Carbon",
             "NPOP"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_26",
@@ -1478,7 +1580,13 @@ SAMPLE_PRODUCTS = [
             "Seaweed Bio-Stimulant",
             "Prevents Flower Drop",
             "Multiplex Quality"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Green - Eco Nutrients / FCO Approved",
+        "gstRate": "5% GST Included"
     },
     {
         "_id": "prod_11",
@@ -1554,7 +1662,13 @@ SAMPLE_PRODUCTS = [
             "Corteva Pexalon",
             "BPH Hopper Specialist",
             "21-Day Shield"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Yellow - Moderately Toxic (Insecticide/Herbicide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_12",
@@ -1630,7 +1744,13 @@ SAMPLE_PRODUCTS = [
             "FMC Coragen",
             "Rynaxypyr Active",
             "Borer Specialist"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Yellow - Moderately Toxic (Insecticide/Herbicide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_13",
@@ -1714,7 +1834,13 @@ SAMPLE_PRODUCTS = [
             "Bayer Confidor",
             "Anti-Sucking Pests",
             "Systemic Shield"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Yellow - Moderately Toxic (Insecticide/Herbicide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_14",
@@ -1798,7 +1924,13 @@ SAMPLE_PRODUCTS = [
             "UPL Saaf",
             "Dual Action Fungicide",
             "Broad Spectrum"
-        ]
+        ],
+        "mfg_date": "2025-11-10",
+        "mfgDate": "2025-11-10",
+        "shelf_life": "18 Months from MFG",
+        "shelfLife": "18 Months from MFG",
+        "toxicityLevel": "Blue - Slightly Toxic (Fungicide/Bactericide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_15",
@@ -1882,7 +2014,13 @@ SAMPLE_PRODUCTS = [
             "Chlorpyrifos 20%",
             "Termite Specialist",
             "Soil Drenching"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Yellow - Moderately Toxic (Insecticide/Herbicide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_27",
@@ -1966,7 +2104,13 @@ SAMPLE_PRODUCTS = [
             "Glyphosate 41%",
             "Total Weed Killer",
             "Roundup Molecule"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Yellow - Moderately Toxic (Insecticide/Herbicide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_28",
@@ -2050,7 +2194,13 @@ SAMPLE_PRODUCTS = [
             "BASF Stomp Extra",
             "Gulli Danda Specialist",
             "Pre-Emergence"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Yellow - Moderately Toxic (Insecticide/Herbicide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_29",
@@ -2134,7 +2284,13 @@ SAMPLE_PRODUCTS = [
             "Emamectin 5% SG",
             "Bollworm & DBM Specialist",
             "Syngenta"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Yellow - Moderately Toxic (Insecticide/Herbicide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_30",
@@ -2218,7 +2374,13 @@ SAMPLE_PRODUCTS = [
             "Hexaconazole 5%",
             "Sheath Blight Cure",
             "Tata Rallis"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Blue - Slightly Toxic (Fungicide/Bactericide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_31",
@@ -2294,7 +2456,13 @@ SAMPLE_PRODUCTS = [
             "Copper Oxychloride 50%",
             "Bacterial Shield",
             "Rallis Blitox"
-        ]
+        ],
+        "mfg_date": "2026-02-15",
+        "mfgDate": "2026-02-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Blue - Slightly Toxic (Fungicide/Bactericide)",
+        "gstRate": "18% GST Included"
     },
     {
         "_id": "prod_16",
@@ -2371,7 +2539,13 @@ SAMPLE_PRODUCTS = [
             "32 Blades",
             "1 Yr Warranty",
             "KisanKraft"
-        ]
+        ],
+        "mfg_date": "2026-01-15",
+        "mfgDate": "2026-01-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Green - Farm Machinery (BIS/ISI Certified)",
+        "gstRate": "12% GST Included"
     },
     {
         "_id": "prod_17",
@@ -2447,7 +2621,13 @@ SAMPLE_PRODUCTS = [
             "12V 12Ah Battery",
             "Telescopic Lance",
             "1 Year Warranty"
-        ]
+        ],
+        "mfg_date": "2026-01-15",
+        "mfgDate": "2026-01-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Green - Farm Machinery (BIS/ISI Certified)",
+        "gstRate": "12% GST Included"
     },
     {
         "_id": "prod_18",
@@ -2523,7 +2703,13 @@ SAMPLE_PRODUCTS = [
             "Zero Seed Waste",
             "6 Seed Discs",
             "Balwan Quality"
-        ]
+        ],
+        "mfg_date": "2026-01-20",
+        "mfgDate": "2026-01-20",
+        "shelf_life": "3 to 5 Years Warranty",
+        "shelfLife": "3 to 5 Years Warranty",
+        "toxicityLevel": "Green - Farm Machinery (BIS/ISI Certified)",
+        "gstRate": "12% GST Included"
     },
     {
         "_id": "prod_19",
@@ -2599,7 +2785,13 @@ SAMPLE_PRODUCTS = [
             "Soil Health Testing",
             "No Battery Needed",
             "Instant Readout"
-        ]
+        ],
+        "mfg_date": "2026-01-15",
+        "mfgDate": "2026-01-15",
+        "shelf_life": "24 Months from MFG",
+        "shelfLife": "24 Months from MFG",
+        "toxicityLevel": "Green - Farm Machinery (BIS/ISI Certified)",
+        "gstRate": "12% GST Included"
     },
     {
         "_id": "prod_20",
@@ -2675,7 +2867,13 @@ SAMPLE_PRODUCTS = [
             "Jain Drip",
             "Saves 60% Water",
             "ISI Certified 1 Acre Kit"
-        ]
+        ],
+        "mfg_date": "2026-01-20",
+        "mfgDate": "2026-01-20",
+        "shelf_life": "3 to 5 Years Warranty",
+        "shelfLife": "3 to 5 Years Warranty",
+        "toxicityLevel": "Green - Farm Machinery (BIS/ISI Certified)",
+        "gstRate": "12% GST Included"
     }
 ]
 

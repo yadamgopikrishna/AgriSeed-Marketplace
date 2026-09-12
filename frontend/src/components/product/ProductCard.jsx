@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, ShoppingCart, ShieldCheck, Check, Zap, Heart, Flame } from 'lucide-react';
+import { Star, ShoppingCart, ShieldCheck, Check, Zap, Heart, Flame, RotateCw, Calendar } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
@@ -12,8 +12,9 @@ export const ProductCard = ({ product }) => {
   const { t, localizeProduct } = useLanguage();
   const { isInWishlist, toggleWishlist } = useWishlist();
 
+  const productId = product.id || product._id;
   const lp = localizeProduct(product);
-  const isWished = isInWishlist(product.id);
+  const isWished = isInWishlist(productId);
 
   const [selectedPackIndex, setSelectedPackIndex] = useState(0);
 
@@ -23,6 +24,10 @@ export const ProductCard = ({ product }) => {
   const selectedPack = currentPack.size;
 
   const [addedAnim, setAddedAnim] = useState(false);
+
+  const handleCardClick = () => {
+    navigate(`/product/${productId}`);
+  };
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -47,11 +52,14 @@ export const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 hover:border-emerald-500/60 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group">
+    <div
+      onClick={handleCardClick}
+      className="bg-white rounded-2xl border border-slate-200/80 hover:border-emerald-500/60 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer"
+    >
       
       {/* Top Image & Badges */}
       <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
-        <Link to={`/product/${product.id}`}>
+        <Link to={`/product/${productId}`} onClick={(e) => e.stopPropagation()}>
           <ProductImage
             src={product.imageUrl}
             alt={lp.name}
@@ -73,6 +81,12 @@ export const ProductCard = ({ product }) => {
         >
           <Heart className={`w-4 h-4 ${isWished ? 'fill-white' : ''}`} />
         </button>
+
+        {/* 360° Studio Badge on hover/display */}
+        <div className="absolute bottom-3 left-3 bg-slate-950/70 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 opacity-90 group-hover:bg-emerald-700 group-hover:opacity-100 transition-all shadow-xs">
+          <RotateCw className="w-3 h-3 text-emerald-400 group-hover:text-white" />
+          <span>360° View</span>
+        </div>
 
         {/* Category Pill */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
@@ -122,7 +136,7 @@ export const ProductCard = ({ product }) => {
                 {product.brand}
               </span>
             )}
-            <Link to={`/product/${product.id}`}>
+            <Link to={`/product/${productId}`} onClick={(e) => e.stopPropagation()}>
               <h3 className="font-bold text-slate-900 text-sm hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
                 {lp.name}
               </h3>
@@ -140,15 +154,20 @@ export const ProductCard = ({ product }) => {
             </p>
           ) : null}
 
-          {/* QC Lab Certificate Tag */}
-          <div className="mt-2 flex items-center gap-1 text-[10px] text-blue-700 bg-blue-50/80 px-2 py-0.5 rounded-md border border-blue-100 font-mono">
-            <ShieldCheck className="w-3 h-3 text-blue-600 shrink-0" />
-            <span className="truncate">Cert: {product.labCertId || 'CIB-RC/2024-QC'}</span>
+          {/* Manufacturing & Expiry Highlights */}
+          <div className="mt-2 flex items-center justify-between text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded-md border border-slate-200/70 font-mono">
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-emerald-600" />
+              <span>EXP: <strong>{product.expiryDate || '2027-12'}</strong></span>
+            </span>
+            <span className="text-blue-700 font-bold truncate max-w-[120px]">
+              {product.labCertId || 'CIB-RC QC'}
+            </span>
           </div>
 
           {/* Dynamic Pack Size Selector */}
           {packs && packs.length > 1 && (
-            <div className="mt-3">
+            <div className="mt-3" onClick={(e) => e.stopPropagation()}>
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
                 {t('selectPackUnit')}
               </label>
@@ -157,7 +176,10 @@ export const ProductCard = ({ product }) => {
                   <button
                     key={pack.size || idx}
                     type="button"
-                    onClick={() => setSelectedPackIndex(idx)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPackIndex(idx);
+                    }}
                     className={`text-[11px] px-2 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       selectedPackIndex === idx
                         ? 'bg-emerald-700 text-white shadow-xs'
@@ -173,7 +195,7 @@ export const ProductCard = ({ product }) => {
         </div>
 
         {/* Pricing & CTA Actions */}
-        <div className="pt-4 mt-3 border-t border-slate-100">
+        <div className="pt-4 mt-3 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-baseline justify-between mb-3">
             <div>
               <span className="text-xs text-slate-400 font-medium">Price: </span>
@@ -228,3 +250,4 @@ export const ProductCard = ({ product }) => {
     </div>
   );
 };
+
