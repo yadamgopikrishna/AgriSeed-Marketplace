@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="bottleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#f8fafc"/>
+      <stop offset="70%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="greenCap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#15803d"/>
+      <stop offset="50%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#166534"/>
+    </linearGradient>
+    <linearGradient id="labelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#16a34a"/>
+      <stop offset="30%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#14532d"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="15" stdDeviation="15" flood-color="#0f172a" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="600" fill="url(#bgGrad)" rx="24"/>
+  <circle cx="300" cy="300" r="240" fill="#22c55e" opacity="0.08"/>
+
+  <!-- Bottle Group with Shadow -->
+  <g filter="url(#shadow)" transform="translate(0, -10)">
+    <!-- Base Shadow on Floor -->
+    <ellipse cx="300" cy="530" rx="140" ry="22" fill="#0f172a" opacity="0.18"/>
+
+    <!-- Bottle Body -->
+    <!-- Cap / Measuring Cap -->
+    <rect x="250" y="80" width="100" height="60" rx="8" fill="url(#greenCap)"/>
+    <rect x="240" y="130" width="120" height="15" rx="4" fill="#14532d"/>
+    <!-- Bottle Neck -->
+    <path d="M260,145 L260,180 L230,220 L230,490 Q230,515 255,515 L345,515 Q370,515 370,490 L370,220 L340,145 Z" fill="url(#bottleGrad)"/>
+    
+    <!-- Bottle Highlights -->
+    <path d="M245,230 L245,490" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Front Label -->
+    <rect x="235" y="235" width="130" height="230" rx="8" fill="url(#labelGrad)"/>
+    <rect x="240" y="240" width="120" height="220" rx="6" fill="#ffffff"/>
+
+    <!-- IFFCO Header on Label -->
+    <rect x="240" y="240" width="120" height="35" rx="4" fill="#166534"/>
+    <text x="300" y="264" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#ffffff" text-anchor="middle" letter-spacing="2">IFFCO</text>
+
+    <!-- Nano Urea Title -->
+    <text x="300" y="300" font-family="Arial, sans-serif" font-weight="900" font-size="14" fill="#15803d" text-anchor="middle">NANO UREA</text>
+    <text x="300" y="318" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#0f172a" text-anchor="middle">LIQUID NITROGEN</text>
+
+    <!-- Molecule Graphic -->
+    <circle cx="300" cy="355" r="22" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <circle cx="300" cy="355" r="8" fill="#15803d"/>
+    <circle cx="285" cy="345" r="5" fill="#22c55e"/>
+    <circle cx="315" cy="345" r="5" fill="#22c55e"/>
+    <circle cx="300" cy="372" r="5" fill="#22c55e"/>
+    <line x1="285" y1="345" x2="300" y2="355" stroke="#16a34a" stroke-width="2"/>
+    <line x1="315" y1="345" x2="300" y2="355" stroke="#16a34a" stroke-width="2"/>
+    <line x1="300" y1="372" x2="300" y2="355" stroke="#16a34a" stroke-width="2"/>
+
+    <!-- Specs text -->
+    <text x="300" y="402" font-family="Arial, sans-serif" font-weight="800" font-size="9" fill="#15803d" text-anchor="middle">4.0% N (40,000 PPM)</text>
+    <text x="300" y="416" font-family="Arial, sans-serif" font-weight="700" font-size="8" fill="#64748b" text-anchor="middle">Replaces 1 Urea Bag (45kg)</text>
+
+    <!-- Volume Badge -->
+    <rect x="255" y="425" width="90" height="24" rx="12" fill="#166534"/>
+    <text x="300" y="441" font-family="Arial, sans-serif" font-weight="900" font-size="11" fill="#facc15" text-anchor="middle">500 ml BOTTLE</text>
+  </g>
+
+  <!-- Certified Tag & Leaf Badge -->
+  <g transform="translate(420, 90)">
+    <rect width="130" height="42" rx="21" fill="#15803d" filter="url(#shadow)"/>
+    <text x="65" y="26" font-family="Arial, sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">🧪 100% NANO</text>
+  </g>
+</svg>

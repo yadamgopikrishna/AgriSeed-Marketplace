@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import ProductImage from '../components/common/ProductImage';
 
 export const CartPage = () => {
   const navigate = useNavigate();
@@ -118,9 +119,10 @@ export const CartPage = () => {
             {cartItems.map((item, idx) => (
               <div key={`${item.id}-${item.packSize}-${idx}`} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
-                  <img
+                  <ProductImage
                     src={item.imageUrl}
                     alt={getLocalizedProductName(item)}
+                    category={item.category}
                     className="w-16 h-16 rounded-xl object-cover border border-slate-200 shrink-0"
                   />
                   <div>

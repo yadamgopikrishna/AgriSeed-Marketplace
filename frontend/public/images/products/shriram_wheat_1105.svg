@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradWheat" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ecfdf5"/>
+      <stop offset="100%" stop-color="#d1fae5"/>
+    </linearGradient>
+    <linearGradient id="sackWheat" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#047857"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#065f46"/>
+    </linearGradient>
+    <filter id="shadowWheat" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#065f46" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#bgGradWheat)" rx="24"/>
+
+  <g filter="url(#shadowWheat)">
+    <ellipse cx="300" cy="525" rx="160" ry="24" fill="#0f172a" opacity="0.2"/>
+
+    <path d="M180,150 Q300,130 420,150 L445,470 Q445,510 400,515 L200,515 Q155,510 155,470 Z" fill="url(#sackWheat)"/>
+    <rect x="175" y="140" width="250" height="22" fill="#064e3b" rx="4"/>
+    <line x1="185" y1="151" x2="415" y2="151" stroke="#ffffff" stroke-width="3" stroke-dasharray="8,6"/>
+
+    <rect x="195" y="190" width="210" height="295" rx="12" fill="#ffffff"/>
+
+    <rect x="195" y="190" width="210" height="50" rx="12" fill="#d97706"/>
+    <text x="300" y="222" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#ffffff" text-anchor="middle" letter-spacing="2">SHRIRAM FARM</text>
+
+    <text x="300" y="270" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#047857" text-anchor="middle">SUPER 1105 WHEAT</text>
+    <text x="300" y="292" font-family="Arial, sans-serif" font-weight="700" font-size="11" fill="#b45309" text-anchor="middle">HIGH-YIELDING HYBRID SEEDS</text>
+
+    <circle cx="300" cy="335" r="24" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <text x="300" y="345" font-size="24" text-anchor="middle">🌾</text>
+
+    <rect x="220" y="375" width="160" height="36" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+    <text x="300" y="394" font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="#b45309" text-anchor="middle">✨ 96% GERMINATION</text>
+    <text x="300" y="406" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="#64748b" text-anchor="middle">Rust Resistant / 28-32 Qtl Yield</text>
+
+    <rect x="230" y="425" width="140" height="34" rx="17" fill="#047857"/>
+    <text x="300" y="447" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">40 KG SEED SACK</text>
+  </g>
+</svg>

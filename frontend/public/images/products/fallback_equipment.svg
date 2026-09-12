@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <rect width="600" height="600" fill="#f8fafc" rx="24"/>
+  <circle cx="300" cy="300" r="200" fill="#3b82f6" opacity="0.1"/>
+  <rect x="200" y="200" width="200" height="180" rx="20" fill="#1e293b"/>
+  <circle cx="230" cy="420" r="40" fill="#0f172a" stroke="#94a3b8" stroke-width="6"/>
+  <circle cx="370" cy="420" r="40" fill="#0f172a" stroke="#94a3b8" stroke-width="6"/>
+  <text x="300" y="290" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#ffffff" text-anchor="middle">🚜 AGRI EQUIPMENT</text>
+  <text x="300" y="325" font-family="Arial, sans-serif" font-weight="700" font-size="13" fill="#38bdf8" text-anchor="middle">FARM TECH &amp; MACHINERY</text>
+</svg>

@@ -19,6 +19,7 @@ from database import DatabaseManager
 from seed_data import seed_database, SAMPLE_PRODUCTS, SAMPLE_SELLERS, SAMPLE_USERS, SAMPLE_REVIEWS, SAMPLE_ORDERS
 
 REACT_DIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frontend', 'dist')
+REACT_PUBLIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frontend', 'public')
 
 app = Flask(
     __name__,
@@ -103,7 +104,7 @@ def format_product(p):
         "stock": p_dict.get("stock", 50),
         "rating": p_dict.get("rating", 4.8),
         "reviewCount": p_dict.get("reviewCount", p_dict.get("review_count", 25)),
-        "imageUrl": p_dict.get("imageUrl", p_dict.get("image_url", "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80")),
+        "imageUrl": p_dict.get("imageUrl", p_dict.get("image_url", "/images/products/fallback_fertilizer.svg")),
         "cropSuitability": p_dict.get("cropSuitability", p_dict.get("crop_suitability", "All Crops")),
         "season": p_dict.get("season", "All Seasons"),
         "germinationRate": p_dict.get("germinationRate", p_dict.get("germination_rate", "92%")),
@@ -1545,6 +1546,17 @@ def api_reset_demo_data():
 # ==========================================
 # MODERN REACT SPA SERVING ROUTE
 # ==========================================
+
+@app.route('/images/<path:filename>')
+def serve_product_images(filename):
+    """Explicitly serves static product images from dist/images or public/images."""
+    dist_img_path = os.path.join(REACT_DIST_DIR, 'images', filename)
+    if os.path.exists(dist_img_path):
+        return send_from_directory(os.path.join(REACT_DIST_DIR, 'images'), filename)
+    public_img_path = os.path.join(REACT_PUBLIC_DIR, 'images', filename)
+    if os.path.exists(public_img_path):
+        return send_from_directory(os.path.join(REACT_PUBLIC_DIR, 'images'), filename)
+    return jsonify({"error": "Image not found"}), 404
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

@@ -4,6 +4,7 @@ import { Star, ShoppingCart, ShieldCheck, Check, Zap, Heart, Flame } from 'lucid
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useWishlist } from '../../context/WishlistContext';
+import ProductImage from '../common/ProductImage';
 
 export const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -51,9 +52,10 @@ export const ProductCard = ({ product }) => {
       {/* Top Image & Badges */}
       <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
         <Link to={`/product/${product.id}`}>
-          <img
+          <ProductImage
             src={product.imageUrl}
             alt={lp.name}
+            category={product.category}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />

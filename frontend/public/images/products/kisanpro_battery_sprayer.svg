@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradSpray" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="tankBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <filter id="shadowSpray" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0369a1" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#bgGradSpray)" rx="24"/>
+
+  <g filter="url(#shadowSpray)">
+    <ellipse cx="300" cy="525" rx="160" ry="24" fill="#0f172a" opacity="0.2"/>
+
+    <rect x="200" y="160" width="200" height="310" rx="30" fill="url(#tankBlue)"/>
+    <rect x="260" y="130" width="80" height="35" rx="8" fill="#facc15" stroke="#eab308" stroke-width="2"/>
+
+    <rect x="220" y="210" width="160" height="220" rx="16" fill="#ffffff"/>
+    <rect x="220" y="210" width="160" height="42" rx="16" fill="#0284c7"/>
+    <text x="300" y="238" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#ffffff" text-anchor="middle" letter-spacing="2">KISANPRO</text>
+
+    <text x="300" y="280" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#0284c7" text-anchor="middle">16L KNAPSACK</text>
+    <text x="300" y="302" font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="#f59e0b" text-anchor="middle">12V 12Ah DUAL BATTERY</text>
+
+    <rect x="245" y="325" width="110" height="30" rx="6" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+    <text x="300" y="344" font-family="Arial, sans-serif" font-weight="900" font-size="10" fill="#15803d" text-anchor="middle">⚡ 30 TANKS PER CHARGE</text>
+
+    <text x="300" y="380" font-family="Arial, sans-serif" font-weight="700" font-size="9" fill="#0f172a" text-anchor="middle">Includes 4 Brass Nozzle Set</text>
+    <text x="300" y="394" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="#64748b" text-anchor="middle">Stainless Steel Telescopic Lance</text>
+
+    <path d="M390,430 Q440,430 450,350 L450,160" stroke="#facc15" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <rect x="442" y="100" width="16" height="80" rx="4" fill="#94a3b8"/>
+    <polygon points="450,80 435,105 465,105" fill="#facc15"/>
+
+    <rect x="235" y="415" width="130" height="30" rx="15" fill="#0284c7"/>
+    <text x="300" y="435" font-family="Arial, sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">16 LITRES TANK</text>
+  </g>
+</svg>

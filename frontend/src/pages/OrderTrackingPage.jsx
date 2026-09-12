@@ -19,6 +19,7 @@ import { INITIAL_ORDERS } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
 import { InvoiceModal } from '../components/common/InvoiceModal';
 import { orderService } from '../services/api';
+import ProductImage from '../components/common/ProductImage';
 
 export const OrderTrackingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -273,9 +274,10 @@ export const OrderTrackingPage = () => {
                   {currentOrder.items?.map((item, idx) => (
                     <div key={idx} className="py-3 flex items-center justify-between text-xs">
                       <div className="flex items-center gap-3">
-                        <img
+                        <ProductImage
                           src={item.imageUrl}
                           alt={getLocalizedProductName(item)}
+                          category={item.category}
                           className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                         />
                         <div>

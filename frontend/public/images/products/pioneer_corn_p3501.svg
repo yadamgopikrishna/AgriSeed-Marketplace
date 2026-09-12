@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradCorn" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fefce8"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <linearGradient id="pouchCorn" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eab308"/>
+      <stop offset="50%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <filter id="shadowCorn" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#854d0e" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#bgGradCorn)" rx="24"/>
+
+  <g filter="url(#shadowCorn)">
+    <ellipse cx="300" cy="525" rx="150" ry="24" fill="#0f172a" opacity="0.18"/>
+
+    <path d="M190,130 Q300,110 410,130 L430,470 Q430,500 390,505 L210,505 Q170,500 170,470 Z" fill="url(#pouchCorn)"/>
+    <rect x="190" y="125" width="220" height="25" fill="#854d0e" rx="4"/>
+
+    <rect x="205" y="170" width="190" height="300" rx="12" fill="#ffffff"/>
+
+    <rect x="205" y="170" width="190" height="50" rx="12" fill="#1e3a8a"/>
+    <text x="300" y="202" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#ffffff" text-anchor="middle" letter-spacing="2">PIONEER®</text>
+
+    <text x="300" y="255" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#ca8a04" text-anchor="middle">P3501 HYBRID</text>
+    <text x="300" y="278" font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="#15803d" text-anchor="middle">SWEET CORN SEEDS</text>
+
+    <ellipse cx="300" cy="335" rx="14" ry="28" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+    <text x="300" y="345" font-size="22" text-anchor="middle">🌽</text>
+
+    <rect x="220" y="375" width="160" height="36" rx="8" fill="#fefce8" stroke="#fde047" stroke-width="1"/>
+    <text x="300" y="394" font-family="Arial, sans-serif" font-weight="800" font-size="10" fill="#854d0e" text-anchor="middle">🌽 14-16% HIGH BRIX</text>
+    <text x="300" y="406" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="#64748b" text-anchor="middle">Tight Husk / Zero Borer Entry</text>
+
+    <rect x="235" y="425" width="130" height="34" rx="17" fill="#ca8a04"/>
+    <text x="300" y="447" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">1 KG PACK</text>
+  </g>
+</svg>

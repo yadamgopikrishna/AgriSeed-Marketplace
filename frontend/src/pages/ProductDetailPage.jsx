@@ -26,6 +26,7 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ProductCard } from '../components/product/ProductCard';
+import ProductImage from '../components/common/ProductImage';
 import { productService } from '../services/api';
 
 export const ProductDetailPage = () => {
@@ -160,9 +161,10 @@ export const ProductDetailPage = () => {
         {/* Left Column: Image View & Badges */}
         <div className="lg:col-span-5 space-y-4">
           <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-            <img
+            <ProductImage
               src={rawProduct.imageUrl}
               alt={lp.name}
+              category={rawProduct.category}
               className="w-full h-full object-cover"
             />
             {rawProduct.germinationRate && rawProduct.germinationRate !== 'N/A' && (

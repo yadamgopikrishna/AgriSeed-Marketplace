@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradPex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+    <linearGradient id="pexCap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="50%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <linearGradient id="whitePlastic" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#f8fafc"/>
+      <stop offset="70%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <filter id="shadowPex" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#9a3412" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#bgGradPex)" rx="24"/>
+
+  <!-- Bottle Group -->
+  <g filter="url(#shadowPex)" transform="translate(0, -10)">
+    <ellipse cx="300" cy="535" rx="135" ry="22" fill="#0f172a" opacity="0.2"/>
+
+    <!-- Measuring Cap (Orange) -->
+    <rect x="255" y="70" width="90" height="65" rx="10" fill="url(#pexCap)"/>
+    <rect x="245" y="125" width="110" height="15" rx="4" fill="#9a3412"/>
+    
+    <!-- Bottle Ergonomic Shape -->
+    <path d="M265,140 L265,175 L230,225 L230,495 Q230,520 255,520 L345,520 Q370,520 370,495 L370,225 L335,140 Z" fill="url(#whitePlastic)"/>
+    <path d="M245,235 L245,495" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+
+    <!-- Pexalon Branded Label -->
+    <rect x="235" y="235" width="130" height="245" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+
+    <!-- Corteva Agriscience Header -->
+    <rect x="235" y="235" width="130" height="38" rx="8" fill="#0284c7"/>
+    <text x="300" y="258" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle" letter-spacing="1">CORTEVA™</text>
+    <text x="300" y="269" font-family="Arial, sans-serif" font-weight="600" font-size="7" fill="#e0f2fe" text-anchor="middle">agriscience</text>
+
+    <!-- Product Name -->
+    <text x="300" y="305" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#ea580c" text-anchor="middle" letter-spacing="1">PEXALON</text>
+    <text x="300" y="322" font-family="Arial, sans-serif" font-weight="800" font-size="8" fill="#0369a1" text-anchor="middle">Pyraxalt™ active</text>
+
+    <!-- Chemical Molecule -->
+    <rect x="242" y="332" width="116" height="20" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="300" y="345" font-family="Arial, sans-serif" font-weight="700" font-size="7" fill="#334155" text-anchor="middle">Triflumezopyrim 10% SC</text>
+
+    <!-- Statutory Caution Triangle -->
+    <g transform="translate(280, 360)">
+      <polygon points="20,0 40,30 0,30" fill="#eab308" stroke="#ca8a04" stroke-width="1.5"/>
+      <polygon points="20,30 0,30 20,42" fill="#2563eb"/>
+      <polygon points="20,30 40,30 20,42" fill="#2563eb"/>
+      <text x="20" y="24" font-family="Arial, sans-serif" font-weight="900" font-size="9" fill="#000000" text-anchor="middle">CAUTION</text>
+    </g>
+
+    <text x="300" y="420" font-family="Arial, sans-serif" font-weight="800" font-size="8" fill="#15803d" text-anchor="middle">🛡️ 21 DAYS BPH SHIELD</text>
+    <text x="300" y="432" font-family="Arial, sans-serif" font-weight="600" font-size="7" fill="#64748b" text-anchor="middle">Stops Feeding in 15 Mins</text>
+
+    <!-- Volume Tag -->
+    <rect x="250" y="445" width="100" height="26" rx="13" fill="#ea580c"/>
+    <text x="300" y="462" font-family="Arial, sans-serif" font-weight="900" font-size="11" fill="#ffffff" text-anchor="middle">235 ml BOTTLE</text>
+  </g>
+
+  <g transform="translate(400, 80)">
+    <rect width="160" height="42" rx="21" fill="#ea580c" filter="url(#shadowPex)"/>
+    <text x="80" y="26" font-family="Arial, sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">🌱 BPH SPECIALIST</text>
+  </g>
+</svg>

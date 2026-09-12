@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradSoil" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <filter id="shadowSoil" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#15803d" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#bgGradSoil)" rx="24"/>
+
+  <g filter="url(#shadowSoil)" transform="translate(0, -10)">
+    <ellipse cx="300" cy="535" rx="100" ry="18" fill="#0f172a" opacity="0.2"/>
+
+    <rect x="220" y="110" width="160" height="180" rx="24" fill="#15803d"/>
+    <rect x="235" y="130" width="130" height="90" rx="12" fill="#ffffff"/>
+
+    <rect x="245" y="140" width="110" height="50" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+    <text x="300" y="165" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#166534" text-anchor="middle">pH 6.8 (OPTIMAL)</text>
+    <text x="300" y="180" font-family="Arial, sans-serif" font-weight="700" font-size="9" fill="#0284c7" text-anchor="middle">MOISTURE: 72% | NPK: HIGH</text>
+
+    <rect x="260" y="235" width="80" height="24" rx="12" fill="#0f172a"/>
+    <circle cx="280" cy="247" r="8" fill="#22c55e"/>
+
+    <rect x="265" y="290" width="14" height="220" rx="6" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+    <polygon points="272,525 265,510 279,510" fill="#94a3b8"/>
+
+    <rect x="320" y="290" width="14" height="220" rx="6" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+    <polygon points="327,525 320,510 334,510" fill="#ca8a04"/>
+
+    <g transform="translate(180, 50)">
+      <rect width="240" height="42" rx="21" fill="#15803d"/>
+      <text x="120" y="26" font-family="Arial, sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">🌱 4-IN-1 SOIL HEALTH TESTER</text>
+    </g>
+  </g>
+</svg>

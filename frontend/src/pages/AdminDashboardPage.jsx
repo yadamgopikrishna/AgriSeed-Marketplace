@@ -145,7 +145,7 @@ export const AdminDashboardPage = () => {
       stock: Number(newProd.stock),
       rating: 5.0,
       reviewCount: 1,
-      imageUrl: newProd.imageUrl || 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
+      imageUrl: newProd.imageUrl || (newProd.category === 'Fertilizers' ? '/images/products/iffco_nano_urea.svg' : newProd.category === 'Pesticides' ? '/images/products/corteva_pexalon.svg' : newProd.category === 'Farming Equipment' ? '/images/products/kisankraft_power_weeder.svg' : '/images/products/pusa_basmati_1121.svg'),
       cropSuitability: newProd.cropSuitability,
       season: newProd.season,
       germinationRate: newProd.germinationRate,

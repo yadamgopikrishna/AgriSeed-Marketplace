@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { X, ShoppingCart, Trash2, Plus, Minus, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
+import ProductImage from './ProductImage';
 
 export const CartDrawer = () => {
   const {
@@ -93,9 +94,10 @@ export const CartDrawer = () => {
           ) : (
             cartItems.map((item, idx) => (
               <div key={`${item.id}-${item.packSize}-${idx}`} className="flex gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-200 transition-colors">
-                <img
+                <ProductImage
                   src={item.imageUrl}
                   alt={getLocalizedProductName(item)}
+                  category={item.category}
                   className="w-18 h-18 rounded-xl object-cover border border-slate-200 shrink-0"
                 />
                 <div className="flex-1 min-w-0">

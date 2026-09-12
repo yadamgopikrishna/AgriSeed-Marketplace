@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradWeed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="metalRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="50%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+    <filter id="shadowWeed" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#bgGradWeed)" rx="24"/>
+
+  <g filter="url(#shadowWeed)">
+    <ellipse cx="300" cy="520" rx="200" ry="24" fill="#0f172a" opacity="0.22"/>
+
+    <path d="M220,180 L290,290" stroke="#0f172a" stroke-width="14" stroke-linecap="round"/>
+    <path d="M380,180 L310,290" stroke="#0f172a" stroke-width="14" stroke-linecap="round"/>
+    <rect x="200" y="165" width="40" height="20" rx="6" fill="#dc2626"/>
+    <rect x="360" y="165" width="40" height="20" rx="6" fill="#dc2626"/>
+    <line x1="220" y1="210" x2="380" y2="210" stroke="#475569" stroke-width="8"/>
+
+    <rect x="230" y="270" width="140" height="110" rx="16" fill="url(#metalRed)"/>
+    <rect x="245" y="285" width="110" height="40" rx="6" fill="#0f172a"/>
+    <text x="300" y="310" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">KISANKRAFT 7 HP</text>
+
+    <rect x="250" y="240" width="100" height="35" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="300" y="262" font-family="Arial, sans-serif" font-weight="800" font-size="10" fill="#dc2626" text-anchor="middle">PETROL 4-STROKE</text>
+
+    <circle cx="210" cy="460" r="48" fill="#1e293b" stroke="#0f172a" stroke-width="8"/>
+    <circle cx="210" cy="460" r="22" fill="#e2e8f0"/>
+    <circle cx="390" cy="460" r="48" fill="#1e293b" stroke="#0f172a" stroke-width="8"/>
+    <circle cx="390" cy="460" r="22" fill="#e2e8f0"/>
+
+    <path d="M180,410 Q300,380 420,410 L430,440 L170,440 Z" fill="#ef4444"/>
+
+    <g transform="translate(180, 70)">
+      <rect width="240" height="44" rx="22" fill="#0f172a"/>
+      <text x="120" y="28" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#facc15" text-anchor="middle">🚜 7.0 HP POWER WEEDER</text>
+    </g>
+  </g>
+</svg>

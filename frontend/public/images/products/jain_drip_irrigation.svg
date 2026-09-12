@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradDrip" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <filter id="shadowDrip" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0369a1" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="600" height="600" fill="url(#bgGradDrip)" rx="24"/>
+
+  <g filter="url(#shadowDrip)">
+    <ellipse cx="300" cy="525" rx="180" ry="24" fill="#0f172a" opacity="0.2"/>
+
+    <circle cx="300" cy="340" r="160" fill="none" stroke="#0f172a" stroke-width="32"/>
+    <circle cx="300" cy="340" r="120" fill="none" stroke="#1e293b" stroke-width="28"/>
+    <circle cx="300" cy="340" r="80" fill="none" stroke="#334155" stroke-width="24"/>
+
+    <rect x="260" y="240" width="80" height="150" rx="16" fill="#dc2626" stroke="#991b1b" stroke-width="3"/>
+    <rect x="250" y="260" width="100" height="24" rx="6" fill="#0f172a"/>
+    <text x="300" y="276" font-family="Arial, sans-serif" font-weight="900" font-size="10" fill="#ffffff" text-anchor="middle">JAIN FILTER</text>
+
+    <circle cx="210" cy="230" r="16" fill="#38bdf8" opacity="0.8"/>
+    <circle cx="390" cy="230" r="16" fill="#38bdf8" opacity="0.8"/>
+
+    <g transform="translate(160, 60)">
+      <rect width="280" height="44" rx="22" fill="#0284c7"/>
+      <text x="140" y="28" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle">💧 1 ACRE DRIP IRRIGATION KIT</text>
+    </g>
+  </g>
+</svg>

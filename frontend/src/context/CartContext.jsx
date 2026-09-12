@@ -13,7 +13,7 @@ export const CartProvider = ({ children }) => {
         packSize: '10 kg Bag',
         price: 850,
         quantity: 2,
-        imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
+        imageUrl: '/images/products/pusa_basmati_1121.svg',
         cropSuitability: 'Paddy / Rice'
       }
     ];

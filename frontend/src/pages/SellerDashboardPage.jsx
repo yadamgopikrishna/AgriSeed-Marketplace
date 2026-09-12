@@ -29,6 +29,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { sellerService } from '../services/api';
 import { INITIAL_PRODUCTS, INITIAL_ORDERS, INITIAL_SELLERS } from '../data/mockData';
+import ProductImage from '../components/common/ProductImage';
 
 export const SellerDashboardPage = () => {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ export const SellerDashboardPage = () => {
     season: 'Kharif',
     germinationRate: 'N/A',
     description: 'Government certified quality insecticide for brown planthopper control in paddy fields.',
-    imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80'
+    imageUrl: '/images/products/corteva_pexalon.svg'
   });
 
   const [toastMessage, setToastMessage] = useState('');
@@ -144,7 +145,7 @@ export const SellerDashboardPage = () => {
           season: 'All Seasons',
           germinationRate: 'N/A',
           description: 'Eco-friendly nanotechnology fertilizer for high crop yield.',
-          imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80'
+          imageUrl: '/images/products/iffco_nano_urea.svg'
         });
       } else {
         alert(res.message || 'Failed to list product.');
@@ -432,9 +433,10 @@ export const SellerDashboardPage = () => {
                     <tr key={p.id || p._id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <img
+                          <ProductImage
                             src={p.imageUrl}
                             alt={p.name}
+                            category={p.category}
                             className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
                           />
                           <div>

@@ -4,6 +4,7 @@ import { X, Heart, ShoppingCart, Trash2, ArrowRight, ShieldCheck } from 'lucide-
 import { useWishlist } from '../../context/WishlistContext';
 import { useCart } from '../../context/CartContext';
 import { useLanguage } from '../../context/LanguageContext';
+import ProductImage from './ProductImage';
 
 export const WishlistDrawer = () => {
   const { wishlist, isWishlistOpen, setIsWishlistOpen, removeFromWishlist, clearWishlist } = useWishlist();
@@ -67,9 +68,10 @@ export const WishlistDrawer = () => {
               const lp = localizeProduct(item);
               return (
                 <div key={item.id} className="flex gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-200 transition-colors">
-                  <img
+                  <ProductImage
                     src={item.imageUrl}
                     alt={lp.name}
+                    category={item.category}
                     className="w-18 h-18 rounded-xl object-cover border border-slate-200 shrink-0"
                   />
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
