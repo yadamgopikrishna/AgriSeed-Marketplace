@@ -11,14 +11,20 @@ if sys.platform == 'win32':
         pass
 
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from config import Config
 from database import DatabaseManager
 from seed_data import seed_database, SAMPLE_PRODUCTS, SAMPLE_SELLERS, SAMPLE_USERS, SAMPLE_REVIEWS, SAMPLE_ORDERS
 
-app = Flask(__name__)
+REACT_DIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frontend', 'dist')
+
+app = Flask(
+    __name__,
+    static_folder=os.path.join(REACT_DIST_DIR, 'assets'),
+    static_url_path='/assets'
+)
 app.config.from_object(Config)
 CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
@@ -140,221 +146,8 @@ def inject_globals():
     }
 
 # ==========================================
-# PAGE ROUTES
+# PRESENTATION ROUTE (Slide Deck)
 # ==========================================
-
-@app.route('/')
-def index():
-    """Welcome / Splash Screen + Home Page."""
-    featured_products = list(db.products.find({"is_featured": True}))
-    popular_products = list(db.products.find({"is_popular": True}))
-    all_products = list(db.products.find({}))
-    
-    # Calculate some dynamic counts
-    category_counts = {
-        'Seeds': db.products.count_documents({"category": "Seeds"}),
-        'Fertilizers': db.products.count_documents({"category": "Fertilizers"}),
-        'Pesticides': db.products.count_documents({"category": "Pesticides"}),
-        'Farming Equipment': db.products.count_documents({"category": "Farming Equipment"})
-    }
-    
-    return render_template(
-        'index.html',
-        featured_products=featured_products,
-        popular_products=popular_products,
-        total_products=len(all_products),
-        category_counts=category_counts
-    )
-
-@app.route('/catalog')
-def catalog():
-    """Product Categories & Catalog Page with filters."""
-    category = request.args.get('category', '')
-    crop = request.args.get('crop', '')
-    search = request.args.get('q', '')
-    sort = request.args.get('sort', 'featured')
-
-    query = {}
-    if category and category != 'All':
-        query['category'] = category
-    if crop and crop != 'All':
-        query['crop_suitability'] = {'$regex': crop, '$options': 'i'}
-    if search:
-        query['$or'] = [
-            {'name': {'$regex': search, '$options': 'i'}},
-            {'description': {'$regex': search, '$options': 'i'}},
-            {'category': {'$regex': search, '$options': 'i'}},
-            {'crop_suitability': {'$regex': search, '$options': 'i'}}
-        ]
-
-    products = list(db.products.find(query))
-
-    # Apply sorting
-    if sort == 'price_low':
-        products.sort(key=lambda x: x.get('price', 0))
-    elif sort == 'price_high':
-        products.sort(key=lambda x: x.get('price', 0), reverse=True)
-    elif sort == 'rating':
-        products.sort(key=lambda x: x.get('rating', 0), reverse=True)
-
-    categories = ["Seeds", "Fertilizers", "Pesticides", "Farming Equipment"]
-    crops = ["Paddy / Rice", "Wheat", "Cotton", "Vegetables", "Mustard", "Corn / Maize"]
-
-    return render_template(
-        'catalog.html',
-        products=products,
-        selected_category=category,
-        selected_crop=crop,
-        search_query=search,
-        selected_sort=sort,
-        categories=categories,
-        crops=crops,
-        total_found=len(products)
-    )
-
-@app.route('/product/<product_id>')
-def product_detail(product_id):
-    """Product Details Page."""
-    product = db.products.find_one({"_id": product_id})
-    if not product:
-        flash("Product not found", "error")
-        return redirect(url_for('catalog'))
-
-    seller = db.sellers.find_one({"_id": product.get('seller_id')}) or {}
-    reviews = list(db.reviews.find({"product_id": product_id}))
-    
-    # Related products from same category
-    related_products = list(db.products.find({
-        "category": product.get('category'),
-        "_id": {"$ne": product_id}
-    }).limit(4))
-
-    return render_template(
-        'product_detail.html',
-        product=product,
-        seller=seller,
-        reviews=reviews,
-        related_products=related_products
-    )
-
-@app.route('/cart')
-def cart():
-    """Shopping Cart Page."""
-    cart_items = session.get('cart', [])
-    
-    subtotal = sum(item['price'] * item['quantity'] for item in cart_items)
-    discount = session.get('cart_discount', 0)
-    coupon_code = session.get('coupon_code', None)
-    
-    delivery_charge = 0 if (subtotal >= 999 or subtotal == 0) else 75
-    total = max(0, subtotal - discount + delivery_charge)
-
-    return render_template(
-        'cart.html',
-        cart_items=cart_items,
-        subtotal=subtotal,
-        discount=discount,
-        coupon_code=coupon_code,
-        delivery_charge=delivery_charge,
-        total=total
-    )
-
-@app.route('/checkout')
-def checkout():
-    """Checkout & Payment Page."""
-    cart_items = session.get('cart', [])
-    if not cart_items:
-        flash("Your cart is empty. Add products to proceed with checkout.", "warning")
-        return redirect(url_for('catalog'))
-
-    current_user = get_current_user()
-    subtotal = sum(item['price'] * item['quantity'] for item in cart_items)
-    discount = session.get('cart_discount', 0)
-    coupon_code = session.get('coupon_code', None)
-    delivery_charge = 0 if subtotal >= 999 else 75
-    total = max(0, subtotal - discount + delivery_charge)
-
-    return render_template(
-        'checkout.html',
-        cart_items=cart_items,
-        subtotal=subtotal,
-        discount=discount,
-        coupon_code=coupon_code,
-        delivery_charge=delivery_charge,
-        total=total,
-        farmer=current_user
-    )
-
-@app.route('/orders/track/<order_id>')
-def track_order_page(order_id):
-    """Order Tracking Page."""
-    order = db.orders.find_one({"_id": order_id})
-    if not order:
-        flash(f"Order #{order_id} not found.", "error")
-        return redirect(url_for('index'))
-    return render_template('order_tracking.html', order=order)
-
-@app.route('/track')
-def track_search_page():
-    """Order Tracking Search / Lookup Page."""
-    order_id = request.args.get('order_id', '').strip()
-    if order_id:
-        return redirect(url_for('track_order_page', order_id=order_id))
-    return render_template('order_tracking.html', order=None)
-
-@app.route('/dashboard')
-def dashboard():
-    """Farmer Account Dashboard."""
-    current_user = get_current_user()
-    if not current_user:
-        flash("Please log in to access your farmer dashboard.", "info")
-        return redirect(url_for('auth_page', next='/dashboard'))
-
-    # Retrieve farmer orders
-    orders = list(db.orders.find({"user_id": current_user['_id']}).sort("created_at", -1))
-    
-    # Active orders (not delivered yet)
-    active_orders = [o for o in orders if o.get('status') != 'Delivered']
-    
-    return render_template(
-        'dashboard.html',
-        farmer=current_user,
-        orders=orders,
-        active_orders=active_orders
-    )
-
-@app.route('/admin')
-def admin_page():
-    """Admin Store Manager Dashboard."""
-    current_user = get_current_user()
-    # Check admin role if logged in, or allow viewing demo with warning
-    is_admin = current_user and current_user.get('role') == 'admin'
-
-    products = list(db.products.find({}))
-    orders = list(db.orders.find({}).sort("created_at", -1))
-    farmers = list(db.users.find({"role": "farmer"}))
-    sellers = list(db.sellers.find({}))
-
-    total_revenue = sum(o.get('total_amount', 0) for o in orders)
-    low_stock_products = [p for p in products if p.get('stock', 0) <= 25]
-
-    return render_template(
-        'admin.html',
-        products=products,
-        orders=orders,
-        farmers=farmers,
-        sellers=sellers,
-        total_revenue=total_revenue,
-        low_stock_products=low_stock_products,
-        is_admin=is_admin
-    )
-
-@app.route('/auth')
-def auth_page():
-    """Farmer Login & Registration Page."""
-    if session.get('user_id'):
-        return redirect(url_for('dashboard'))
-    return render_template('auth.html')
 
 @app.route('/presentation')
 def presentation_page():
@@ -1066,6 +859,32 @@ def api_reset_demo_data():
     session.clear()
 
     return jsonify({"success": True, "message": "Demo data reset successfully to pristine state!"})
+
+# ==========================================
+# MODERN REACT SPA SERVING ROUTE
+# ==========================================
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react_app(path):
+    """
+    Serves the compiled production React/Vite Single Page Application (frontend/dist).
+    Falls back to index.html for client-side routing.
+    """
+    # Prevent catching unhandled API routes
+    if path.startswith('api/'):
+        return jsonify({"success": False, "message": f"API endpoint '/{path}' not found."}), 404
+
+    # If static file exists in frontend/dist (e.g., vite.svg, favicon.ico)
+    if path and os.path.exists(os.path.join(REACT_DIST_DIR, path)):
+        return send_from_directory(REACT_DIST_DIR, path)
+
+    # Serve modern React SPA entry point
+    if os.path.exists(os.path.join(REACT_DIST_DIR, 'index.html')):
+        return send_from_directory(REACT_DIST_DIR, 'index.html')
+
+    # Fallback to Jinja template if build has not been run
+    return render_template('index.html')
 
 if __name__ == '__main__':
     print("=" * 60)
